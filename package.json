@@ -1,0 +1,25 @@
+{
+  "name": "serve-my-jams",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/wgroeneveld/serve-my-jams",
+    "type": "git"
+  },
+  "author": "Wouter Groeneveld",
+  "license": "MIT",
+  "main": "src/serve.js",
+  "scripts": {
+    "test": "jest",
+    "jam": "node src/serve.js"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3"
+  },
+  "dependencies": {
+    "koa": "^2.13.1",
+    "koa-body": "^4.2.0",
+    "koa-helmet": "^6.0.0",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^10.0.0"
+  }
+}
