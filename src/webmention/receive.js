@@ -1,6 +1,6 @@
 
 function isValidUrl(url) {
-	return url &&
+	return url !== undefined &&
 		(url.startsWith("http://") || url.startsWith("https://"))
 }
 
@@ -19,9 +19,9 @@ function isValidUrl(url) {
 */	 
 function validate(request) {
 	return request.type === "application/x-www-form-urlencoded" &&
-		request.body &&
-		isValidUrl(request.body.source) &&
-		isValidUrl(request.body.target)
+		request.body !== undefined &&
+		isValidUrl(request?.body.source) &&
+		isValidUrl(request?.body.target)
 }
 
 async function receive(body) {
