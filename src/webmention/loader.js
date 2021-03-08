@@ -9,7 +9,6 @@ function validate(params) {
 
 async function load(domain) {
 	const fileEntries = await fsp.readdir(`data/${domain}`, { withFileTypes: true });
-	console.log(fileEntries)
 
 	const files = await Promise.all(fileEntries.map(async (file) => {
 		const contents = await fsp.readFile(`data/${domain}/${file.name}`, 'utf-8')
