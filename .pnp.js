@@ -37,6 +37,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {
           "packageLocation": "./",
           "packageDependencies": [
+            ["dayjs", "npm:1.10.4"],
             ["got", "npm:11.8.2"],
             ["jest", "npm:26.6.3"],
             ["koa", "npm:2.13.1"],
@@ -44,7 +45,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["koa-helmet", "npm:6.0.0"],
             ["koa-logger", "npm:3.2.1"],
             ["koa-router", "npm:10.0.0"],
-            ["koa2-ratelimit", "npm:0.9.0"]
+            ["koa2-ratelimit", "npm:0.9.0"],
+            ["md5", "npm:2.3.0"],
+            ["microformats-parser", "npm:1.4.0"],
+            ["mockdate", "npm:3.0.2"]
           ],
           "linkType": "SOFT",
         }]
@@ -1801,6 +1805,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["charenc", [
+        ["npm:0.0.2", {
+          "packageLocation": "./.yarn/cache/charenc-npm-0.0.2-aca0c2f207-ff8199e903.zip/node_modules/charenc/",
+          "packageDependencies": [
+            ["charenc", "npm:0.0.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["chownr", [
         ["npm:2.0.0", {
           "packageLocation": "./.yarn/cache/chownr-npm-2.0.0-638f1c9c61-b06ba0bf42.zip/node_modules/chownr/",
@@ -2087,6 +2100,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["crypt", [
+        ["npm:0.0.2", {
+          "packageLocation": "./.yarn/cache/crypt-npm-0.0.2-033627d94f-1ad9c8439a.zip/node_modules/crypt/",
+          "packageDependencies": [
+            ["crypt", "npm:0.0.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["cssom", [
         ["npm:0.3.8", {
           "packageLocation": "./.yarn/cache/cssom-npm-0.3.8-a9291d36ff-b7fb8b13aa.zip/node_modules/cssom/",
@@ -2131,6 +2153,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["abab", "npm:2.0.5"],
             ["whatwg-mimetype", "npm:2.3.0"],
             ["whatwg-url", "npm:8.4.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["dayjs", [
+        ["npm:1.10.4", {
+          "packageLocation": "./.yarn/cache/dayjs-npm-1.10.4-e450424eab-3b7bb2232f.zip/node_modules/dayjs/",
+          "packageDependencies": [
+            ["dayjs", "npm:1.10.4"]
           ],
           "linkType": "HARD",
         }]
@@ -4588,6 +4619,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["md5", [
+        ["npm:2.3.0", {
+          "packageLocation": "./.yarn/cache/md5-npm-2.3.0-86c49d3915-ba00eaf2b7.zip/node_modules/md5/",
+          "packageDependencies": [
+            ["md5", "npm:2.3.0"],
+            ["charenc", "npm:0.0.2"],
+            ["crypt", "npm:0.0.2"],
+            ["is-buffer", "npm:1.1.6"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["media-typer", [
         ["npm:0.3.0", {
           "packageLocation": "./.yarn/cache/media-typer-npm-0.3.0-8674f8f0f5-be1c825782.zip/node_modules/media-typer/",
@@ -4620,6 +4663,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/methods-npm-1.1.2-92f6fdb39b-450e4ea0fd.zip/node_modules/methods/",
           "packageDependencies": [
             ["methods", "npm:1.1.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["microformats-parser", [
+        ["npm:1.4.0", {
+          "packageLocation": "./.yarn/cache/microformats-parser-npm-1.4.0-f182b7e7c0-3bfddfc39e.zip/node_modules/microformats-parser/",
+          "packageDependencies": [
+            ["microformats-parser", "npm:1.4.0"],
+            ["parse5", "npm:6.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -4755,6 +4808,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/mkdirp-npm-1.0.4-37f6ef56b9-1aa3a6a2d7.zip/node_modules/mkdirp/",
           "packageDependencies": [
             ["mkdirp", "npm:1.0.4"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["mockdate", [
+        ["npm:3.0.2", {
+          "packageLocation": "./.yarn/cache/mockdate-npm-3.0.2-14482dcf0f-27a242abaa.zip/node_modules/mockdate/",
+          "packageDependencies": [
+            ["mockdate", "npm:3.0.2"]
           ],
           "linkType": "HARD",
         }]
@@ -5280,6 +5342,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/parse5-npm-5.1.1-8e63d82cff-fad72ff501.zip/node_modules/parse5/",
           "packageDependencies": [
             ["parse5", "npm:5.1.1"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:6.0.1", {
+          "packageLocation": "./.yarn/cache/parse5-npm-6.0.1-70a35a494a-e312014edd.zip/node_modules/parse5/",
+          "packageDependencies": [
+            ["parse5", "npm:6.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -6012,6 +6081,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",
           "packageDependencies": [
             ["serve-my-jams", "workspace:."],
+            ["dayjs", "npm:1.10.4"],
             ["got", "npm:11.8.2"],
             ["jest", "npm:26.6.3"],
             ["koa", "npm:2.13.1"],
@@ -6019,7 +6089,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["koa-helmet", "npm:6.0.0"],
             ["koa-logger", "npm:3.2.1"],
             ["koa-router", "npm:10.0.0"],
-            ["koa2-ratelimit", "npm:0.9.0"]
+            ["koa2-ratelimit", "npm:0.9.0"],
+            ["md5", "npm:2.3.0"],
+            ["microformats-parser", "npm:1.4.0"],
+            ["mockdate", "npm:3.0.2"]
           ],
           "linkType": "SOFT",
         }]

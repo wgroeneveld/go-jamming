@@ -1,12 +1,13 @@
 
-const { receive, validate } = require('../../src/webmention/receive')
-
 describe("validate tests", () => {
 
 	const validhttpurl = "http://brainbaking.com/bla"
 	const validhttpsurl = "https://brainbaking.com/blie"
 	const urlfrominvaliddomain = "http://brainthe.bake/jup"
 	const invalidurl = "lolzw"
+
+	const { validate } = require('../../src/webmention/receive')
+
 
 	test("is valid if source and target https urls", () => {
 		const result = validate({
@@ -112,9 +113,5 @@ describe("validate tests", () => {
 
 		expect(result).toBe(false)
 	})
-
-})
-
-describe("receive webmention process tests", () => {
 
 })
