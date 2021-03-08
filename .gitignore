@@ -1,4 +1,6 @@
 
+data/*
+
 .yarn/*
 !.yarn/patches
 !.yarn/plugins

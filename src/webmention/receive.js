@@ -52,10 +52,18 @@ async function isValidTargetUrl(target) {
 	return false
 }
 
-async function saveWebmentionToDisk(source, target, mentiondata) {
-	console.log(`source=${source},target=${target}`)
+function asPath(source, target) {
 	const filename = md5(`source=${source},target=${target}`)
-	await fsp.writeFile(`data/${filename}.json`, mentiondata, 'utf-8')
+	const domain = config.allowedWebmentionSources.find(d => target.indexOf(d) >= 0)
+	return `data/${domain}/${filename}.json`
+}
+
+async function deletePossibleOlderWebmention(source, target) {
+	await fsp.unlink(asPath(source, target))
+}
+
+async function saveWebmentionToDisk(source, target, mentiondata) {
+	await fsp.writeFile(asPath(source, target), mentiondata, 'utf-8')
 }
 
 function publishedNow() {
@@ -121,6 +129,7 @@ async function receive(body) {
 		src = await got(body.source)
 	} catch(unknownSource) {
 		console.log(` ABORT: invalid source url: ` + unknownSource)
+		await deletePossibleOlderWebmention(body.source, body.target)
 		return
 	}
 	await processSourceBody(src.body, body.source, body.target)

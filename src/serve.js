@@ -27,10 +27,10 @@ app.use(bodyParser({
    urlencoded: true
 }));
 
-
 // route docs: https://github.com/koajs/router/blob/HEAD/API.md#module_koa-router--Router+get%7Cput%7Cpost%7Cpatch%7Cdelete%7Cdel
 require("./webmention/route").route(router);
 const config = require("./config");
+config.setupDataDirs();
 
 app.use(router.routes()).use(router.allowedMethods());
 

@@ -1,7 +1,8 @@
 const fs = require('fs').promises
 
 async function got(url) {
-	const body = await fs.readFile(`./test/__mocks__/${url}`, 'utf8')
+	const relativeUrl = url.replace('https://brainbaking.com/', '')
+	const body = await fs.readFile(`./test/__mocks__/${relativeUrl}`, 'utf8')
 	return {
 		body
 	}
