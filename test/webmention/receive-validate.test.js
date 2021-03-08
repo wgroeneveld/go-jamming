@@ -20,12 +20,12 @@ describe("webmention receiver validate tests", () => {
 
 		expect(result).toBe(true)
 	})
-	test("is NOT valid if source is a valid url but not form valid domain", () => {
+	test("is NOT valid if target is a valid url but not form valid domain", () => {
 		const result = validate({
 			type: "application/x-www-form-urlencoded",
 			body: {
-				source: urlfrominvaliddomain,
-				target: validhttpsurl + "2"
+				source: validhttpsurl + "2",
+				target: urlfrominvaliddomain
 			}
 		})
 

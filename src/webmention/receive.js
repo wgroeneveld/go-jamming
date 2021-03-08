@@ -39,7 +39,7 @@ function validate(request) {
 		isValidUrl(request?.body?.source) &&
 		isValidUrl(request?.body?.target) &&
 		request?.body?.source !== request?.body?.target &&
-		isValidDomain(request?.body?.source)
+		isValidDomain(request?.body?.target)
 }
 
 async function isValidTargetUrl(target) {
