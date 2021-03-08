@@ -71,23 +71,30 @@ function publishedNow() {
 }
 
 function parseBodyAsIndiewebSite(source, target, hEntry) {
+	function shorten(txt) {
+		if(txt.length <= 250) return txt
+		return txt.substring(0, 250) + "..."
+	}
+
 	const authorPropName = hEntry.properties?.author?.[0]?.properties?.name?.[0]
 	const authorValue = hEntry.properties?.author?.[0]?.value
-	const picture = hEntry.properties?.author?.[0]?.properties?.photo?.[0]?.value
+	const picture = hEntry.properties?.author?.[0]?.properties?.photo?.[0]
 	const summary = hEntry.properties?.summary?.[0]
-	const contentEntry = hEntry.properties?.content?.[0]?.value?.substring(0, 250) + "..."
+	const contentEntry = hEntry.properties?.content?.[0]?.value
 	const publishedDate = hEntry.properties?.published?.[0]
+	const url = hEntry.properties?.url?.[0]
 
 	return {
 		author: {
 			name: authorPropName ? authorPropName : authorValue,
-			picture
+			picture: picture.value ? picture.value : picture
 		},
-		content: summary ? summary : contentEntry,
+		content: summary ? shorten(summary) : shorten(contentEntry),
 		published: publishedDate ? publishedDate : publishedNow(),
+		url: url ? url : source,
 		source,
 		target
-	}	
+	}
 }
 
 function parseBodyAsNonIndiewebSite(source, target, body) {

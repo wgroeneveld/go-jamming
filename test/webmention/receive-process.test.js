@@ -26,6 +26,29 @@ describe("receive webmention process tests happy path", () => {
 		return `${dumpdir}/` + md5(`source=${body.source},target=${body.target}`)
 	}
 
+	test("receive a brid.gy webmention that has a url and photo without value", async () => {
+		const body = {
+			source: "https://brainbaking.com/valid-bridgy-source.html",
+			target: "https://brainbaking.com/valid-indieweb-target.html"
+		}
+		await receive(body)
+
+		const result = await fsp.readFile(`${asFilename(body)}.json`, 'utf-8')
+		const data = JSON.parse(result)
+
+		expect(data).toEqual({
+			author: {
+				name: "Stampeding Longhorn",
+				picture: "https://cdn.social.linux.pizza/v1/AUTH_91eb37814936490c95da7b85993cc2ff/sociallinuxpizza/accounts/avatars/000/185/996/original/9e36da0c093cfc9b.png"
+			},
+			url: "https://social.linux.pizza/@StampedingLonghorn/105821099684887793",
+			content: "@wouter The cat pictures are awesome. for jest tests!",
+			source: body.source,
+			target: body.target,
+			published: "2021-03-02T16:17:18.000Z"
+		})
+	})
+
 	test("receive saves a JSON file of indieweb-metadata if all is valid", async () => {
 		const body = {
 			source: "https://brainbaking.com/valid-indieweb-source.html",
@@ -41,7 +64,8 @@ describe("receive webmention process tests happy path", () => {
 				name: "Wouter Groeneveld",
 				picture: "https://brainbaking.com//img/avatar.jpg"
 			},
-			content: "This is cool, I just found out about valid indieweb target - so cool...",
+			url: "https://brainbaking.com/notes/2021/03/06h12m41s48/",
+			content: "This is cool, I just found out about valid indieweb target - so cool",
 			source: body.source,
 			target: body.target,
 			published: "2021-03-06T12:41:00"
@@ -63,6 +87,7 @@ describe("receive webmention process tests happy path", () => {
 				name: "Wouter Groeneveld",
 				picture: "https://brainbaking.com//img/avatar.jpg"
 			},
+			url: "https://brainbaking.com/notes/2021/03/06h12m41s48/",			
 			content: "This is cool, this is a summary!",
 			source: body.source,
 			target: body.target,
@@ -114,6 +139,5 @@ describe("receive webmention process tests happy path", () => {
 		const data = fs.readdirSync(dumpdir)
 		expect(data.length).toBe(0)
 	})
-
 
 })

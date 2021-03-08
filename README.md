@@ -40,3 +40,7 @@ Will result in a `202 Accepted` - it handles things async. Stores in `.json` fil
 
 Retrieves a JSON array with relevant webmentions stored for that domain. The token should match. See `config.js` to fiddle with it yourself. Environment variables are supported, although I haven't used them yet. 
 
+## TODOs
+
+- `published` date is not well-formatted and blindly taken over from feed
+
