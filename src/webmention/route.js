@@ -6,6 +6,7 @@ function route(router) {
 		if(!validate(ctx.request)) {
 			ctx.throw(400, "malformed webmention request")
 		}
+		// we do NOT await this on purpose.
 		receive(ctx.request.body)
 
 	    ctx.body = "Thanks, bro. Will process this webmention soon, pinky swear!";

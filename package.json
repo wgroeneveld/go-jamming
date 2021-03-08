@@ -16,6 +16,7 @@
     "jest": "^26.6.3"
   },
   "dependencies": {
+    "got": "^11.8.2",
     "koa": "^2.13.1",
     "koa-body": "^4.2.0",
     "koa-helmet": "^6.0.0",

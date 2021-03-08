@@ -1,10 +1,20 @@
 
+const got = require('got')
+const config = require('./../config')
+
 function isValidUrl(url) {
 	return url !== undefined &&
 		(url.startsWith("http://") || url.startsWith("https://"))
 }
 
+function isValidDomain(url) {
+	return config.allowedWebmentionSources.some(domain => {
+		return url.indexOf(domain) !== -1
+	})
+}
+
 /**
+Remember, TARGET is own domain, SOURCE is the article to process
  https://www.w3.org/TR/webmention/#sender-notifies-receiver
  example:
 		POST /webmention-endpoint HTTP/1.1
@@ -20,12 +30,31 @@ function isValidUrl(url) {
 function validate(request) {
 	return request.type === "application/x-www-form-urlencoded" &&
 		request.body !== undefined &&
-		isValidUrl(request?.body.source) &&
-		isValidUrl(request?.body.target)
+		isValidUrl(request?.body?.source) &&
+		isValidUrl(request?.body?.target) &&
+		request?.body?.source !== request?.body?.target &&
+		isValidDomain(request?.body?.source)
+}
+
+function processSourceBody(body, target) {
+	if(body.indexOf(target) === -1) {
+		return
+	}
 }
 
 async function receive(body) {
-	// do stuff with it
+	try {
+		await got(body.target)
+	} catch(unknownTarget) {
+		return
+	}
+
+	try {
+		const src = await got(body.source)
+		processSourceBody(src.body, body.target)
+	} catch(unknownSource) {
+		return
+	}
 } 
 
 module.exports = {
