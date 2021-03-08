@@ -34,9 +34,7 @@ config.setupDataDirs();
 
 app.use(router.routes()).use(router.allowedMethods());
 
-const port = process.env.PORT || config.port
-
-app.listen(port, config.host, () => {
-	console.log(`Started localhost at port ${port}`)
+app.listen(config.port, config.host, () => {
+	console.log(`Started localhost at port ${config.port}`)
 });
 

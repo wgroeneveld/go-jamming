@@ -20,8 +20,9 @@ function setupDataDirs() {
 
 
 module.exports = {
-	port: 4000,
+	port: process.env.PORT || 4000,
 	host: "localhost",
+	token: process.env.TOKEN || "miauwkes",
 
 	utcOffset: 60,
 

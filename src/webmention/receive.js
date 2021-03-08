@@ -110,6 +110,7 @@ async function processSourceBody(body, source, target) {
 		return
 	}
 
+	// fiddle: https://aimee-gm.github.io/microformats-parser/
 	const microformat = mf2(body, {
 		// WHY? crashes on relative URL, should be injected using Jest. Don't care. 
 		baseUrl: source.startsWith("http") ? source : `http://localhost/${source}`

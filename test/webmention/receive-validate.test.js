@@ -1,5 +1,5 @@
 
-describe("validate tests", () => {
+describe("webmention receiver validate tests", () => {
 
 	const validhttpurl = "http://brainbaking.com/bla"
 	const validhttpsurl = "https://brainbaking.com/blie"
