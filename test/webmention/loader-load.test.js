@@ -31,7 +31,9 @@ describe("webmention loading of existing json files tests", () => {
 		if(fs.existsSync(dumpdir)) {
 			rmdir(dumpdir)
 		}
-		fs.mkdirSync(dumpdir)
+		fs.mkdirSync(dumpdir, {
+			recursive: true
+		})
 	})
 
 	test("return an array of webmentions from domain dir", async () => {

@@ -15,7 +15,9 @@ describe("receive webmention process tests happy path", () => {
 		if(fs.existsSync(dumpdir)) {
 			rmdir(dumpdir)
 		}
-		fs.mkdirSync(dumpdir)
+		fs.mkdirSync(dumpdir, {
+			recursive: true
+		})
 
 		MockDate.set('2020-01-01')
 	})
