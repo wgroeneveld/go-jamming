@@ -76,12 +76,14 @@ function parseBodyAsIndiewebSite(source, target, hEntry) {
 		return txt.substring(0, 250) + "..."
 	}
 
+	const name = hEntry.properties?.name?.[0]
 	const authorPropName = hEntry.properties?.author?.[0]?.properties?.name?.[0]
 	const authorValue = hEntry.properties?.author?.[0]?.value
 	const picture = hEntry.properties?.author?.[0]?.properties?.photo?.[0]
 	const summary = hEntry.properties?.summary?.[0]
 	const contentEntry = hEntry.properties?.content?.[0]?.value
 	const publishedDate = hEntry.properties?.published?.[0]
+	const uid = hEntry.properties?.uid?.[0]
 	const url = hEntry.properties?.url?.[0]
 
 	return {
@@ -89,23 +91,27 @@ function parseBodyAsIndiewebSite(source, target, hEntry) {
 			name: authorPropName ? authorPropName : authorValue,
 			picture: picture.value ? picture.value : picture
 		},
+		name: name,
 		content: summary ? shorten(summary) : shorten(contentEntry),
 		published: publishedDate ? publishedDate : publishedNow(),
-		url: url ? url : source,
+		// Mastodon uids start with "tag:server", but we do want indieweb uids from other sources 
+		url: uid && uid.startsWith("http") ? uid : (url ? url : source),
 		source,
 		target
 	}
 }
 
 function parseBodyAsNonIndiewebSite(source, target, body) {
-	const content = body.match(/<title>(.*?)<\/title>/)?.splice(1, 1)[0]
+	const title = body.match(/<title>(.*?)<\/title>/)?.splice(1, 1)[0]
 
 	return {
 		author: {
 			name: source
 		},
-		content,
+		name: title,
+		content: title,
 		published: publishedNow(),
+		url: source,
 		source,
 		target
 	}

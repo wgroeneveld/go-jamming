@@ -43,6 +43,7 @@ describe("receive webmention process tests happy path", () => {
 			},
 			url: "https://social.linux.pizza/@StampedingLonghorn/105821099684887793",
 			content: "@wouter The cat pictures are awesome. for jest tests!",
+			name: "@wouter The cat pictures are awesome. for jest tests!",
 			source: body.source,
 			target: body.target,
 			published: "2021-03-02T16:17:18.000Z"
@@ -66,6 +67,7 @@ describe("receive webmention process tests happy path", () => {
 			},
 			url: "https://brainbaking.com/notes/2021/03/06h12m41s48/",
 			content: "This is cool, I just found out about valid indieweb target - so cool",
+			name: "I just learned about https://www.inklestudios.com/...",
 			source: body.source,
 			target: body.target,
 			published: "2021-03-06T12:41:00"
@@ -87,7 +89,8 @@ describe("receive webmention process tests happy path", () => {
 				name: "Wouter Groeneveld",
 				picture: "https://brainbaking.com//img/avatar.jpg"
 			},
-			url: "https://brainbaking.com/notes/2021/03/06h12m41s48/",			
+			url: "https://brainbaking.com/notes/2021/03/06h12m41s48/",
+			name: "I just learned about https://www.inklestudios.com/...",
 			content: "This is cool, this is a summary!",
 			source: body.source,
 			target: body.target,
@@ -110,6 +113,8 @@ describe("receive webmention process tests happy path", () => {
 				name: "https://brainbaking.com/valid-nonindieweb-source.html",
 			},
 			content: "Diablo 2 Twenty Years Later: A Retrospective | Jefklaks Codex",
+			name: "Diablo 2 Twenty Years Later: A Retrospective | Jefklaks Codex",
+			url: body.source,
 			source: body.source,
 			target: body.target,
 			published: "2020-01-01T01:00:00"
