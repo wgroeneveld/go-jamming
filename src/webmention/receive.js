@@ -72,7 +72,7 @@ function publishedNow() {
 
 function parseBodyAsIndiewebSite(source, target, hEntry) {
 	function shorten(txt) {
-		if(txt.length <= 250) return txt
+		if(!txt || txt.length <= 250) return txt
 		return txt.substring(0, 250) + "..."
 	}
 
@@ -85,6 +85,7 @@ function parseBodyAsIndiewebSite(source, target, hEntry) {
 	const publishedDate = hEntry.properties?.published?.[0]
 	const uid = hEntry.properties?.uid?.[0]
 	const url = hEntry.properties?.url?.[0]
+	const type = hEntry.properties?.["like-of"]?.length ? "like" : "mention"
 
 	return {
 		author: {
@@ -94,6 +95,7 @@ function parseBodyAsIndiewebSite(source, target, hEntry) {
 		name: name,
 		content: summary ? shorten(summary) : shorten(contentEntry),
 		published: publishedDate ? publishedDate : publishedNow(),
+		type,
 		// Mastodon uids start with "tag:server", but we do want indieweb uids from other sources 
 		url: uid && uid.startsWith("http") ? uid : (url ? url : source),
 		source,
@@ -112,6 +114,7 @@ function parseBodyAsNonIndiewebSite(source, target, body) {
 		content: title,
 		published: publishedNow(),
 		url: source,
+		type: "mention",
 		source,
 		target
 	}
