@@ -82,10 +82,11 @@ function parseBodyAsIndiewebSite(source, target, hEntry) {
 	const picture = hEntry.properties?.author?.[0]?.properties?.photo?.[0]
 	const summary = hEntry.properties?.summary?.[0]
 	const contentEntry = hEntry.properties?.content?.[0]?.value
+	const bridgyTwitterContent = hEntry.properties?.["bridgy-twitter-content"]?.[0]
 	const publishedDate = hEntry.properties?.published?.[0]
 	const uid = hEntry.properties?.uid?.[0]
 	const url = hEntry.properties?.url?.[0]
-	const type = hEntry.properties?.["like-of"]?.length ? "like" : "mention"
+	const type = hEntry.properties?.["like-of"]?.length ? "like" : (hEntry.properties?.["bookmark-of"]?.length ? "bookmark" : "mention" )
 
 	return {
 		author: {
@@ -93,7 +94,7 @@ function parseBodyAsIndiewebSite(source, target, hEntry) {
 			picture: picture.value ? picture.value : picture
 		},
 		name: name,
-		content: summary ? shorten(summary) : shorten(contentEntry),
+		content: bridgyTwitterContent ? shorten(bridgyTwitterContent) : (summary ? shorten(summary) : shorten(contentEntry)),
 		published: publishedDate ? publishedDate : publishedNow(),
 		type,
 		// Mastodon uids start with "tag:server", but we do want indieweb uids from other sources 

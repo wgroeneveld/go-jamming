@@ -26,6 +26,19 @@ describe("receive webmention process tests happy path", () => {
 		return `${dumpdir}/` + md5(`source=${body.source},target=${body.target}`)
 	}
 
+	test("receive a webmention bookmark via twitter", async () => {
+		const body = {
+			source: "https://brainbaking.com/valid-bridgy-twitter-source.html",
+			target: "https://brainbaking.com/post/2021/03/the-indieweb-mixed-bag"
+		}
+		await receive(body)
+
+		const result = await fsp.readFile(`${asFilename(body)}.json`, 'utf-8')
+		const data = JSON.parse(result)
+		expect(data.type).toEqual("bookmark");
+		expect(data.content).toContain("Recommended read:")
+	})
+
 	test("receive a brid.gy webmention like", async () => {
 		const body = {
 			source: "https://brainbaking.com/valid-bridgy-like.html",

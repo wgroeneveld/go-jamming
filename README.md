@@ -43,4 +43,4 @@ Retrieves a JSON array with relevant webmentions stored for that domain. The tok
 ## TODOs
 
 - `published` date is not well-formatted and blindly taken over from feed
-
+- [brid.gy](https://brid.gy/) does not send webmentions if no target found, although I'd like these to appear in the [brainbaking.com/notes](https://brainbaking.com/notes) somehow, being syndicated from my Mastodon feed.
