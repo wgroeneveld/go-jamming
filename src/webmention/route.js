@@ -22,9 +22,10 @@ function route(router) {
 			ctx.throw(403, "access denied")
 		}
 
-		console.log(` OK: someone wants to send mentions from domain ${ctx.params.domain}`)
+		const since = ctx.request.query?.since
+		console.log(` OK: someone wants to send mentions from domain ${ctx.params.domain} since ${since}`)
 		// we do NOT await this on purpose.
-		webmentionSender.send(ctx.params.domain, ctx.request.query?.since)
+		webmentionSender.send(ctx.params.domain, since)
 
 		ctx.body = "Thanks, bro. Will send these webmentions soon, pinky swear!"
 		ctx.status = 202
