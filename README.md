@@ -40,6 +40,19 @@ Will result in a `202 Accepted` - it handles things async. Stores in `.json` fil
 
 Retrieves a JSON array with relevant webmentions stored for that domain. The token should match. See `config.js` to fiddle with it yourself. Environment variables are supported, although I haven't used them yet. 
 
+#### 1.3 `PUT /webmention/:domain/:token`
+
+Sends out webmentions, based on the domain's `index.xml` RSS feed, and optionally, a `since` request query parameter that is supposed to be a string, fed through [Dayjs](https://day.js.org/) to format. (e.g. `2021-03-16T16:00:00.000Z`). 
+
+This does a couple of things:
+
+1. Fetch RSS entries (since x, or everything)
+2. Find outbound `href`s (starting with `http`)
+3. Check if those domains have a `webmention` link endpoint installed, according to the w3.org rules. 
+4. If so: `POST` for each found href with `source` the own domain and `target` the outbound link found in the RSS feed. 
+
+As with the `POST` call, will result in a `202 Accepted` and handles things async/in parallel. 
+
 ## TODOs
 
 - `published` date is not well-formatted and blindly taken over from feed
