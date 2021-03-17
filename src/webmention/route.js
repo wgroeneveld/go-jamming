@@ -1,6 +1,7 @@
 
 const webmentionReceiver = require('./receive')
 const webmentionLoader = require('./loader')
+const webmentionSender = require('./send')
 
 function route(router) {
 	router.post("webmention receive endpoint", "/webmention", async (ctx) => {
@@ -12,9 +13,22 @@ function route(router) {
 		// we do NOT await this on purpose.
 		webmentionReceiver.receive(ctx.request.body)
 
-	    ctx.body = "Thanks, bro. Will process this webmention soon, pinky swear!";
+	    ctx.body = "Thanks, bro. Will process this webmention soon, pinky swear!"
 	    ctx.status = 202
 	});
+
+	router.put("webmention send endpoint", "/webmention/:domain/:token", async (ctx) => {
+		if(!webmentionLoader.validate(ctx.params)) {
+			ctx.throw(403, "access denied")
+		}
+
+		console.log(` OK: someone wants to send mentions from domain ${ctx.params.domain}`)
+		// we do NOT await this on purpose.
+		webmentionSender.send(ctx.params.domain, ctx.request.query?.since)
+
+		ctx.body = "Thanks, bro. Will send these webmentions soon, pinky swear!"
+		ctx.status = 202
+	})
 
 	router.get("webmention get endpoint", "/webmention/:domain/:token", async (ctx) => {
 		if(!webmentionLoader.validate(ctx.params)) {

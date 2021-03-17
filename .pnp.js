@@ -38,6 +38,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",
           "packageDependencies": [
             ["dayjs", "npm:1.10.4"],
+            ["fast-xml-parser", "npm:3.19.0"],
             ["got", "npm:11.8.2"],
             ["jest", "npm:26.6.3"],
             ["koa", "npm:2.13.1"],
@@ -2739,6 +2740,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/fast-levenshtein-npm-2.0.6-fcd74b8df5-a2d03af308.zip/node_modules/fast-levenshtein/",
           "packageDependencies": [
             ["fast-levenshtein", "npm:2.0.6"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["fast-xml-parser", [
+        ["npm:3.19.0", {
+          "packageLocation": "./.yarn/cache/fast-xml-parser-npm-3.19.0-b7dcd3a31a-bac00722d0.zip/node_modules/fast-xml-parser/",
+          "packageDependencies": [
+            ["fast-xml-parser", "npm:3.19.0"]
           ],
           "linkType": "HARD",
         }]
@@ -6082,6 +6092,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["serve-my-jams", "workspace:."],
             ["dayjs", "npm:1.10.4"],
+            ["fast-xml-parser", "npm:3.19.0"],
             ["got", "npm:11.8.2"],
             ["jest", "npm:26.6.3"],
             ["koa", "npm:2.13.1"],

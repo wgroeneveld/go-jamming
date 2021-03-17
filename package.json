@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "dayjs": "^1.10.4",
+    "fast-xml-parser": "^3.19.0",
     "got": "^11.8.2",
     "koa": "^2.13.1",
     "koa-body": "^4.2.0",

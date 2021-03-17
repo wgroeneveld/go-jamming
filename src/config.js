@@ -6,6 +6,11 @@ const allowedWebmentionSources = [
 	"jefklakscodex.com"
 ]
 
+// do NOT send out webmentions to any of these domains.
+const disallowedWebmentionDomains = [
+	"youtube.com"
+]
+
 function setupDataDirs() {
 	allowedWebmentionSources.forEach(domain => {
 		const dir = `data/${domain}`
@@ -27,5 +32,6 @@ module.exports = {
 	utcOffset: 60,
 
 	allowedWebmentionSources,
+	disallowedWebmentionDomains,
 	setupDataDirs
 }

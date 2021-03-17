@@ -2218,6 +2218,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fast-xml-parser@npm:^3.19.0":
+  version: 3.19.0
+  resolution: "fast-xml-parser@npm:3.19.0"
+  bin:
+    xml2js: cli.js
+  checksum: bac00722d00f7f8782ab507281bff3c5cff2b37e2e1e26891a11ac2ac3f0c40e91f545492923d6dc8a57bdf9cfba99518c02ddff380f4ff1e81083d25055e43e
+  languageName: node
+  linkType: hard
+
 "fb-watchman@npm:^2.0.0":
   version: 2.0.1
   resolution: "fb-watchman@npm:2.0.1"
@@ -5167,6 +5176,7 @@ fsevents@^2.1.2:
   resolution: "serve-my-jams@workspace:."
   dependencies:
     dayjs: ^1.10.4
+    fast-xml-parser: ^3.19.0
     got: ^11.8.2
     jest: ^26.6.3
     koa: ^2.13.1
