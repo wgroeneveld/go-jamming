@@ -12,10 +12,8 @@ const parseOpts = {
 
 function collectHrefsFromDescription(description) {
 	// first thought: use parser.parse() and traverse recursively. turned out to be way too slow.
-  const x = description.match(/href="([^"]*")/g)
-  console.log(x)
-	const links = x
-		.map(match => match.replace("href=", "").replaceAll("\"", ""))
+	const links = description.match(/href="([^"]*")/g)
+		.map(match => match.replace("href=", "").replace(/\"/g, ""))
 		.filter(match => !(/\.(gif|zip|rar|bz2|gz|7z|jpe?g|tiff?|png|webp|bmp)$/i).test(match))
 		.filter(match => !config.disallowedWebmentionDomains.some(domain => match.indexOf(domain) >= 0))
 	return [...new Set(links)]
