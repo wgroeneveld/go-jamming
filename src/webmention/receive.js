@@ -91,7 +91,7 @@ function parseBodyAsIndiewebSite(source, target, hEntry) {
 	return {
 		author: {
 			name: authorPropName ? authorPropName : authorValue,
-			picture: picture.value ? picture.value : picture
+			picture: picture?.value ? picture?.value : picture
 		},
 		name: name,
 		content: bridgyTwitterContent ? shorten(bridgyTwitterContent) : (summary ? shorten(summary) : shorten(contentEntry)),
