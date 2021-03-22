@@ -53,6 +53,10 @@ This does a couple of things:
 
 As with the `POST` call, will result in a `202 Accepted` and handles things async/in parallel. 
 
+**Does this thing take updates into account**?
+
+Yes and no. It checks the `<pubDate/>` `<item/>` RSS tag by default, but if a `<time datetime="..."/>` tag is present in the `<description/>`, it treats that date as the "last modified" date. There is no such thing in the RSS 2.0 W3.org specs, so I had to come up with my own hacks! Remember that if you want this to work, you also need to include a time tag in your RSS feed (e.g. `.Lastmod` gitinfo in Hugo). 
+
 ## TODOs
 
 - `published` date is not well-formatted and blindly taken over from feed

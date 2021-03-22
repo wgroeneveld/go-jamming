@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Brain Baking</title>
+    <link>https://brainbaking.com/</link>
+    <description>Recent content on Brain Baking</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>Wouter Groeneveld</managingEditor>
+    <webMaster>Wouter Groeneveld</webMaster>
+    <lastBuildDate>Tue, 16 Mar 2021 17:07:14 +0000</lastBuildDate>
+    
+	<atom:link href="https://brainbaking.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>@celia @kev I have read both you and Kev&#39;s post on...</title>
+      <link>https://brainbaking.com/notes/2021/03/16h17m07s14/</link>
+      <comments>https://brainbaking.com/notes/2021/03/16h17m07s14/#commento</comments>
+      <pubDate>Tue, 16 Mar 2021 17:07:14 +0000</pubDate>
+      <author>Wouter Groeneveld</author>
+      <guid isPermaLink="true">https://brainbaking.com/notes/2021/03/16h17m07s14/</guid>
+      
+
+      
+      <description>
+          <![CDATA[ 
+          
+
+          <p><span class="h-card"><a class="u-url mention" data-user="A5GVjIHI6MH82H6iLQ" href="https://fosstodon.org/@celia" rel="ugc">@<span>celia</span></a></span> <span class="h-card"><a class="u-url mention" data-user="A54b8g0RBaIgjzczMu" href="https://fosstodon.org/@kev" rel="ugc">@<span>kev</span></a></span> I have read both you and Kev&rsquo;s post on this and agree on some points indeed! But I&rsquo;m not yet ready to give up webmentions. As an academic, the idea of citing/mentioning each other is very alluring 🤓. Plus, I needed an excuse to fiddle some more with JS&hellip; <br><br>As much as I loved using Wordpress before, I can&rsquo;t imagine going back to writing stuff in there instead of in markdown. Gotta keep the workflow short, though. Hope it helps you focus on what matters - content!</p>
+
+
+          <p>
+            By <a href="/about">Wouter Groeneveld</a> on <time datetime="2021-03-20">20 March 2021</time>.
+          </p>
+          ]]>
+      </description>
+    </item>
+  </channel>
+</rss>

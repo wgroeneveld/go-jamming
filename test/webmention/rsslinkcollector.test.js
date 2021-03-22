@@ -35,6 +35,22 @@ describe("collect RSS links of articles since certain period", () => {
 		])
 	})
 
+	test("collects if time tag found in content that acts as an update stamp", async () => {
+		// sample item: pubDate 2021-03-16, timestamp updated: 2021-03-20
+		xml = (await fs.readFile('./test/__mocks__/samplerss-updated-timestamp.xml')).toString()
+
+		const collected = collect(xml, dayjs('2021-03-19').toDate())
+		expect(collected.length).toBe(1)
+	})
+
+	test("does not collect if time tag found in content but still older than since", async () => {
+		// sample item: pubDate 2021-03-16, timestamp updated: 2021-03-20
+		xml = (await fs.readFile('./test/__mocks__/samplerss-updated-timestamp.xml')).toString()
+
+		const collected = collect(xml, dayjs('2021-03-21').toDate())
+		expect(collected.length).toBe(0)
+	})
+
 	test("collects nothing if date in future and since nothing new in feed", () => {
 		const collected = collect(xml, dayjs().add(7, 'day').toDate())
 		expect(collected.length).toEqual(0)
