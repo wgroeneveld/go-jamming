@@ -29,6 +29,7 @@ app.use(bodyParser({
 
 // route docs: https://github.com/koajs/router/blob/HEAD/API.md#module_koa-router--Router+get%7Cput%7Cpost%7Cpatch%7Cdelete%7Cdel
 require("./webmention/route").route(router);
+require("./pingback/route").route(router);
 const config = require("./config");
 config.setupDataDirs();
 
