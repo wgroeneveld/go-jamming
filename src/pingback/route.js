@@ -18,7 +18,7 @@ function success(msg) {
 }
 
 function err(e) {
-	console.err(` -- pingback receive went wrong: ${e.message}`)
+	console.error(` -- pingback receive went wrong: ${e.message}`)
 	return `<?xml version="1.0" encoding="UTF-8"?>
 <methodResponse>
     <fault>
