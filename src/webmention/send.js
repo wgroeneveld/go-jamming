@@ -1,13 +1,13 @@
 
 const got = require('got')
 const { collect } = require('./rsslinkcollector')
-const { discover } = require('./linkdiscoverer')
+const { discover } = require('./../linkdiscoverer')
 
 async function mention(opts) {
 	const { source, target } = opts
 	const endpoint = await discover(target)
 	if(endpoint) {
-		await got.post(endpoint, {
+		await got.post(endpoint.link, {
 			contentType: "x-www-form-urlencoded",
 			form: {
 				source,
@@ -18,7 +18,7 @@ async function mention(opts) {
 				methods: ["POST"]
 			}
 		})
-		console.log(` OK: webmention@${endpoint}, sent: source ${source}, target ${target}`)
+		console.log(` OK: ${endpoint.type}@${endpoint.link}, sent: source ${source}, target ${target}`)
 	}
 }
 

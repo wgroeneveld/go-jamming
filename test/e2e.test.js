@@ -19,8 +19,6 @@ describe("e2e tests", () => {
 		const occ = html.indexOf(url)
 		const len = 100
 		console.log(html.substring(occ - len, occ + url.length + len))
-
-		<a[^>]+?' . $preg_target . '[^>]*>([^>]+?)</a>
 	})
 
 })

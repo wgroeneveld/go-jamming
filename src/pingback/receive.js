@@ -40,10 +40,13 @@ function validate(body) {
 // Wordpress pingback processing source: https://developer.wordpress.org/reference/classes/wp_xmlrpc_server/pingback_ping/
 async function receive(body) {
 	const xml = parser.parse(body)
-	await webmentionReceiver.receive({
+	const webmentionBody = {
 		source: xml.methodCall.params.param[0].value.string,
 		target: xml.methodCall.params.param[1].value.string
-	})
+	}
+
+    console.log(` OK: looks like a valid pingback: \n\tsource ${webmentionBody.source}\n\ttarget ${webmentionBody.target}`)
+	await webmentionReceiver.receive(webmentionBody)
 }
 
 module.exports = {
