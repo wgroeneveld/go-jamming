@@ -67,6 +67,10 @@ function route(router) {
 			ctx.body = err(e)
 		}
 	});
+
+    router.put("pingback send endpoint", "/pingback/:domain/:token", async (ctx) => {
+
+    });
 }
 
 module.exports = {

@@ -1,8 +1,11 @@
 
+const webmentionReceiver = require('./../webmention/receive')
 const config = require('./../config')
 const parser = require("fast-xml-parser")
 
 /**
+See https://www.hixie.ch/specs/pingback/pingback#refsXMLRPC
+---
 Sample XML:
 <?xml version="1.0" encoding="UTF-8"?>
 <methodCall>
@@ -33,8 +36,14 @@ function validate(body) {
 	return true
 }
 
+// we treat a pingback as a webmention. 
+// Wordpress pingback processing source: https://developer.wordpress.org/reference/classes/wp_xmlrpc_server/pingback_ping/
 async function receive(body) {
-
+	const xml = parser.parse(body)
+	await webmentionReceiver.receive({
+		source: xml.methodCall.params.param[0].value.string,
+		target: xml.methodCall.params.param[1].value.string
+	})
 }
 
 module.exports = {
