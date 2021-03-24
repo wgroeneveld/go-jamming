@@ -18,7 +18,7 @@ function success(msg) {
 }
 
 function err(e) {
-	console.error(` -- pingback receive went wrong: ${e.message}`)
+	console.error(` -- pingback receive went wrong: ${e}`)
 	return `<?xml version="1.0" encoding="UTF-8"?>
 <methodResponse>
     <fault>
@@ -40,7 +40,7 @@ function err(e) {
                     </name>
                     <value>
                         <string>
-                        	${e.message}
+                        	Sorry pal. Malformed request? Or something else, who knows...
                         </string>
                     </value>
                 </member>
