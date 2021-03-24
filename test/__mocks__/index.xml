@@ -28,6 +28,8 @@
           
           <p>hi there! test discovering: <a href="https://brainbaking.com/link-discover-test-single.html">single</a>. Nice!</p>
 
+          <p>this one is a pingback-only <a href="https://brainbaking.com/pingback-discover-test-single.html">single</a> one. Not good!</p>
+
           <p>another cool link: <a href="https://brainbaking.com/link-discover-test-multiple.html">multiple</a></p>
           
           ]]>

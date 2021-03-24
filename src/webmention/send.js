@@ -2,24 +2,32 @@
 const got = require('got')
 const { collect } = require('./rsslinkcollector')
 const { discover } = require('./../linkdiscoverer')
+const { sendPingbackToEndpoint } = require('./../pingback/send')
+
+async function sendWebmentionToEndpoint(endpoint, source, target) {
+	await got.post(endpoint, {
+		contentType: "x-www-form-urlencoded",
+		form: {
+			source,
+			target
+		},
+		retry: {
+			limit: 5,
+			methods: ["POST"]
+		}
+	})
+	console.log(` OK: webmention@${endpoint}, sent: source ${source}, target ${target}`)
+}
 
 async function mention(opts) {
 	const { source, target } = opts
 	const endpoint = await discover(target)
-	if(endpoint) {
-		await got.post(endpoint.link, {
-			contentType: "x-www-form-urlencoded",
-			form: {
-				source,
-				target
-			},
-			retry: {
-				limit: 5,
-				methods: ["POST"]
-			}
-		})
-		console.log(` OK: ${endpoint.type}@${endpoint.link}, sent: source ${source}, target ${target}`)
+	if(!endpoint) return
+	const sendMention = {
+		"webmention": sendWebmentionToEndpoint,
+		"pingback": sendPingbackToEndpoint
 	}
+	await sendMention[endpoint.type](endpoint.link, source, target)
 }
 
 async function parseRssFeed(xml, since) {
