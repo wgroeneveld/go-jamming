@@ -6,13 +6,17 @@ const { send } = require('../../src/webmention/send')
 
 describe("webmention send scenarios", () => {
 	test("webmention send integration test that can send both webmentions and pingbacks", async () => {
-		got.post = jest.fn()
+		// jest.fn() gives unpredictable and unreadable output if unorderd calledWith... DIY!
+		let posts = {}
+		got.post = function(url, opts) {
+			posts[url] = opts
+		}
 
 		// fetches index.xml
 		await send("brainbaking.com", '2021-03-16T16:00:00.000Z')
 
-		expect(got.post).toHaveBeenCalledTimes(3)
-		expect(got.post).toHaveBeenCalledWith("http://aaronpk.example/webmention-endpoint-header", {
+		expect(Object.keys(posts).length).toBe(3)
+		expect(posts["http://aaronpk.example/webmention-endpoint-header"]).toEqual({
 			contentType: "x-www-form-urlencoded",
 			form: {
 				source: "https://brainbaking.com/notes/2021/03/16h17m07s14/",
@@ -23,7 +27,7 @@ describe("webmention send scenarios", () => {
 				methods: ["POST"]
 			}
 		})
-		expect(got.post).toHaveBeenCalledWith("http://aaronpk.example/pingback-endpoint-body", {
+		expect(posts["http://aaronpk.example/pingback-endpoint-body"]).toEqual({
 			contentType: "text/xml",
 			body: `<?xml version="1.0" encoding="UTF-8"?>
 <methodCall>
@@ -42,7 +46,7 @@ describe("webmention send scenarios", () => {
 				methods: ["POST"]
 			}
 		})
-		expect(got.post).toHaveBeenCalledWith("http://aaronpk.example/webmention-endpoint-body", {
+		expect(posts["http://aaronpk.example/webmention-endpoint-body"]).toEqual({
 			contentType: "x-www-form-urlencoded",
 			form: {
 				source: "https://brainbaking.com/notes/2021/03/16h17m07s14/",

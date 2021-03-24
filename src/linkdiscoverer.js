@@ -39,17 +39,14 @@ async function discover(target) {
 		})
 		const webmention = format.rels?.webmention?.[0]
 		const pingback = format.rels?.pingback?.[0]
-		if(!webmention && !pingback) {
-			throw "no webmention and no pingback found?"
-		}
 
 		return {
-			link: webmention ? webmention : pingback,
-			type: webmention ? "webmention" : "pingback"
+			link: webmention ? webmention : (pingback ? pingback : ""),
+			type: webmention ? "webmention" : (pingback ? "pingback" : "unknown")
 		}
 	} catch(err) {
 		console.warn(` -- whoops, failed to discover ${target}, why: ${err}`)
-		return undefined
+		return { type: "unknown" }
 	}
 }
 

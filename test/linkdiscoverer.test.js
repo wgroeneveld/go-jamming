@@ -3,9 +3,11 @@ const { discover } = require('../src/linkdiscoverer')
 
 describe("link discoverer", () => {
 
-	test("discover nothing if no link is present", async() => {
+	test("discover 'unknown' if no link is present", async() => {
 		const result = await discover("https://brainbaking.com/link-discover-test-none.html")
-		expect(result).toBeUndefined()
+		expect(result).toEqual({
+			type: "unknown"
+		})
 	})
 
 	test("prefer webmentions over pingbacks if both links are present", async () => {

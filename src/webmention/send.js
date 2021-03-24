@@ -22,10 +22,10 @@ async function sendWebmentionToEndpoint(endpoint, source, target) {
 async function mention(opts) {
 	const { source, target } = opts
 	const endpoint = await discover(target)
-	if(!endpoint) return
 	const sendMention = {
 		"webmention": sendWebmentionToEndpoint,
-		"pingback": sendPingbackToEndpoint
+		"pingback": sendPingbackToEndpoint,
+		"unknown": async function() {}
 	}
 	await sendMention[endpoint.type](endpoint.link, source, target)
 }
