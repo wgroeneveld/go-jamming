@@ -1,5 +1,7 @@
 const got = require('got')
-const { mf2 } = require("microformats-parser");
+const { mf2 } = require("microformats-parser")
+
+const log = require('pino')()
 
 const baseUrlOf = (url) => {
 	if(url.match(/\//g).length <= 2) {
@@ -45,7 +47,7 @@ async function discover(target) {
 			type: webmention ? "webmention" : (pingback ? "pingback" : "unknown")
 		}
 	} catch(err) {
-		console.warn(` -- whoops, failed to discover ${target}, why: ${err}`)
+		log.warn(err, ' -- whoops, failed to discover ${target}')
 		return { type: "unknown" }
 	}
 }

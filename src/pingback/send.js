@@ -1,5 +1,6 @@
 
 const got = require('got')
+const log = require('pino')()
 
 async function sendPingbackToEndpoint(endpoint, source, target) {
 	const body = `<?xml version="1.0" encoding="UTF-8"?>
@@ -22,7 +23,7 @@ async function sendPingbackToEndpoint(endpoint, source, target) {
 			methods: ["POST"]
 		}
 	})
-	console.log(` OK: pingback@${endpoint}, sent: source ${source}, target ${target}`)
+	log.info(` OK: pingback@${endpoint}, sent: source ${source}, target ${target}`)
 }
 
 module.exports = {

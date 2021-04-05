@@ -44,12 +44,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["koa", "npm:2.13.1"],
             ["koa-body", "npm:4.2.0"],
             ["koa-helmet", "npm:6.0.0"],
-            ["koa-logger", "npm:3.2.1"],
+            ["koa-pino-logger", "npm:3.0.0"],
             ["koa-router", "npm:10.0.0"],
             ["koa2-ratelimit", "npm:0.9.0"],
             ["md5", "npm:2.3.0"],
             ["microformats-parser", "npm:1.4.0"],
-            ["mockdate", "npm:3.0.2"]
+            ["mockdate", "npm:3.0.2"],
+            ["pino", "npm:6.11.2"]
           ],
           "linkType": "SOFT",
         }]
@@ -1374,6 +1375,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/atob-npm-2.1.2-bcb583261e-597c0d1a74.zip/node_modules/atob/",
           "packageDependencies": [
             ["atob", "npm:2.1.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["atomic-sleep", [
+        ["npm:1.0.0", {
+          "packageLocation": "./.yarn/cache/atomic-sleep-npm-1.0.0-17d8a762a3-2c6fa68caf.zip/node_modules/atomic-sleep/",
+          "packageDependencies": [
+            ["atomic-sleep", "npm:1.0.0"]
           ],
           "linkType": "HARD",
         }]
@@ -2744,6 +2754,34 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["fast-redact", [
+        ["npm:3.0.0", {
+          "packageLocation": "./.yarn/cache/fast-redact-npm-3.0.0-cdc3023768-5a1a724f4b.zip/node_modules/fast-redact/",
+          "packageDependencies": [
+            ["fast-redact", "npm:3.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["fast-safe-stringify", [
+        ["npm:2.0.7", {
+          "packageLocation": "./.yarn/cache/fast-safe-stringify-npm-2.0.7-4c71091538-7bd2254326.zip/node_modules/fast-safe-stringify/",
+          "packageDependencies": [
+            ["fast-safe-stringify", "npm:2.0.7"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["fast-url-parser", [
+        ["npm:1.1.3", {
+          "packageLocation": "./.yarn/cache/fast-url-parser-npm-1.1.3-9be698120a-8dbc306b73.zip/node_modules/fast-url-parser/",
+          "packageDependencies": [
+            ["fast-url-parser", "npm:1.1.3"],
+            ["punycode", "npm:1.4.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["fast-xml-parser", [
         ["npm:3.19.0", {
           "packageLocation": "./.yarn/cache/fast-xml-parser-npm-3.19.0-b7dcd3a31a-bac00722d0.zip/node_modules/fast-xml-parser/",
@@ -2791,6 +2829,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["find-up", "npm:4.1.0"],
             ["locate-path", "npm:5.0.0"],
             ["path-exists", "npm:4.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["flatstr", [
+        ["npm:1.0.12", {
+          "packageLocation": "./.yarn/cache/flatstr-npm-1.0.12-4311d37d16-2803767f91.zip/node_modules/flatstr/",
+          "packageDependencies": [
+            ["flatstr", "npm:1.0.12"]
           ],
           "linkType": "HARD",
         }]
@@ -3240,15 +3287,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/human-signals-npm-1.1.1-616b2586c2-cac115f635.zip/node_modules/human-signals/",
           "packageDependencies": [
             ["human-signals", "npm:1.1.1"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["humanize-number", [
-        ["npm:0.0.2", {
-          "packageLocation": "./.yarn/cache/humanize-number-npm-0.0.2-ac26ad7632-334f89e672.zip/node_modules/humanize-number/",
-          "packageDependencies": [
-            ["humanize-number", "npm:0.0.2"]
           ],
           "linkType": "HARD",
         }]
@@ -4475,15 +4513,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
-      ["koa-logger", [
-        ["npm:3.2.1", {
-          "packageLocation": "./.yarn/cache/koa-logger-npm-3.2.1-c647362edb-0988b6894f.zip/node_modules/koa-logger/",
+      ["koa-pino-logger", [
+        ["npm:3.0.0", {
+          "packageLocation": "./.yarn/cache/koa-pino-logger-npm-3.0.0-5aa51196d2-6c22b4b56e.zip/node_modules/koa-pino-logger/",
           "packageDependencies": [
-            ["koa-logger", "npm:3.2.1"],
-            ["bytes", "npm:3.1.0"],
-            ["chalk", "npm:2.4.2"],
-            ["humanize-number", "npm:0.0.2"],
-            ["passthrough-counter", "npm:1.0.0"]
+            ["koa-pino-logger", "npm:3.0.0"],
+            ["pino-http", "npm:5.5.0"]
           ],
           "linkType": "HARD",
         }]
@@ -5381,15 +5416,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
-      ["passthrough-counter", [
-        ["npm:1.0.0", {
-          "packageLocation": "./.yarn/cache/passthrough-counter-npm-1.0.0-cbb2a89ced-9ceface826.zip/node_modules/passthrough-counter/",
-          "packageDependencies": [
-            ["passthrough-counter", "npm:1.0.0"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
       ["path-exists", [
         ["npm:4.0.0", {
           "packageLocation": "./.yarn/cache/path-exists-npm-4.0.0-e9e4f63eb0-6ab15000c5.zip/node_modules/path-exists/",
@@ -5456,6 +5482,49 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/picomatch-npm-2.2.2-1ce736a913-20fa75e0a5.zip/node_modules/picomatch/",
           "packageDependencies": [
             ["picomatch", "npm:2.2.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["pino", [
+        ["npm:6.11.2", {
+          "packageLocation": "./.yarn/cache/pino-npm-6.11.2-b9cd6ecb15-e854d37d65.zip/node_modules/pino/",
+          "packageDependencies": [
+            ["pino", "npm:6.11.2"],
+            ["fast-redact", "npm:3.0.0"],
+            ["fast-safe-stringify", "npm:2.0.7"],
+            ["flatstr", "npm:1.0.12"],
+            ["pino-std-serializers", "npm:3.2.0"],
+            ["quick-format-unescaped", "npm:4.0.1"],
+            ["sonic-boom", "npm:1.4.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["pino-http", [
+        ["npm:5.5.0", {
+          "packageLocation": "./.yarn/cache/pino-http-npm-5.5.0-b7a5c37af1-6ee96d9e90.zip/node_modules/pino-http/",
+          "packageDependencies": [
+            ["pino-http", "npm:5.5.0"],
+            ["fast-url-parser", "npm:1.1.3"],
+            ["pino", "npm:6.11.2"],
+            ["pino-std-serializers", "npm:2.5.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["pino-std-serializers", [
+        ["npm:2.5.0", {
+          "packageLocation": "./.yarn/cache/pino-std-serializers-npm-2.5.0-1e1542926e-c7605e6b9d.zip/node_modules/pino-std-serializers/",
+          "packageDependencies": [
+            ["pino-std-serializers", "npm:2.5.0"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:3.2.0", {
+          "packageLocation": "./.yarn/cache/pino-std-serializers-npm-3.2.0-9fd67503a4-fb386422f0.zip/node_modules/pino-std-serializers/",
+          "packageDependencies": [
+            ["pino-std-serializers", "npm:3.2.0"]
           ],
           "linkType": "HARD",
         }]
@@ -5563,6 +5632,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["punycode", [
+        ["npm:1.4.1", {
+          "packageLocation": "./.yarn/cache/punycode-npm-1.4.1-be4c23e6d2-5ce1e044ce.zip/node_modules/punycode/",
+          "packageDependencies": [
+            ["punycode", "npm:1.4.1"]
+          ],
+          "linkType": "HARD",
+        }],
         ["npm:2.1.1", {
           "packageLocation": "./.yarn/cache/punycode-npm-2.1.1-26eb3e15cf-0202dc191c.zip/node_modules/punycode/",
           "packageDependencies": [
@@ -5583,6 +5659,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/qs-npm-6.9.6-fee5de1427-853715ab6d.zip/node_modules/qs/",
           "packageDependencies": [
             ["qs", "npm:6.9.6"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["quick-format-unescaped", [
+        ["npm:4.0.1", {
+          "packageLocation": "./.yarn/cache/quick-format-unescaped-npm-4.0.1-54b775e975-0935e55e0a.zip/node_modules/quick-format-unescaped/",
+          "packageDependencies": [
+            ["quick-format-unescaped", "npm:4.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -6098,12 +6183,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["koa", "npm:2.13.1"],
             ["koa-body", "npm:4.2.0"],
             ["koa-helmet", "npm:6.0.0"],
-            ["koa-logger", "npm:3.2.1"],
+            ["koa-pino-logger", "npm:3.0.0"],
             ["koa-router", "npm:10.0.0"],
             ["koa2-ratelimit", "npm:0.9.0"],
             ["md5", "npm:2.3.0"],
             ["microformats-parser", "npm:1.4.0"],
-            ["mockdate", "npm:3.0.2"]
+            ["mockdate", "npm:3.0.2"],
+            ["pino", "npm:6.11.2"]
           ],
           "linkType": "SOFT",
         }]
@@ -6278,6 +6364,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["snapdragon-util", "npm:3.0.1"],
             ["kind-of", "npm:3.2.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["sonic-boom", [
+        ["npm:1.4.1", {
+          "packageLocation": "./.yarn/cache/sonic-boom-npm-1.4.1-e42b921f99-d681f4ef69.zip/node_modules/sonic-boom/",
+          "packageDependencies": [
+            ["sonic-boom", "npm:1.4.1"],
+            ["atomic-sleep", "npm:1.0.0"],
+            ["flatstr", "npm:1.0.12"]
           ],
           "linkType": "HARD",
         }]

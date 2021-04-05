@@ -1069,6 +1069,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"atomic-sleep@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "atomic-sleep@npm:1.0.0"
+  checksum: 2c6fa68cafef5ec1501245da00cde40b8f7ac71428bd727a923ea883b81ad643667a85677056cd663ad3ca584a49dbeb3a1bd4e6c70c1e9e36afd71b6e36ef96
+  languageName: node
+  linkType: hard
+
 "aws-sign2@npm:~0.7.0":
   version: 0.7.0
   resolution: "aws-sign2@npm:0.7.0"
@@ -1297,7 +1304,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bytes@npm:3.1.0, bytes@npm:^3.1.0":
+"bytes@npm:3.1.0":
   version: 3.1.0
   resolution: "bytes@npm:3.1.0"
   checksum: c3f64645ef37922c8194fef88a052de2a28101882dfdf8a225493888c4941a26ea15164957e7492e5c5e3a8e98ee6276f4834efacb68e2d8ad4d91f903250b6c
@@ -1397,7 +1404,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:^2.0.0, chalk@npm:^2.4.2":
+"chalk@npm:^2.0.0":
   version: 2.4.2
   resolution: "chalk@npm:2.4.2"
   dependencies:
@@ -2218,6 +2225,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fast-redact@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "fast-redact@npm:3.0.0"
+  checksum: 5a1a724f4b786c194117f322262440426a03996b1b8851b0e390392770ac2b6ab9037b2ef4b23d8eb7043cbdc7092b37926774a82f794f6179e9087fab44ee49
+  languageName: node
+  linkType: hard
+
+"fast-safe-stringify@npm:^2.0.7":
+  version: 2.0.7
+  resolution: "fast-safe-stringify@npm:2.0.7"
+  checksum: 7bd22543263b707870d70c6f2336b6e8563e34d6807dc388cc0566895e31e0a8273af017a7eb1c9538d0ef54288284e1c0585b557bd856491295a847159fd929
+  languageName: node
+  linkType: hard
+
+"fast-url-parser@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "fast-url-parser@npm:1.1.3"
+  dependencies:
+    punycode: ^1.3.2
+  checksum: 8dbc306b736e32963fe4391a581401c422d826497ce5cacf6e7c60525febfbcea477fbc5b012fe3316f6634a20fa00882168c5ed792ff3ef904c5bc6a11a598d
+  languageName: node
+  linkType: hard
+
 "fast-xml-parser@npm:^3.19.0":
   version: 3.19.0
   resolution: "fast-xml-parser@npm:3.19.0"
@@ -2264,6 +2294,13 @@ __metadata:
     locate-path: ^5.0.0
     path-exists: ^4.0.0
   checksum: d612d28e02eaca6cd7128fc9bc9b456e2547a3f9875b2b2ae2dbdc6b8cec52bc2885efcb3ac6c18954e838f4c8e20565d196784b190e1d38565f9dc39aade722
+  languageName: node
+  linkType: hard
+
+"flatstr@npm:^1.0.12":
+  version: 1.0.12
+  resolution: "flatstr@npm:1.0.12"
+  checksum: 2803767f91887ffd60ac2aac0d6ccf2dd9e2d8f216628a73e3f525d5b5bfa4ac9a5b57334a4c1e6d5622f92f440c52562f7ca9719ace9d025d6c5b7a1a1579db
   languageName: node
   linkType: hard
 
@@ -2665,13 +2702,6 @@ fsevents@^2.1.2:
   version: 1.1.1
   resolution: "human-signals@npm:1.1.1"
   checksum: cac115f635090055427bbd9d066781b17de3a2d8bbf839d920ae2fa52c3eab4efc63b4c8abc10e9a8b979233fa932c43a83a48864003a8c684ed9fb78135dd45
-  languageName: node
-  linkType: hard
-
-"humanize-number@npm:0.0.2":
-  version: 0.0.2
-  resolution: "humanize-number@npm:0.0.2"
-  checksum: 334f89e67241a2c163ee8c98382e958289052ba87c4dd8ebf553e03803964d89dd9609a0027f46c819ce1e31be7b2a49e2c526f6f9cf4df1b8dfb26908176f60
   languageName: node
   linkType: hard
 
@@ -3748,15 +3778,12 @@ fsevents@^2.1.2:
   languageName: node
   linkType: hard
 
-"koa-logger@npm:^3.2.1":
-  version: 3.2.1
-  resolution: "koa-logger@npm:3.2.1"
+"koa-pino-logger@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "koa-pino-logger@npm:3.0.0"
   dependencies:
-    bytes: ^3.1.0
-    chalk: ^2.4.2
-    humanize-number: 0.0.2
-    passthrough-counter: ^1.0.0
-  checksum: 0988b6894f48852115d30d57ac5fc4e71f699ae0bcff401f23435792c407f7bb4a33d2316a40a649a345a83f0ff7af70bf52ca69bf5c705c718c9c6d993b1f1a
+    pino-http: ^5.0.1
+  checksum: 6c22b4b56eb4a6f36401b09bbb2d4a7c4906a42ef616e1d45bfe6e4a78f476e9e163436aef6f682251c8fdef1d15f4eb2c4801e8e3847100e8bc31c6c0f8ba70
   languageName: node
   linkType: hard
 
@@ -4560,13 +4587,6 @@ fsevents@^2.1.2:
   languageName: node
   linkType: hard
 
-"passthrough-counter@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "passthrough-counter@npm:1.0.0"
-  checksum: 9ceface826d03f7bad287fbdfcaaa332f778cb127bc50f8d3cf2f11b74f17f78a0d60638c59e1aaf7bc0e6835417aaba74eb4606ca83504b721028687b957420
-  languageName: node
-  linkType: hard
-
 "path-exists@npm:^4.0.0":
   version: 4.0.0
   resolution: "path-exists@npm:4.0.0"
@@ -4620,6 +4640,47 @@ fsevents@^2.1.2:
   version: 2.2.2
   resolution: "picomatch@npm:2.2.2"
   checksum: 20fa75e0a58b39d83425b3db68744d5f6f361fd4fd66ec7745d884036d502abba0d553a637703af79939b844164b13e60eea339ccb043d7fbd74c3da2592b864
+  languageName: node
+  linkType: hard
+
+"pino-http@npm:^5.0.1":
+  version: 5.5.0
+  resolution: "pino-http@npm:5.5.0"
+  dependencies:
+    fast-url-parser: ^1.1.3
+    pino: ^6.0.0
+    pino-std-serializers: ^2.4.0
+  checksum: 6ee96d9e9036bf11a1a03646b28f58fc30ece6524d4035a498e3c8ff4988192fdc6f297ab739753cc889f70aca7fd578343fc18d514ef823f54dd25a89a6cb45
+  languageName: node
+  linkType: hard
+
+"pino-std-serializers@npm:^2.4.0":
+  version: 2.5.0
+  resolution: "pino-std-serializers@npm:2.5.0"
+  checksum: c7605e6b9dd3b2e6898059da0bca93277ed9139f0b884d9f7c922f22f011ba4a930389a71728e7c682ee5c3bf786aa67a90f10b1eb8eadc0467c5b78883a43bc
+  languageName: node
+  linkType: hard
+
+"pino-std-serializers@npm:^3.1.0":
+  version: 3.2.0
+  resolution: "pino-std-serializers@npm:3.2.0"
+  checksum: fb386422f018951ecdaf241b76554d6149928e9dd5c89d1bc12100d61d7f14b140fcbbfcf9203921b21cda05cc3eab2499289fe272358d50836627ccda15f5ec
+  languageName: node
+  linkType: hard
+
+"pino@npm:^6.0.0, pino@npm:^6.11.2":
+  version: 6.11.2
+  resolution: "pino@npm:6.11.2"
+  dependencies:
+    fast-redact: ^3.0.0
+    fast-safe-stringify: ^2.0.7
+    flatstr: ^1.0.12
+    pino-std-serializers: ^3.1.0
+    quick-format-unescaped: 4.0.1
+    sonic-boom: ^1.0.2
+  bin:
+    pino: ./bin.js
+  checksum: e854d37d659080c6f96c4030a279b44a25cc1550b8ca6aee0c9a62420773c2771090cfec96587aa917d4c82a2d1744d52e63d9d9135d4c410f9d30438069a013
   languageName: node
   linkType: hard
 
@@ -4711,6 +4772,13 @@ fsevents@^2.1.2:
   languageName: node
   linkType: hard
 
+"punycode@npm:^1.3.2":
+  version: 1.4.1
+  resolution: "punycode@npm:1.4.1"
+  checksum: 5ce1e044cee2b12f1c65ccd523d7e71d6578f2c77f5c21c2e7a9d588535559c9508571d42638c131dab93cbe9a7b37bce1a7475d43fc8236c99dfe1efc36cfa5
+  languageName: node
+  linkType: hard
+
 "punycode@npm:^2.1.0, punycode@npm:^2.1.1":
   version: 2.1.1
   resolution: "punycode@npm:2.1.1"
@@ -4729,6 +4797,13 @@ fsevents@^2.1.2:
   version: 6.5.2
   resolution: "qs@npm:6.5.2"
   checksum: fa0410eff2c05ce3328e11f82db4015e7819c986ee056d6b62b06ae112f4929af09ea3b879ca168ff9f0338f50972bba487ad0e46c879e42bfaf63c3c2ea7f09
+  languageName: node
+  linkType: hard
+
+"quick-format-unescaped@npm:4.0.1":
+  version: 4.0.1
+  resolution: "quick-format-unescaped@npm:4.0.1"
+  checksum: 0935e55e0aaaf789baa080768e822694bc0a497a3170fd35bf2b1aee2a953cf3b5a24e9d29a70dbe7bdc72534c6e1be917ab5c599d587ce0425c98293d8cc1c7
   languageName: node
   linkType: hard
 
@@ -5182,12 +5257,13 @@ fsevents@^2.1.2:
     koa: ^2.13.1
     koa-body: ^4.2.0
     koa-helmet: ^6.0.0
-    koa-logger: ^3.2.1
+    koa-pino-logger: ^3.0.0
     koa-router: ^10.0.0
     koa2-ratelimit: ^0.9.0
     md5: ^2.3.0
     microformats-parser: ^1.4.0
     mockdate: ^3.0.2
+    pino: ^6.11.2
   languageName: unknown
   linkType: soft
 
@@ -5338,6 +5414,16 @@ fsevents@^2.1.2:
     source-map-resolve: ^0.5.0
     use: ^3.1.0
   checksum: c30b63a732bf37dbd2147bf57b4d9eac651ab7b313d1521f73855154b2c2f5a3f2ad18bd47e21cc64b6991f868ecb2a99f8da973ca86da39956f1f0f720b7033
+  languageName: node
+  linkType: hard
+
+"sonic-boom@npm:^1.0.2":
+  version: 1.4.1
+  resolution: "sonic-boom@npm:1.4.1"
+  dependencies:
+    atomic-sleep: ^1.0.0
+    flatstr: ^1.0.12
+  checksum: d681f4ef6910e4ae698f17c9b1f3120ea9fc26ae25c870c5c6e73e29b5b4ba88005df507041f57a5e06ee85c739285f35c91604af9d61eabaeed96e79ef34824
   languageName: node
   linkType: hard
 

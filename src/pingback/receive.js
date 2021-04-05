@@ -2,6 +2,7 @@
 const webmentionReceiver = require('./../webmention/receive')
 const config = require('./../config')
 const parser = require("fast-xml-parser")
+const log = require('pino')()
 
 /**
 See https://www.hixie.ch/specs/pingback/pingback#refsXMLRPC
@@ -26,8 +27,17 @@ const isValidDomain = (url) => {
 	})
 }
 
+function xmlparse(body) {
+	try {
+		return parser.parse(body)
+	} catch(e) {
+		log.error('%s %s', 'fast-xml-parser was unable to parse the following body:', body)
+		throw e
+	}
+}
+
 function validate(body) {
-	const xml = parser.parse(body)
+	const xml = xmlparse(body)
 	if(!xml) return false
 	if(!xml.methodCall || xml.methodCall.methodName !== "pingback.ping") return false
 	if(!xml.methodCall.params || !xml.methodCall.params.param || xml.methodCall.params.param.length !== 2) return false
@@ -39,13 +49,13 @@ function validate(body) {
 // we treat a pingback as a webmention. 
 // Wordpress pingback processing source: https://developer.wordpress.org/reference/classes/wp_xmlrpc_server/pingback_ping/
 async function receive(body) {
-	const xml = parser.parse(body)
+	const xml = xmlparse(body)
 	const webmentionBody = {
 		source: xml.methodCall.params.param[0].value.string,
 		target: xml.methodCall.params.param[1].value.string
 	}
 
-    console.log(` OK: looks like a valid pingback: \n\tsource ${webmentionBody.source}\n\ttarget ${webmentionBody.target}`)
+    log.info('%s %o', 'OK: looks like a valid pingback', webmentionBody)
 	await webmentionReceiver.receive(webmentionBody)
 }
 

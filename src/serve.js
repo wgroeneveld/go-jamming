@@ -1,7 +1,8 @@
 "use strict";
 
 const Koa = require("koa");
-const Logger = require("koa-logger");
+const pino = require('koa-pino-logger')()
+const log = require('pino')()
 const bodyParser = require('koa-body');
 const koaRouter = require("koa-router");
 const helmet = require("koa-helmet");
@@ -17,9 +18,7 @@ app.use(RateLimit.middleware({
   max: 100
 }));
 app.use(helmet());
-
-// TODO not sure what to do on error yet
-app.use(Logger());
+app.use(pino);
 
 // enable ctx.request.body parsing for x-www-form-urlencoded webmentions etc
 app.use(bodyParser({
@@ -36,6 +35,6 @@ config.setupDataDirs();
 app.use(router.routes()).use(router.allowedMethods());
 
 app.listen(config.port, config.host, () => {
-	console.log(`Started localhost at port ${config.port}`)
+	log.info(`Started localhost at port ${config.port}`)
 });
 

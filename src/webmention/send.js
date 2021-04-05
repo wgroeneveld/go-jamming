@@ -4,6 +4,8 @@ const { collect } = require('./rsslinkcollector')
 const { discover } = require('./../linkdiscoverer')
 const { sendPingbackToEndpoint } = require('./../pingback/send')
 
+const log = require('pino')()
+
 async function sendWebmentionToEndpoint(endpoint, source, target) {
 	await got.post(endpoint, {
 		contentType: "x-www-form-urlencoded",
@@ -16,7 +18,7 @@ async function sendWebmentionToEndpoint(endpoint, source, target) {
 			methods: ["POST"]
 		}
 	})
-	console.log(` OK: webmention@${endpoint}, sent: source ${source}, target ${target}`)
+	log.info(` OK: webmention@${endpoint}, sent: source ${source}, target ${target}`)
 }
 
 async function mention(opts) {

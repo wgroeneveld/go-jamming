@@ -8,6 +8,8 @@ const dayjs = require('dayjs')
 const utc = require('dayjs/plugin/utc')
 dayjs.extend(utc)
 
+const log = require('pino')()
+
 function isValidUrl(url) {
 	return url !== undefined &&
 		(url.startsWith("http://") || url.startsWith("https://"))
@@ -48,7 +50,7 @@ async function isValidTargetUrl(target) {
 		return true
 	} catch(unknownTarget) {
 	}
-	console.log(` ABORT: invalid target url`)
+	log.warn(` ABORT: invalid target url`)
 	return false
 }
 
@@ -59,7 +61,11 @@ function asPath(source, target) {
 }
 
 async function deletePossibleOlderWebmention(source, target) {
-	await fsp.unlink(asPath(source, target))
+	try {
+		await fsp.unlink(asPath(source, target))
+	} catch(e) {
+		// does not matter, file not there. 
+	}
 }
 
 async function saveWebmentionToDisk(source, target, mentiondata) {
@@ -123,7 +129,7 @@ function parseBodyAsNonIndiewebSite(source, target, body) {
 
 async function processSourceBody(body, source, target) {
 	if(body.indexOf(target) === -1) {
-		console.log(` ABORT: no mention of ${target} found in html src of source`)
+		log.warn(` ABORT: no mention of ${target} found in html src of source`)
 		return
 	}
 
@@ -136,7 +142,7 @@ async function processSourceBody(body, source, target) {
 
 	const data = hEntry ? parseBodyAsIndiewebSite(source, target, hEntry) : parseBodyAsNonIndiewebSite(source, target, body)
 	await saveWebmentionToDisk(source, target, JSON.stringify(data))
-	console.log(` OK: webmention processed`)
+	log.info(` OK: webmention processed`)
 }
 
 async function receive(body) {
@@ -146,7 +152,7 @@ async function receive(body) {
 	try {
 		src = await got(body.source)
 	} catch(unknownSource) {
-		console.log(` ABORT: invalid source url: ` + unknownSource)
+		log.warn(` ABORT: invalid source url: ` + unknownSource)
 		await deletePossibleOlderWebmention(body.source, body.target)
 		return
 	}
