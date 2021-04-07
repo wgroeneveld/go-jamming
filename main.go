@@ -1,8 +1,10 @@
 
 package main
 
-import "fmt"
+import (
+	"github.com/wgroeneveld/go-jamming/app"
+)
 
 func main() {
-	fmt.Println("it works!")
+	app.Start()
 }
