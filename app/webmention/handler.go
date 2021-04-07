@@ -22,6 +22,11 @@ func HandlePut(conf *common.Config) http.HandlerFunc {
 
 func HandlePost(conf *common.Config) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
+    	r.ParseForm()
+    	if !validate(r, r.Header, conf) {
+    		http.Error(w, "400 bad request", http.StatusBadRequest)
+    	}
+    	fmt.Printf("%+v\n", r.Header)
     }
 }
 
