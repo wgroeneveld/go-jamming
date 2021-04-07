@@ -3,8 +3,11 @@ package webmention
 
 import (
 	"strings"
+	"net/http"
 
 	"github.com/wgroeneveld/go-jamming/common"
+
+	"github.com/rs/zerolog/log"
 )
 
 func isValidUrl(url string) bool {
@@ -21,11 +24,21 @@ func isValidDomain(url string, conf *common.Config) bool {
 	return false
 }
 
+// great, these are needed to do the structural typing for the tests...
 type httpReq interface {
 	FormValue(key string) string
 }
 type httpHeader interface {
 	Get(key string) string
+}
+
+func isValidTargetUrl(url string) bool {
+	_, err := http.Get(url)
+	if err != nil {
+		log.Warn().Str("target", url).Msg("Invalid target URL")
+		return false
+	}
+	return true
 }
 
 func validate(r httpReq, h httpHeader, conf *common.Config) bool {

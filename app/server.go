@@ -2,13 +2,13 @@
 package app
 
 import (
-	"fmt"
     "strconv"
 	"net/http"
 
-	"github.com/gorilla/mux"
-
     "github.com/wgroeneveld/go-jamming/common"
+
+    "github.com/gorilla/mux"
+    "github.com/rs/zerolog/log"
 )
 
 type server struct {
@@ -36,7 +36,8 @@ func Start() {
 
     server.routes()
     http.Handle("/", r)
+    r.Use(loggingMiddleware)
 
-    fmt.Printf("Serving at port %d...\n", server.conf.Port)
+    log.Info().Int("port", server.conf.Port).Msg("Serving...")
     http.ListenAndServe(":" + strconv.Itoa(server.conf.Port), nil)
 }

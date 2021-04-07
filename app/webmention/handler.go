@@ -24,9 +24,23 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
     	r.ParseForm()
     	if !validate(r, r.Header, conf) {
-    		http.Error(w, "400 bad request", http.StatusBadRequest)
+    		common.BadRequest(w)
+    		return
     	}
-    	fmt.Printf("%+v\n", r.Header)
+    	
+    	target := r.FormValue("target")
+    	if !isValidTargetUrl(target) {
+    		common.BadRequest(w)
+    		return
+    	}
+
+    	wm := &webmention{
+            source: r.FormValue("source"),
+            target: target,
+        } 
+
+        go wm.receive()
+        common.Accept(w)
     }
 }
 
