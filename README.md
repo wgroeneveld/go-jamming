@@ -1,10 +1,12 @@
-# serve-my-jams 🥞
+# go-jammin' 🥞
 
-> A minimalistic jamstack-augmented microservice for webmentions etc
+> A minimalistic Go-powered jamstack-augmented microservice for webmentions etc
+
+⚠️ **This is a fork of [https://github.com/wgroeneveld/serve-my-jams](serve-my-jams)**, the Node-powered original microservice, which is no longer being maintained. 
 
 **Are you looking for a way to DO something with this?** See https://github.com/wgroeneveld/jam-my-stack !
 
-This is a set of minimalistic [Koa-based](https://koajs.com/) microservices that aid you in your IndieWeb Jamstack coolness 😎 (name-dropping). While [jam-my-stack](https://github.com/wgroeneveld/jam-my-stack) is a set of scripts used to run at checkin-time, this is a dymamic service that handles requests. 
+This is a set of minimalistic Go-based microservices that aid you in your IndieWeb Jamstack coolness 😎 (name-dropping). While [jam-my-stack](https://github.com/wgroeneveld/jam-my-stack) is a set of scripts used to run at checkin-time, this is a dymamic service that handles requests. 
 
 Inspect how it's used on https://brainbaking.com/ - usually, a `<link/>` in your `<head/>` suffices:
 

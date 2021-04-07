@@ -1,11 +1,7 @@
 
 data/*
 
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
+# this is the binary
+go-jamming
 
 *.sublime-workspace
