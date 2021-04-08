@@ -4,7 +4,7 @@ package webmention
 import (
 	"fmt"
 
-	"github.com/wgroeneveld/go-jamming/common"
+	"github.com/wgroeneveld/go-jamming/rest"
 
 	"github.com/rs/zerolog/log"
 )
@@ -18,23 +18,29 @@ func (wm *webmention) String() string {
     return fmt.Sprintf("source: %s, target: %s", wm.source, wm.target)
 }
 
-func (wm *webmention) receive() {
+// used as a "class" to iject dependencies, just to be able to test. Do NOT like htis. 
+// Is there a better way? e.g. in validate, I just pass rest.Client as an arg. Not great either. 
+type receiver struct {
+	restClient rest.Client
+}
+
+func (recv *receiver) receive(wm webmention) {
 	log.Info().Str("webmention", wm.String()).Msg("OK: looks valid")
-	body, geterr := common.Get(wm.source)
+	body, geterr := recv.restClient.GetBody(wm.source)
 
 	if geterr != nil {
         log.Warn().Str("source", wm.source).Msg("  ABORT: invalid url")
-		wm.deletePossibleOlderWebmention()
+		recv.deletePossibleOlderWebmention(wm)
 		return
 	}
 
-	wm.processSourceBody(body)	
+	recv.processSourceBody(body, wm)
 }
 
-func (wm *webmention) deletePossibleOlderWebmention() {
+func (recv *receiver) deletePossibleOlderWebmention(wm webmention) {
 
 }
 
-func (wm *webmention) processSourceBody(body string) {
+func (recv *receiver) processSourceBody(body string, wm webmention) {
 	
 }

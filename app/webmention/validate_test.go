@@ -3,6 +3,8 @@ package webmention
 
 import (
 	"testing"
+	"errors"
+	"net/http"
 
 	"github.com/wgroeneveld/go-jamming/common"
 )
@@ -109,7 +111,34 @@ func TestValidate(t *testing.T) {
 				t.Fatalf("got %v, want %v", actual, tc.expected)
 			}
 		})
-	}
+	}	
+}
 
-	
+type restClientMock struct {
+}
+
+func (client *restClientMock) Get(url string) (*http.Response, error) {
+	if url == "failing" {
+		return nil, errors.New("whoops")
+	}
+	return nil, nil
+}
+func (client *restClientMock) GetBody(url string) (string, error) {
+	return "", nil
+}
+
+func TestIsValidTargetUrlFalseIfGetFails(t *testing.T) {
+	client := &restClientMock{}
+	result := isValidTargetUrl("failing", client)
+	if result != false {
+		t.Fatalf("expected to fail")
+	}
+}
+
+func TestIsValidTargetUrlTrueIfGetSucceeds(t *testing.T) {
+	client := &restClientMock{}
+	result := isValidTargetUrl("valid stuff!", client)
+	if result != true {
+		t.Fatalf("expected to succeed")
+	}
 }

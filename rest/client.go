@@ -1,23 +1,22 @@
 
-package common
+package rest
 
 import (
 	"fmt"
 	"net/http"
-	"io/ioutil"
+	"io/ioutil"	
 )
 
-func BadRequest(w http.ResponseWriter) {
-	http.Error(w, "400 bad request", http.StatusBadRequest)
+type Client interface {
+	Get(url string) (*http.Response, error)
+	GetBody(url string) (string, error)
 }
 
-func Accept(w http.ResponseWriter) {
-	w.WriteHeader(202)
-	w.Write([]byte("Thanks, bro. Will send these webmentions soon, pinky swear!"))
+type HttpClient struct {
 }
 
 // something like this? https://freshman.tech/snippets/go/http-response-to-string/
-func Get(url string) (string, error) {
+func (client *HttpClient) GetBody(url string) (string, error) {
 	resp, geterr := http.Get(url)
 	if geterr != nil {
 		return "", geterr
@@ -34,4 +33,9 @@ func Get(url string) (string, error) {
 	}
 
 	return string(body), nil
+}
+
+
+func (client *HttpClient) Get(url string) (*http.Response, error) {
+	return http.Get(url)
 }

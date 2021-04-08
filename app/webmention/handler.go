@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/wgroeneveld/go-jamming/common"
+    "github.com/wgroeneveld/go-jamming/rest"
 )
 
 func HandleGet(conf *common.Config) http.HandlerFunc {
@@ -21,26 +22,31 @@ func HandlePut(conf *common.Config) http.HandlerFunc {
 }
 
 func HandlePost(conf *common.Config) http.HandlerFunc {
+    httpClient := &rest.HttpClient{}
+
     return func(w http.ResponseWriter, r *http.Request) {
     	r.ParseForm()
     	if !validate(r, r.Header, conf) {
-    		common.BadRequest(w)
+    		rest.BadRequest(w)
     		return
     	}
     	
     	target := r.FormValue("target")
-    	if !isValidTargetUrl(target) {
-    		common.BadRequest(w)
+    	if !isValidTargetUrl(target, httpClient) {
+    		rest.BadRequest(w)
     		return
     	}
 
-    	wm := &webmention{
+    	wm := webmention{
             source: r.FormValue("source"),
             target: target,
-        } 
+        }
+        recv := &receiver{
+            restClient: httpClient,
+        }
 
-        go wm.receive()
-        common.Accept(w)
+        go recv.receive(wm)
+        rest.Accept(w)
     }
 }
 

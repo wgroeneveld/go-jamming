@@ -3,9 +3,9 @@ package webmention
 
 import (
 	"strings"
-	"net/http"
 
 	"github.com/wgroeneveld/go-jamming/common"
+	"github.com/wgroeneveld/go-jamming/rest"
 
 	"github.com/rs/zerolog/log"
 )
@@ -24,16 +24,8 @@ func isValidDomain(url string, conf *common.Config) bool {
 	return false
 }
 
-// great, these are needed to do the structural typing for the tests...
-type httpReq interface {
-	FormValue(key string) string
-}
-type httpHeader interface {
-	Get(key string) string
-}
-
-func isValidTargetUrl(url string) bool {
-	_, err := http.Get(url)
+func isValidTargetUrl(url string, httpClient rest.Client) bool {
+	_, err := httpClient.Get(url)
 	if err != nil {
 		log.Warn().Str("target", url).Msg("Invalid target URL")
 		return false
@@ -41,7 +33,7 @@ func isValidTargetUrl(url string) bool {
 	return true
 }
 
-func validate(r httpReq, h httpHeader, conf *common.Config) bool {
+func validate(r rest.HttpReq, h rest.HttpHeader, conf *common.Config) bool {
 	return h.Get("Content-Type") == "application/x-www-form-urlencoded" &&
 		isValidUrl(r.FormValue("source")) &&
 		isValidUrl(r.FormValue("target")) &&
