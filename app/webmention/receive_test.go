@@ -62,3 +62,24 @@ func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testi
   		t.Fatalf("Expected possibly older webmention to be deleted, but it wasn't!")
   	}
 }
+
+func TestProcessSourceBodyAbortsIfNoMentionOfTargetFoundInSourceHtml(t *testing.T) {
+	os.MkdirAll("testdata/jefklakscodex.com", os.ModePerm)
+	defer os.RemoveAll("testdata")
+
+	wm := webmention{
+		source: "https://brainbaking.com",
+		target: "https://jefklakscodex.com/articles",
+	}
+	filename := wm.asPath(conf)
+
+	receiver := &receiver {
+		conf: conf,
+	}
+
+	receiver.processSourceBody("<html>my nice body</html>", wm)
+  	if _, err := os.Stat(filename); err == nil {
+  		t.Fatalf("Expected no file to be created!")
+  	}
+}
+

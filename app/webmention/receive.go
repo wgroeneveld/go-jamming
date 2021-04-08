@@ -3,6 +3,7 @@ package webmention
 
 import (
 	"fmt"
+	"strings"
 	"os"
 	"crypto/md5"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/wgroeneveld/go-jamming/rest"
 
 	"github.com/rs/zerolog/log"
+	"willnorris.com/go/microformats"
 )
 
 type webmention struct {
@@ -52,5 +54,15 @@ func (recv *receiver) deletePossibleOlderWebmention(wm webmention) {
 }
 
 func (recv *receiver) processSourceBody(body string, wm webmention) {
-	
+	if strings.Index(body, wm.target) == -1 {
+		log.Warn().Str("target", wm.target).Msg("ABORT: no mention of target found in html src of source!")
+		return
+	}
+
+	r := strings.NewReader(body)
+	data := microformats.Parse(r, nil)
+
+	fmt.Println(data.Items[0].Type[0]) // h-entry
+	// then: .Properties on Items[0]
+	// see https://github.com/willnorris/microformats/blob/main/microformats.go
 }
