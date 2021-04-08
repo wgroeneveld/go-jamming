@@ -43,6 +43,7 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
         }
         recv := &receiver{
             restClient: httpClient,
+            conf: conf,
         }
 
         go recv.receive(wm)

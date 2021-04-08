@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/wgroeneveld/go-jamming/common"
+	"github.com/wgroeneveld/go-jamming/mocks"
 )
 
 type httpReqMock struct {
@@ -114,21 +115,8 @@ func TestValidate(t *testing.T) {
 	}	
 }
 
-// neat trick! https://medium.com/@matryer/meet-moq-easily-mock-interfaces-in-go-476444187d10
-type restClientMock struct {
-	GetFunc func(string) (*http.Response, error)
-}
-
-// although these are still requied to match the rest.Client interface. 
-func (m *restClientMock) Get(url string) (*http.Response, error) {
-	return m.GetFunc(url)
-}
-func (m *restClientMock) GetBody(url string) (string, error) {
-	return "", nil
-}
-
 func TestIsValidTargetUrlFalseIfGetFails(t *testing.T) {
-	client := &restClientMock{
+	client := &mocks.RestClientMock{
 		GetFunc: func(url string) (*http.Response, error) {
 			return nil, errors.New("whoops")
 		},
@@ -140,7 +128,7 @@ func TestIsValidTargetUrlFalseIfGetFails(t *testing.T) {
 }
 
 func TestIsValidTargetUrlTrueIfGetSucceeds(t *testing.T) {
-	client := &restClientMock{
+	client := &mocks.RestClientMock{
 		GetFunc: func(url string) (*http.Response, error) {
 			return nil, nil
 		},

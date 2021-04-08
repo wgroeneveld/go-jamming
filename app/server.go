@@ -32,7 +32,9 @@ func (s *server) authorizedOnly(h http.HandlerFunc) http.HandlerFunc {
 
 func Start() {
     r := mux.NewRouter()
-    server := &server{router: r, conf: common.Configure()}
+    config := common.Configure()
+    config.SetupDataDirs()
+    server := &server{router: r, conf: config}
 
     server.routes()
     http.Handle("/", r)

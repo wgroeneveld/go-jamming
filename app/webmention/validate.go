@@ -16,12 +16,11 @@ func isValidUrl(url string) bool {
 }
 
 func isValidDomain(url string, conf *common.Config) bool {
-	for _, domain := range conf.AllowedWebmentionSources {
-		if strings.Index(url, domain) != -1 {
-			return true
-		}
+	_, err := conf.FetchDomain(url)
+	if err != nil {
+		return false
 	}
-	return false
+	return true
 }
 
 func isValidTargetUrl(url string, httpClient rest.Client) bool {

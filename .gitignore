@@ -1,5 +1,6 @@
 
 data/*
+testdata
 
 # this is the binary
 go-jamming
