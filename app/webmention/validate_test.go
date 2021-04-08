@@ -114,21 +114,25 @@ func TestValidate(t *testing.T) {
 	}	
 }
 
+// neat trick! https://medium.com/@matryer/meet-moq-easily-mock-interfaces-in-go-476444187d10
 type restClientMock struct {
+	GetFunc func(string) (*http.Response, error)
 }
 
-func (client *restClientMock) Get(url string) (*http.Response, error) {
-	if url == "failing" {
-		return nil, errors.New("whoops")
-	}
-	return nil, nil
+// although these are still requied to match the rest.Client interface. 
+func (m *restClientMock) Get(url string) (*http.Response, error) {
+	return m.GetFunc(url)
 }
-func (client *restClientMock) GetBody(url string) (string, error) {
+func (m *restClientMock) GetBody(url string) (string, error) {
 	return "", nil
 }
 
 func TestIsValidTargetUrlFalseIfGetFails(t *testing.T) {
-	client := &restClientMock{}
+	client := &restClientMock{
+		GetFunc: func(url string) (*http.Response, error) {
+			return nil, errors.New("whoops")
+		},
+	}
 	result := isValidTargetUrl("failing", client)
 	if result != false {
 		t.Fatalf("expected to fail")
@@ -136,7 +140,11 @@ func TestIsValidTargetUrlFalseIfGetFails(t *testing.T) {
 }
 
 func TestIsValidTargetUrlTrueIfGetSucceeds(t *testing.T) {
-	client := &restClientMock{}
+	client := &restClientMock{
+		GetFunc: func(url string) (*http.Response, error) {
+			return nil, nil
+		},
+	}
 	result := isValidTargetUrl("valid stuff!", client)
 	if result != true {
 		t.Fatalf("expected to succeed")
