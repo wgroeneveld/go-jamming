@@ -2,9 +2,9 @@
 package webmention
 
 import (
-	"testing"
-	"os"
 	"errors"
+	"os"
+	"testing"
 
 	"github.com/wgroeneveld/go-jamming/common"
 	"github.com/wgroeneveld/go-jamming/mocks"
@@ -34,6 +34,26 @@ func writeSomethingTo(filename string) {
 	file, _ := os.Create(filename)
 	file.WriteString("lolz")
 	defer file.Close()	
+}
+
+func TestReceiveTargetExistsSavesWebmentionToDisk(t *testing.T) {
+	os.MkdirAll("testdata/jefklakscodex.com", os.ModePerm)
+	//defer os.RemoveAll("testdata")
+
+	wm := webmention{
+		source: "https://brainbaking.com",
+		target: "https://jefklakscodex.com/articles",
+	}
+	//filename := wm.asPath(conf)
+
+	receiver := &receiver {
+		conf: conf,
+		restClient: &mocks.RestClientMock{
+			GetBodyFunc: mocks.BodyFunc(t, "../../mocks/valid-indieweb-source.html"),
+		},
+	}
+
+	receiver.receive(wm)
 }
 
 func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testing.T) {

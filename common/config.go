@@ -21,7 +21,7 @@ type Config struct {
 
 func (c *Config) FetchDomain(url string) (string, error) {
 	for _, domain := range c.AllowedWebmentionSources {
-		if strings.Index(url, domain) != -1 {
+		if strings.Contains(url, domain) {
 			return domain, nil
 		}
 	}

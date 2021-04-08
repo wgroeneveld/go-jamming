@@ -2,6 +2,8 @@
 package mocks
 
 import (
+	"testing"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -19,3 +21,12 @@ func (m *RestClientMock) GetBody(url string) (string, error) {
 	return m.GetBodyFunc(url)
 }
 
+func BodyFunc(t *testing.T, mockfile string) func(string) (string, error) {
+	html, err := ioutil.ReadFile(mockfile)
+	if err != nil {
+		t.Error(err)
+	}
+	return func(url string) (string, error) {
+		return string(html), nil
+	}
+}
