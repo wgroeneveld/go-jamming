@@ -2,14 +2,17 @@
 package webmention
 
 import (
-	"fmt"
-	"net/url"
-	"strings"
-	"os"
 	"crypto/md5"
-
+	"encoding/json"
+	"fmt"
 	"github.com/wgroeneveld/go-jamming/common"
 	"github.com/wgroeneveld/go-jamming/rest"
+	"io/fs"
+	"io/ioutil"
+	"net/url"
+	"os"
+	"regexp"
+	"strings"
 
 	"github.com/rs/zerolog/log"
 	"willnorris.com/go/microformats"
@@ -68,21 +71,6 @@ func getHEntry(data *microformats.Data) *microformats.Microformat {
 	return nil
 }
 
-type indiewebAuthor struct {
-	name string
-	picture string
-}
-
-type indiewebData struct {
-	author indiewebAuthor
-	name string
-	content string
-	published string // TODO to a date
-	url string
-	dateType string // TODO json property "type"
-	source string
-	target string
-}
 
 func (recv *receiver) processSourceBody(body string, wm webmention) {
 	if !strings.Contains(body, wm.target) {
@@ -95,63 +83,119 @@ func (recv *receiver) processSourceBody(body string, wm webmention) {
 	hEntry := getHEntry(data)
 	var indieweb *indiewebData
 	if hEntry == nil {
-		indieweb = parseBodyAsNonIndiewebSite(body, wm)
+		indieweb = recv.parseBodyAsNonIndiewebSite(body, wm)
 	} else {
-		indieweb = parseBodyAsIndiewebSite(hEntry, wm)
+		indieweb = recv.parseBodyAsIndiewebSite(hEntry, wm)
 	}
 	
-	saveWebmentionToDisk(wm, indieweb)
+	recv.saveWebmentionToDisk(wm, indieweb)
 	log.Info().Str("file", wm.asPath(recv.conf)).Msg("OK: webmention processed.")
 }
 
-func saveWebmentionToDisk(wm webmention, indieweb *indiewebData) {
-
+func (recv *receiver) saveWebmentionToDisk(wm webmention, indieweb *indiewebData) {
+	jsonData, jsonErr := json.Marshal(indieweb)
+	if jsonErr != nil {
+		log.Err(jsonErr).Msg("Unable to serialize webmention into JSON")
+	}
+	err := ioutil.WriteFile(wm.asPath(recv.conf), jsonData, fs.ModePerm)
+	if err != nil {
+		log.Err(err).Msg("Unable to save webmention to disk")
+	}
 }
 
 // TODO I'm smelling very unstable code, apply https://golang.org/doc/effective_go#recover here?
 // see https://github.com/willnorris/microformats/blob/main/microformats.go
-func parseBodyAsIndiewebSite(hEntry *microformats.Microformat, wm webmention) *indiewebData {
-	name := mfstr(hEntry, "name")
-	authorName := mfstr(mfprop(hEntry, "author"), "name")
-	if authorName == "" {
-		authorName = mfprop(hEntry, "author").Value
-	}
-	// TODO sometimes it's picture.value??
-	pic := mfstr(mfprop(hEntry, "author"), "photo")
-	summary := mfstr(hEntry, "summary")
-	contentEntry := mfmap(hEntry, "content")["value"]
-	bridgyTwitterContent := mfstr(hEntry, "bridgy-twitter-content")
+func (recv *receiver) parseBodyAsIndiewebSite(hEntry *microformats.Microformat, wm webmention) *indiewebData {
+	name := mfStr(hEntry, "name")
+	pic := mfStr(mfProp(hEntry, "author"), "photo")
+	mfType := determineMfType(hEntry)
 
 	return &indiewebData{
-		name: name,
-		author: indiewebAuthor{
-			name: authorName,
-			picture: pic,
+		Name: name,
+		Author: indiewebAuthor{
+			Name: determineAuthorName(hEntry),
+			Picture: pic,
 		},
-		content: determineContent(summary, contentEntry, bridgyTwitterContent),
-		source: wm.source,
-		target: wm.target,
+		Content: determineContent(hEntry),
+		Url: determineUrl(hEntry, wm.source),
+		Published: determinePublishedDate(hEntry, recv.conf.UtcOffset),
+		Source: wm.source,
+		Target: wm.target,
+		IndiewebType: mfType,
 	}
-
-	//len(entry.Properties["hoopw"])
 }
 
-func shorten(txt string) string {
-	if len(txt) <= 250 {
-		return txt
+func determinePublishedDate(hEntry *microformats.Microformat, utcOffset int) string {
+	publishedDate := mfStr(hEntry, "published")
+	if publishedDate == "" {
+		return publishedNow(utcOffset)
 	}
-	return txt[0:250] + "..."
+	return publishedDate
 }
 
-func determineContent(summary string, contentEntry string, bridgyTwitterContent string) string {
+func determineAuthorName(hEntry *microformats.Microformat) string {
+	authorName := mfStr(mfProp(hEntry, "author"), "name")
+	if authorName == "" {
+		return mfProp(hEntry, "author").Value
+	}
+	return authorName
+}
+
+func determineMfType(hEntry *microformats.Microformat) string {
+	likeOf := mfStr(hEntry, "like-of")
+	if likeOf != "" {
+		return "like"
+	}
+	bookmarkOf := mfStr(hEntry, "bookmark-of")
+	if bookmarkOf != "" {
+		return "bookmark"
+	}
+	return "mention"
+}
+
+// Mastodon uids start with "tag:server", but we do want indieweb uids from other sources
+func determineUrl(hEntry *microformats.Microformat, source string) string {
+	uid := mfStr(hEntry, "uid")
+	if uid != "" && strings.HasPrefix(uid, "http") {
+		return uid
+	}
+	url := mfStr(hEntry, "url")
+	if url != "" {
+		return url
+	}
+	return source
+}
+
+func determineContent(hEntry *microformats.Microformat) string {
+	bridgyTwitterContent := mfStr(hEntry, "bridgy-twitter-content")
 	if bridgyTwitterContent != "" {
 		return shorten(bridgyTwitterContent)
-	} else if summary != "" {
+	}
+	summary := mfStr(hEntry, "summary")
+	if summary != "" {
 		return shorten(summary)
 	}
+	contentEntry := mfMap(hEntry, "content")["value"]
 	return shorten(contentEntry)
 }
 
-func parseBodyAsNonIndiewebSite(body string, wm webmention) *indiewebData {
-	return nil
+func (recv *receiver) parseBodyAsNonIndiewebSite(body string, wm webmention) *indiewebData {
+	r := regexp.MustCompile(`<title>(.*?)<\/title>`)
+	titleMatch := r.FindStringSubmatch(body)
+	title := wm.source
+	if titleMatch != nil {
+		title = titleMatch[1]
+	}
+	return &indiewebData{
+		Author: indiewebAuthor{
+			Name: wm.source,
+		},
+		Name: title,
+		Content: title,
+		Published: publishedNow(recv.conf.UtcOffset),
+		Url: wm.source,
+		IndiewebType: "mention",
+		Source: wm.source,
+		Target: wm.target,
+	}
 }

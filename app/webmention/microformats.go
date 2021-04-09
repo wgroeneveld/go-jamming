@@ -1,11 +1,46 @@
 package webmention
 
-import "willnorris.com/go/microformats"
+import (
+	"time"
+	"willnorris.com/go/microformats"
+)
+
+const (
+	DateFormat = "2006-01-02T15:04:05"
+)
+
+type indiewebAuthor struct {
+	Name string				`json:"name"`
+	Picture string			`json:"picture"`
+}
+
+type indiewebData struct {
+	Author indiewebAuthor	`json:"author"`
+	Name string				`json:"name"`
+	Content string			`json:"content"`
+	Published string		`json:"published"`
+	Url string				`json:"url"`
+	IndiewebType string 	`json:"type"`
+	Source string			`json:"source"`
+	Target string			`json:"target"`
+}
+
+var now = time.Now
+func publishedNow(utcOffset int) string {
+	return now().UTC().Add(time.Duration(utcOffset) * time.Minute).Format("2006-01-02T15:04:05")
+}
+
+func shorten(txt string) string {
+	if len(txt) <= 250 {
+		return txt
+	}
+	return txt[0:250] + "..."
+}
 
 // Go stuff: entry.Properties["name"][0].(string),
 // JS stuff: hEntry.properties?.name?.[0]
 // The problem: convoluted syntax and no optional chaining!
-func mfstr(mf *microformats.Microformat, key string) string {
+func mfStr(mf *microformats.Microformat, key string) string {
 	val := mf.Properties[key]
 	if len(val) == 0 {
 		return ""
@@ -24,7 +59,7 @@ func mfstr(mf *microformats.Microformat, key string) string {
 	return str
 }
 
-func mfmap(mf *microformats.Microformat, key string) map[string]string {
+func mfMap(mf *microformats.Microformat, key string) map[string]string {
 	val := mf.Properties[key]
 	if len(val) == 0 {
 		return map[string]string{}
@@ -36,7 +71,7 @@ func mfmap(mf *microformats.Microformat, key string) map[string]string {
 	return mapVal
 }
 
-func mfprop(mf *microformats.Microformat, key string) *microformats.Microformat {
+func mfProp(mf *microformats.Microformat, key string) *microformats.Microformat {
 	val := mf.Properties[key]
 	if len(val) == 0 {
 		return &microformats.Microformat{
