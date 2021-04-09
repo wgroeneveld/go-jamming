@@ -2,13 +2,13 @@
 package app
 
 import (
-    "strconv"
 	"net/http"
+	"strconv"
 
-    "github.com/wgroeneveld/go-jamming/common"
+	"github.com/wgroeneveld/go-jamming/common"
 
-    "github.com/gorilla/mux"
-    "github.com/rs/zerolog/log"
+	"github.com/gorilla/mux"
+	"github.com/rs/zerolog/log"
 )
 
 type server struct {
@@ -22,7 +22,7 @@ func unauthorized(w http.ResponseWriter, r *http.Request) { http.Error(w, "401 u
 func (s *server) authorizedOnly(h http.HandlerFunc) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
 	    vars := mux.Vars(r)
-	    if vars["token"] != s.conf.Token {
+	    if vars["token"] != s.conf.Token || !s.conf.IsAnAllowedDomain(vars["domain"]) {
         	unauthorized(w, r)
         	return
 	    }

@@ -2,5 +2,6 @@ package common
 
 import "time"
 
-// I know it's public. Not sure how to handle this in tests, package-independent
+// https://labs.yulrizka.com/en/stubbing-time-dot-now-in-golang/
+// None of the above are very appealing. For now, just use the lazy way.
 var Now = time.Now

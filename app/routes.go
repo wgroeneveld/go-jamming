@@ -3,18 +3,20 @@ package app
 
 import (
 	"github.com/wgroeneveld/go-jamming/app/index"
-	"github.com/wgroeneveld/go-jamming/app/webmention"
 	"github.com/wgroeneveld/go-jamming/app/pingback"
+	"github.com/wgroeneveld/go-jamming/app/webmention"
 )
 
 // stole ideas from https://pace.dev/blog/2018/05/09/how-I-write-http-services-after-eight-years.html
 // not that contempt with passing conf, but can't create receivers on non-local types, and won't move specifics into package app
 // https://blog.questionable.services/article/http-handler-error-handling-revisited/ is the better idea, but more work
 func (s *server) routes() {
-	s.router.HandleFunc("/", index.Handle(s.conf)).Methods("GET")
-	s.router.HandleFunc("/pingback", pingback.HandlePost(s.conf)).Methods("POST")
-	s.router.HandleFunc("/webmention", webmention.HandlePost(s.conf)).Methods("POST")
-	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandleGet(s.conf))).Methods("GET")
-	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandlePut(s.conf))).Methods("PUT")
+	cnf := s.conf
+
+	s.router.HandleFunc("/", index.Handle(cnf)).Methods("GET")
+	s.router.HandleFunc("/pingback", pingback.HandlePost(cnf)).Methods("POST")
+	s.router.HandleFunc("/webmention", webmention.HandlePost(cnf)).Methods("POST")
+	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandleGet(cnf))).Methods("GET")
+	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandlePut(cnf))).Methods("PUT")
 }
 

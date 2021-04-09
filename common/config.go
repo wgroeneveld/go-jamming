@@ -2,9 +2,9 @@
 package common
 
 import (
+	"errors"
 	"os"
 	"strconv"
-	"errors"
 	"strings"
 
 	"github.com/rs/zerolog/log"
@@ -17,6 +17,15 @@ type Config struct {
 	DataPath string
 	AllowedWebmentionSources []string
 	DisallowedWebmentionDomains []string
+}
+
+func (c *Config) IsAnAllowedDomain(url string) bool {
+	for _, domain := range c.AllowedWebmentionSources {
+		if domain == url {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *Config) FetchDomain(url string) (string, error) {
