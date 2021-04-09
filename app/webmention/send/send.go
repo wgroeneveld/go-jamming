@@ -2,10 +2,10 @@ package send
 
 import (
 	"github.com/rs/zerolog/log"
-	"github.com/wgroeneveld/go-jamming/app/mf"
-	"github.com/wgroeneveld/go-jamming/app/pingback/send"
-	"github.com/wgroeneveld/go-jamming/common"
-	"github.com/wgroeneveld/go-jamming/rest"
+	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/app/pingback/send"
+	"brainbaking.com/go-jamming/common"
+	"brainbaking.com/go-jamming/rest"
 )
 
 type Sender struct {

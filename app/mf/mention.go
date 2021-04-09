@@ -3,7 +3,7 @@ package mf
 import (
 	"crypto/md5"
 	"fmt"
-	"github.com/wgroeneveld/go-jamming/common"
+	"brainbaking.com/go-jamming/common"
 	"net/url"
 )
 

@@ -1,4 +1,4 @@
-module github.com/wgroeneveld/go-jamming
+module brainbaking.com/go-jamming
 
 go 1.16
 

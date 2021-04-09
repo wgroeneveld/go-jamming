@@ -4,7 +4,7 @@ package main
 import (
 	"os"
 
-	"github.com/wgroeneveld/go-jamming/app"
+	"brainbaking.com/go-jamming/app"
 
     "github.com/rs/zerolog"
     "github.com/rs/zerolog/log"

@@ -2,9 +2,9 @@
 package app
 
 import (
-	"github.com/wgroeneveld/go-jamming/app/index"
-	"github.com/wgroeneveld/go-jamming/app/pingback"
-	"github.com/wgroeneveld/go-jamming/app/webmention"
+	"brainbaking.com/go-jamming/app/index"
+	"brainbaking.com/go-jamming/app/pingback"
+	"brainbaking.com/go-jamming/app/webmention"
 )
 
 // stole ideas from https://pace.dev/blog/2018/05/09/how-I-write-http-services-after-eight-years.html

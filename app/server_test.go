@@ -3,7 +3,7 @@ package app
 import (
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
-	"github.com/wgroeneveld/go-jamming/common"
+	"brainbaking.com/go-jamming/common"
 	"net/http"
 	"net/http/httptest"
 	"testing"

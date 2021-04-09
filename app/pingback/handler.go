@@ -4,10 +4,10 @@ package pingback
 import (
 	"encoding/xml"
 	"github.com/rs/zerolog/log"
-	"github.com/wgroeneveld/go-jamming/app/mf"
-	"github.com/wgroeneveld/go-jamming/app/webmention/receive"
-	"github.com/wgroeneveld/go-jamming/common"
-	"github.com/wgroeneveld/go-jamming/rest"
+	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/app/webmention/recv"
+	"brainbaking.com/go-jamming/common"
+	"brainbaking.com/go-jamming/rest"
 	"io/ioutil"
 	"net/http"
 )
@@ -33,7 +33,7 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
 			Source: rpc.Source(),
 			Target: rpc.Target(),
 		}
-		receiver := receive.Receiver{
+		receiver := recv.Receiver{
 			RestClient: &rest.HttpClient{},
 			Conf:       conf,
 		}

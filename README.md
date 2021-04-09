@@ -1,8 +1,10 @@
 # go-jammin' 🥞
 
+Go module `brainbaking.com/go-jamming`:
+
 > A minimalistic Go-powered jamstack-augmented microservice for webmentions etc
 
-⚠️ **This is a fork of [https://github.com/wgroeneveld/serve-my-jams](serve-my-jams)**, the Node-powered original microservice, which is no longer being maintained. 
+✅️ **This is a fork of [https://github.com/wgroeneveld/serve-my-jams](serve-my-jams)**, the Node-powered original microservice, which is no longer being maintained. 
 
 **Are you looking for a way to DO something with this?** See https://github.com/wgroeneveld/jam-my-stack !
 

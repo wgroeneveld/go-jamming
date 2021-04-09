@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 	"willnorris.com/go/microformats"
-	"github.com/wgroeneveld/go-jamming/common"
+	"brainbaking.com/go-jamming/common"
 )
 
 const (

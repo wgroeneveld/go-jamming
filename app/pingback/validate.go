@@ -1,7 +1,7 @@
 package pingback
 
 import (
-	"github.com/wgroeneveld/go-jamming/common"
+	"brainbaking.com/go-jamming/common"
 	"strings"
 )
 

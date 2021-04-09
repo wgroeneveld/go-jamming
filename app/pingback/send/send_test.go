@@ -2,8 +2,8 @@ package send
 
 import (
 	"github.com/stretchr/testify/assert"
-	"github.com/wgroeneveld/go-jamming/app/mf"
-	"github.com/wgroeneveld/go-jamming/mocks"
+	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/mocks"
 	"testing"
 )
 

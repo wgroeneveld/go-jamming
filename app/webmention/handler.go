@@ -4,13 +4,13 @@ package webmention
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/wgroeneveld/go-jamming/app/mf"
-	"github.com/wgroeneveld/go-jamming/app/webmention/receive"
-	"github.com/wgroeneveld/go-jamming/app/webmention/send"
+	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/app/webmention/recv"
+	"brainbaking.com/go-jamming/app/webmention/send"
 	"net/http"
 
-	"github.com/wgroeneveld/go-jamming/common"
-	"github.com/wgroeneveld/go-jamming/rest"
+	"brainbaking.com/go-jamming/common"
+	"brainbaking.com/go-jamming/rest"
 )
 
 var httpClient = &rest.HttpClient{}
@@ -26,7 +26,7 @@ func HandlePut(conf *common.Config) http.HandlerFunc {
 		since := getSinceQueryParam(r)
 		domain := mux.Vars(r)["domain"]
 
-		snder := send.Sender{
+		snder := &send.Sender{
 			RestClient: httpClient,
 			Conf:       conf,
 		}
@@ -62,7 +62,7 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
             Source: r.FormValue("source"),
             Target: target,
         }
-        recv := &receive.Receiver{
+        recv := &recv.Receiver{
             RestClient: httpClient,
             Conf:       conf,
         }

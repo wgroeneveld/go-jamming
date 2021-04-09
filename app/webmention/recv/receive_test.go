@@ -1,17 +1,17 @@
 
-package receive
+package recv
 
 import (
 	"errors"
 	"github.com/stretchr/testify/assert"
-	"github.com/wgroeneveld/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/app/mf"
 	"io/ioutil"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/wgroeneveld/go-jamming/common"
-	"github.com/wgroeneveld/go-jamming/mocks"
+	"brainbaking.com/go-jamming/common"
+	"brainbaking.com/go-jamming/mocks"
 )
 
 var conf = &common.Config{

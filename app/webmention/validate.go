@@ -4,8 +4,8 @@ package webmention
 import (
 	"strings"
 
-	"github.com/wgroeneveld/go-jamming/common"
-	"github.com/wgroeneveld/go-jamming/rest"
+	"brainbaking.com/go-jamming/common"
+	"brainbaking.com/go-jamming/rest"
 
 	"github.com/rs/zerolog/log"
 )

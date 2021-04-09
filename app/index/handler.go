@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"fmt"
 
-	"github.com/wgroeneveld/go-jamming/common"
+	"brainbaking.com/go-jamming/common"
 )
 
 func Handle(conf *common.Config) http.HandlerFunc {

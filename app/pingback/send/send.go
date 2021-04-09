@@ -2,8 +2,8 @@ package send
 
 import (
 	"github.com/rs/zerolog/log"
-	"github.com/wgroeneveld/go-jamming/app/mf"
-	"github.com/wgroeneveld/go-jamming/rest"
+	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/rest"
 	"strings"
 )
 

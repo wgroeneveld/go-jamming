@@ -3,7 +3,7 @@ package pingback
 import (
 	"encoding/xml"
 	"github.com/stretchr/testify/assert"
-	"github.com/wgroeneveld/go-jamming/common"
+	"brainbaking.com/go-jamming/common"
 	"testing"
 )
 

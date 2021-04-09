@@ -6,8 +6,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/wgroeneveld/go-jamming/common"
-	"github.com/wgroeneveld/go-jamming/mocks"
+	"brainbaking.com/go-jamming/common"
+	"brainbaking.com/go-jamming/mocks"
 )
 
 type httpReqMock struct {
