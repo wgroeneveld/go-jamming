@@ -3,16 +3,26 @@ package rest
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
-	"io/ioutil"	
+	"strings"
 )
 
 type Client interface {
 	Get(url string) (*http.Response, error)
+	Post(url string, contentType string, body string) error
 	GetBody(url string) (string, error)
 }
 
 type HttpClient struct {
+}
+
+func (client *HttpClient) Post(url string, contenType string, body string) error {
+	_, err := http.Post(url, contenType, strings.NewReader(body))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // something like this? https://freshman.tech/snippets/go/http-response-to-string/
