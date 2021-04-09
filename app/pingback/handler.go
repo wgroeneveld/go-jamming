@@ -6,12 +6,10 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/wgroeneveld/go-jamming/app/mf"
 	"github.com/wgroeneveld/go-jamming/app/webmention/receive"
+	"github.com/wgroeneveld/go-jamming/common"
 	"github.com/wgroeneveld/go-jamming/rest"
 	"io/ioutil"
 	"net/http"
-	"text/template"
-
-	"github.com/wgroeneveld/go-jamming/common"
 )
 
 func HandlePost(conf *common.Config) http.HandlerFunc {
@@ -40,29 +38,25 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
 			Conf:       conf,
 		}
 		go receiver.Receive(wm)
-		pingbackSuccess(w, "Thanks, bro. Will process this soon, pinky swear!")
+		pingbackSuccess(w)
 	}
 }
 
-var successXml = `<?xml version="1.0" encoding="UTF-8"?>
+func pingbackSuccess(w http.ResponseWriter) {
+	xml := `<?xml version="1.0" encoding="UTF-8"?>
 <methodResponse>
     <params>
         <param>
             <value>
                 <string>
-                    {{ . }}
+                    Thanks, bro. Will process this soon, pinky swear!
                 </string>
             </value>
         </param>
     </params>
-</methodResponse>
-`
-// compile once, execute as many times as needed.
-var successTpl, _ = template.New("success").Parse(successXml)
-
-func pingbackSuccess(w http.ResponseWriter, msg string) {
+</methodResponse>`
 	w.WriteHeader(200)
-	successTpl.Execute(w, msg)
+	w.Write([]byte(xml))
 }
 
 // according to the XML-RPC spec, always return a 200, but encode it into the XML.
