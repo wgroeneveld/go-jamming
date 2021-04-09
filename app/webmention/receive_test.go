@@ -22,9 +22,9 @@ var conf = &common.Config{
 
 
 func TestConvertWebmentionToPath(t *testing.T) {
-	wm := webmention{
-		source: "https://brainbaking.com",
-		target: "https://jefklakscodex.com/articles",
+	wm := Mention{
+		Source: "https://brainbaking.com",
+		Target: "https://jefklakscodex.com/articles",
 	}
 
 	result := wm.asPath(conf)
@@ -42,56 +42,56 @@ func writeSomethingTo(filename string) {
 func TestReceive(t *testing.T) {
 	cases := []struct {
 		label string
-		wm webmention
-		json string
+		wm    Mention
+		json  string
 	} {
 		{
-			label: "receive a webmention bookmark via twitter",
-			wm: webmention{
-				source: "https://brainbaking.com/valid-bridgy-twitter-source.html",
-				target: "https://brainbaking.com/post/2021/03/the-indieweb-mixed-bag",
+			label: "receive a Webmention bookmark via twitter",
+			wm: Mention{
+				Source: "https://brainbaking.com/valid-bridgy-twitter-source.html",
+				Target: "https://brainbaking.com/post/2021/03/the-indieweb-mixed-bag",
 			},
 			json: `{"author":{"name":"Jamie Tanna","picture":"https://www.jvt.me/img/profile.png"},"name":"","content":"Recommended read:\nThe IndieWeb Mixed Bag - Thoughts about the (d)evolution of blog interactions\nhttps://brainbaking.com/post/2021/03/the-indieweb-mixed-bag/","published":"2021-03-15T12:42:00+0000","url":"https://brainbaking.com/mf2/2021/03/1bkre/","type":"bookmark","source":"https://brainbaking.com/valid-bridgy-twitter-source.html","target":"https://brainbaking.com/post/2021/03/the-indieweb-mixed-bag"}`,
 		},
 		{
-			label: "receive a brid.gy webmention like",
-			wm: webmention{
-				source: "https://brainbaking.com/valid-bridgy-like.html",
+			label: "receive a brid.gy Webmention like",
+			wm: Mention{
+				Source: "https://brainbaking.com/valid-bridgy-like.html",
 				// wrapped in a a class="u-like-of" tag
-				target: "https://brainbaking.com/valid-indieweb-target.html",
+				Target: "https://brainbaking.com/valid-indieweb-target.html",
 			},
 			// no dates in bridgy-to-mastodon likes...
 			json: `{"author":{"name":"Stampeding Longhorn","picture":"https://cdn.social.linux.pizza/v1/AUTH_91eb37814936490c95da7b85993cc2ff/sociallinuxpizza/accounts/avatars/000/185/996/original/9e36da0c093cfc9b.png"},"name":"","content":"","published":"2020-01-01T12:30:00","url":"https://chat.brainbaking.com/notice/A4nx1rFwKUJYSe4TqK#favorited-by-A4nwg4LYyh4WgrJOXg","type":"like","source":"https://brainbaking.com/valid-bridgy-like.html","target":"https://brainbaking.com/valid-indieweb-target.html"}`,
 		},
 		{
-			label: "receive a brid.gy webmention that has a url and photo without value",
-			wm: webmention{
-				source: "https://brainbaking.com/valid-bridgy-source.html",
-				target: "https://brainbaking.com/valid-indieweb-target.html",
+			label: "receive a brid.gy Webmention that has a url and photo without value",
+			wm: Mention{
+				Source: "https://brainbaking.com/valid-bridgy-source.html",
+				Target: "https://brainbaking.com/valid-indieweb-target.html",
 			},
 			json: `{"author":{"name":"Stampeding Longhorn", "picture":"https://cdn.social.linux.pizza/v1/AUTH_91eb37814936490c95da7b85993cc2ff/sociallinuxpizza/accounts/avatars/000/185/996/original/9e36da0c093cfc9b.png"}, "content":"@wouter The cat pictures are awesome. for jest tests!", "name":"@wouter The cat pictures are awesome. for jest tests!", "published":"2021-03-02T16:17:18.000Z", "source":"https://brainbaking.com/valid-bridgy-source.html", "target":"https://brainbaking.com/valid-indieweb-target.html", "type":"mention", "url":"https://social.linux.pizza/@StampedingLonghorn/105821099684887793"}`,
 		},
 		{
 			label: "receive saves a JSON file of indieweb-metadata if all is valid",
-			wm: webmention{
-				source: "https://brainbaking.com/valid-indieweb-source.html",
-				target: "https://jefklakscodex.com/articles",
+			wm: Mention{
+				Source: "https://brainbaking.com/valid-indieweb-source.html",
+				Target: "https://jefklakscodex.com/articles",
 			},
 			json: `{"author":{"name":"Wouter Groeneveld","picture":"https://brainbaking.com//img/avatar.jpg"},"name":"I just learned about https://www.inklestudios.com/...","content":"This is cool, I just found out about valid indieweb target - so cool","published":"2021-03-06T12:41:00","url":"https://brainbaking.com/notes/2021/03/06h12m41s48/","type":"mention","source":"https://brainbaking.com/valid-indieweb-source.html","target":"https://jefklakscodex.com/articles"}`,
 		},
 		{
 			label: "receive saves a JSON file of indieweb-metadata with summary as content if present",
-			wm: webmention{
-				source: "https://brainbaking.com/valid-indieweb-source-with-summary.html",
-				target: "https://brainbaking.com/valid-indieweb-target.html",
+			wm: Mention{
+				Source: "https://brainbaking.com/valid-indieweb-source-with-summary.html",
+				Target: "https://brainbaking.com/valid-indieweb-target.html",
 			},
 			json: `{"author":{"name":"Wouter Groeneveld", "picture":"https://brainbaking.com//img/avatar.jpg"}, "content":"This is cool, this is a summary!", "name":"I just learned about https://www.inklestudios.com/...", "published":"2021-03-06T12:41:00", "source":"https://brainbaking.com/valid-indieweb-source-with-summary.html", "target":"https://brainbaking.com/valid-indieweb-target.html", "type":"mention", "url":"https://brainbaking.com/notes/2021/03/06h12m41s48/"}`,
 		},
 		{
 			label: "receive saves a JSON file of non-indieweb-data such as title if all is valid",
-			wm: webmention{
-				source: "https://brainbaking.com/valid-nonindieweb-source.html",
-				target: "https://brainbaking.com/valid-indieweb-target.html",
+			wm: Mention{
+				Source: "https://brainbaking.com/valid-nonindieweb-source.html",
+				Target: "https://brainbaking.com/valid-indieweb-target.html",
 			},
 			json: `{"author":{"name":"https://brainbaking.com/valid-nonindieweb-source.html", "picture":""}, "content":"Diablo 2 Twenty Years Later: A Retrospective | Jefklaks Codex", "name":"Diablo 2 Twenty Years Later: A Retrospective | Jefklaks Codex", "published":"2020-01-01T12:30:00", "source":"https://brainbaking.com/valid-nonindieweb-source.html", "target":"https://brainbaking.com/valid-indieweb-target.html", "type":"mention", "url":"https://brainbaking.com/valid-nonindieweb-source.html"}`,
 		},
@@ -106,14 +106,14 @@ func TestReceive(t *testing.T) {
 				return time.Date(2020, time.January, 1, 12, 30, 0, 0, time.UTC)
 			}
 
-			receiver := &receiver {
-				conf: conf,
-				restClient: &mocks.RestClientMock{
+			receiver := &Receiver{
+				Conf: conf,
+				RestClient: &mocks.RestClientMock{
 					GetBodyFunc: mocks.RelPathGetBodyFunc(t),
 				},
 			}
 
-			receiver.receive(tc.wm)
+			receiver.Receive(tc.wm)
 
 			actualJson, _ := ioutil.ReadFile(tc.wm.asPath(conf))
 			assert.JSONEq(t, tc.json, string(actualJson))
@@ -125,9 +125,9 @@ func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testi
 	os.MkdirAll("testdata/jefklakscodex.com", os.ModePerm)
 	defer os.RemoveAll("testdata")
 
-	wm := webmention{
-		source: "https://brainbaking.com",
-		target: "https://jefklakscodex.com/articles",
+	wm := Mention{
+		Source: "https://brainbaking.com",
+		Target: "https://jefklakscodex.com/articles",
 	}
 	filename := wm.asPath(conf)
 	writeSomethingTo(filename)
@@ -137,31 +137,31 @@ func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testi
 			return "", errors.New("whoops")
 		},
 	}	
-	receiver := &receiver {
-		conf: conf,
-		restClient: client,
+	receiver := &Receiver{
+		Conf:       conf,
+		RestClient: client,
 	}
 
-	receiver.receive(wm)
+	receiver.Receive(wm)
 	assert.NoFileExists(t, filename)
 }
 
 func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {
-	wm := webmention{
-		source: "https://brainbaking.com/valid-indieweb-source.html",
-		target: "https://brainbaking.com/valid-indieweb-source.html",
+	wm := Mention{
+		Source: "https://brainbaking.com/valid-indieweb-source.html",
+		Target: "https://brainbaking.com/valid-indieweb-source.html",
 	}
 	filename := wm.asPath(conf)
 	writeSomethingTo(filename)
 
-	receiver := &receiver {
-		conf: conf,
-		restClient: &mocks.RestClientMock{
+	receiver := &Receiver{
+		Conf: conf,
+		RestClient: &mocks.RestClientMock{
 			GetBodyFunc: mocks.RelPathGetBodyFunc(t),
 		},
 	}
 
-	receiver.receive(wm)
+	receiver.Receive(wm)
 	assert.NoFileExists(t, filename)
 }
 
@@ -169,12 +169,12 @@ func TestProcessSourceBodyAbortsIfNoMentionOfTargetFoundInSourceHtml(t *testing.
 	os.MkdirAll("testdata/jefklakscodex.com", os.ModePerm)
 	defer os.RemoveAll("testdata")
 
-	wm := webmention{
-		source: "https://brainbaking.com",
-		target: "https://jefklakscodex.com/articles",
+	wm := Mention{
+		Source: "https://brainbaking.com",
+		Target: "https://jefklakscodex.com/articles",
 	}
-	receiver := &receiver {
-		conf: conf,
+	receiver := &Receiver{
+		Conf: conf,
 	}
 
 	receiver.processSourceBody("<html>my nice body</html>", wm)

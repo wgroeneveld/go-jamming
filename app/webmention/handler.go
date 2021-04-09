@@ -37,16 +37,16 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
     		return
     	}
 
-    	wm := webmention{
-            source: r.FormValue("source"),
-            target: target,
+    	wm := Mention{
+            Source: r.FormValue("source"),
+            Target: target,
         }
-        recv := &receiver{
-            restClient: httpClient,
-            conf: conf,
+        recv := &Receiver{
+            RestClient: httpClient,
+            Conf:       conf,
         }
 
-        go recv.receive(wm)
+        go recv.Receive(wm)
         rest.Accept(w)
     }
 }

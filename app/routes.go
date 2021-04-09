@@ -12,7 +12,7 @@ import (
 // https://blog.questionable.services/article/http-handler-error-handling-revisited/ is the better idea, but more work
 func (s *server) routes() {
 	s.router.HandleFunc("/", index.Handle(s.conf)).Methods("GET")
-	s.router.HandleFunc("/pingback", pingback.Handle(s.conf)).Methods("POST")
+	s.router.HandleFunc("/pingback", pingback.HandlePost(s.conf)).Methods("POST")
 	s.router.HandleFunc("/webmention", webmention.HandlePost(s.conf)).Methods("POST")
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandleGet(s.conf))).Methods("GET")
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandlePut(s.conf))).Methods("PUT")

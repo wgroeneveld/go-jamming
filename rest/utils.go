@@ -11,5 +11,5 @@ func BadRequest(w http.ResponseWriter) {
 
 func Accept(w http.ResponseWriter) {
 	w.WriteHeader(202)
-	w.Write([]byte("Thanks, bro. Will send these webmentions soon, pinky swear!"))
+	w.Write([]byte("Thanks, bro. Will process this soon, pinky swear!"))
 }
