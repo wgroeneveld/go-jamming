@@ -1,17 +1,17 @@
 package app
 
 import (
+	"brainbaking.com/go-jamming/common"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
-	"brainbaking.com/go-jamming/common"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
 var conf = &common.Config{
-	Token: "boemsjakkalakka",
-	AllowedWebmentionSources: []string{ "http://ewelja.be" },
+	Token:                    "boemsjakkalakka",
+	AllowedWebmentionSources: []string{"http://ewelja.be"},
 }
 
 func TestAuthorizedOnlyUnauthorizedWithWrongToken(t *testing.T) {
@@ -26,7 +26,7 @@ func TestAuthorizedOnlyUnauthorizedWithWrongToken(t *testing.T) {
 	r, _ := http.NewRequest("PUT", "/whatever", nil)
 	w := httptest.NewRecorder()
 	r = mux.SetURLVars(r, map[string]string{
-		"token": "invalid",
+		"token":  "invalid",
 		"domain": conf.AllowedWebmentionSources[0],
 	})
 
@@ -46,7 +46,7 @@ func TestAuthorizedOnlyUnauthorizedWithWrongDomain(t *testing.T) {
 	r, _ := http.NewRequest("PUT", "/whatever", nil)
 	w := httptest.NewRecorder()
 	r = mux.SetURLVars(r, map[string]string{
-		"token": conf.Token,
+		"token":  conf.Token,
 		"domain": "https://sexymoddafokkas.be",
 	})
 
@@ -66,7 +66,7 @@ func TestAuthorizedOnlyOkIfTokenAndDomainMatch(t *testing.T) {
 	r, _ := http.NewRequest("PUT", "/whatever", nil)
 	w := httptest.NewRecorder()
 	r = mux.SetURLVars(r, map[string]string{
-		"token": conf.Token,
+		"token":  conf.Token,
 		"domain": conf.AllowedWebmentionSources[0],
 	})
 

@@ -1,4 +1,3 @@
-
 package rest
 
 import (
@@ -32,9 +31,9 @@ func (client *HttpClient) GetBody(url string) (string, error) {
 		return "", geterr
 	}
 
-    if resp.StatusCode < 200 || resp.StatusCode > 299 {
-    	return "", fmt.Errorf("Status code for %s is not OK (%d)", url, resp.StatusCode)
-    }
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return "", fmt.Errorf("Status code for %s is not OK (%d)", url, resp.StatusCode)
+	}
 
 	defer resp.Body.Close()
 	body, readerr := ioutil.ReadAll(resp.Body)
@@ -44,7 +43,6 @@ func (client *HttpClient) GetBody(url string) (string, error) {
 
 	return string(body), nil
 }
-
 
 func (client *HttpClient) Get(url string) (*http.Response, error) {
 	return http.Get(url)

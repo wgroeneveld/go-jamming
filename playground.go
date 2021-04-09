@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-   	"log"
-	"net/http"
 	"io/ioutil"
+	"log"
+	"net/http"
 )
 
 func mainz() {
@@ -14,11 +14,11 @@ func mainz() {
 		log.Fatalln(err)
 	}
 
-   body, err2 := ioutil.ReadAll(resp.Body)
-   if err2 != nil {
-   		log.Fatalln(err)
-   } 
+	body, err2 := ioutil.ReadAll(resp.Body)
+	if err2 != nil {
+		log.Fatalln(err)
+	}
 
-   fmt.Printf("tis ditte")
+	fmt.Printf("tis ditte")
 	fmt.Printf("%s", body)
 }

@@ -1,9 +1,9 @@
 package mf
 
 import (
+	"brainbaking.com/go-jamming/common"
 	"crypto/md5"
 	"fmt"
-	"brainbaking.com/go-jamming/common"
 	"net/url"
 )
 
@@ -17,7 +17,7 @@ func (wm *Mention) String() string {
 }
 
 func (wm *Mention) AsPath(conf *common.Config) string {
-	filename := fmt.Sprintf("%x", md5.Sum([]byte("source=" + wm.Source+ ",target=" + wm.Target)))
+	filename := fmt.Sprintf("%x", md5.Sum([]byte("source="+wm.Source+",target="+wm.Target)))
 	domain, _ := conf.FetchDomain(wm.Target)
 	return conf.DataPath + "/" + domain + "/" + filename + ".json"
 }

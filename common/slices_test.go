@@ -3,7 +3,7 @@ package common
 import "testing"
 
 func TestIncludesElemInArrayTrue(t *testing.T) {
-	arr := []string{ "one", "two"}
+	arr := []string{"one", "two"}
 
 	result := Includes(arr, "two")
 	if result != true {
@@ -12,7 +12,7 @@ func TestIncludesElemInArrayTrue(t *testing.T) {
 }
 
 func TestIncludesElemNotInArrayFalse(t *testing.T) {
-	arr := []string{ "one", "two"}
+	arr := []string{"one", "two"}
 
 	result := Includes(arr, "three")
 	if result != false {

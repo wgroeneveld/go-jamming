@@ -1,4 +1,3 @@
-
 package app
 
 import (
@@ -19,4 +18,3 @@ func (s *server) routes() {
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandleGet(cnf))).Methods("GET")
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandlePut(cnf))).Methods("PUT")
 }
-

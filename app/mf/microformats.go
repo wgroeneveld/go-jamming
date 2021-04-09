@@ -1,10 +1,10 @@
 package mf
 
 import (
+	"brainbaking.com/go-jamming/common"
 	"strings"
 	"time"
 	"willnorris.com/go/microformats"
-	"brainbaking.com/go-jamming/common"
 )
 
 const (
@@ -12,19 +12,19 @@ const (
 )
 
 type IndiewebAuthor struct {
-	Name string				`json:"name"`
-	Picture string			`json:"picture"`
+	Name    string `json:"name"`
+	Picture string `json:"picture"`
 }
 
 type IndiewebData struct {
-	Author IndiewebAuthor	`json:"author"`
-	Name string				`json:"name"`
-	Content string			`json:"content"`
-	Published string		`json:"published"`
-	Url string				`json:"url"`
-	IndiewebType string 	`json:"type"`
-	Source string			`json:"source"`
-	Target string			`json:"target"`
+	Author       IndiewebAuthor `json:"author"`
+	Name         string         `json:"name"`
+	Content      string         `json:"content"`
+	Published    string         `json:"published"`
+	Url          string         `json:"url"`
+	IndiewebType string         `json:"type"`
+	Source       string         `json:"source"`
+	Target       string         `json:"target"`
 }
 
 func PublishedNow(utcOffset int) string {

@@ -1,11 +1,10 @@
-
 package recv
 
 import (
-	"encoding/json"
 	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/rest"
+	"encoding/json"
 	"io/fs"
 	"io/ioutil"
 	"os"
@@ -16,9 +15,8 @@ import (
 	"willnorris.com/go/microformats"
 )
 
-
-// used as a "class" to iject dependencies, just to be able to test. Do NOT like htis. 
-// Is there a better way? e.g. in validate, I just pass rest.Client as an arg. Not great either. 
+// used as a "class" to iject dependencies, just to be able to test. Do NOT like htis.
+// Is there a better way? e.g. in validate, I just pass rest.Client as an arg. Not great either.
 type Receiver struct {
 	RestClient rest.Client
 	Conf       *common.Config
@@ -29,7 +27,7 @@ func (recv *Receiver) Receive(wm mf.Mention) {
 	body, geterr := recv.RestClient.GetBody(wm.Source)
 
 	if geterr != nil {
-        log.Warn().Str("source", wm.Source).Msg("  ABORT: invalid url")
+		log.Warn().Str("source", wm.Source).Msg("  ABORT: invalid url")
 		recv.deletePossibleOlderWebmention(wm)
 		return
 	}
@@ -49,7 +47,6 @@ func getHEntry(data *microformats.Data) *microformats.Microformat {
 	}
 	return nil
 }
-
 
 func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 	if !strings.Contains(body, wm.Target) {
@@ -92,14 +89,14 @@ func (recv *Receiver) parseBodyAsIndiewebSite(hEntry *microformats.Microformat, 
 	return &mf.IndiewebData{
 		Name: name,
 		Author: mf.IndiewebAuthor{
-			Name: mf.DetermineAuthorName(hEntry),
+			Name:    mf.DetermineAuthorName(hEntry),
 			Picture: pic,
 		},
-		Content: mf.DetermineContent(hEntry),
-		Url: mf.DetermineUrl(hEntry, wm.Source),
-		Published: mf.DeterminePublishedDate(hEntry, recv.Conf.UtcOffset),
-		Source: wm.Source,
-		Target: wm.Target,
+		Content:      mf.DetermineContent(hEntry),
+		Url:          mf.DetermineUrl(hEntry, wm.Source),
+		Published:    mf.DeterminePublishedDate(hEntry, recv.Conf.UtcOffset),
+		Source:       wm.Source,
+		Target:       wm.Target,
 		IndiewebType: mfType,
 	}
 }
@@ -115,12 +112,12 @@ func (recv *Receiver) parseBodyAsNonIndiewebSite(body string, wm mf.Mention) *mf
 		Author: mf.IndiewebAuthor{
 			Name: wm.Source,
 		},
-		Name: title,
-		Content: title,
-		Published: mf.PublishedNow(recv.Conf.UtcOffset),
-		Url: wm.Source,
+		Name:         title,
+		Content:      title,
+		Published:    mf.PublishedNow(recv.Conf.UtcOffset),
+		Url:          wm.Source,
 		IndiewebType: "mention",
-		Source: wm.Source,
-		Target: wm.Target,
+		Source:       wm.Source,
+		Target:       wm.Target,
 	}
 }

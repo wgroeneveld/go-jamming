@@ -15,11 +15,11 @@ import "encoding/xml"
 		</param>
 	</params>
 </methodCall>
- */
+*/
 type XmlRPCMethodCall struct {
-	XMLName xml.Name		`xml:"methodCall"`
-	MethodName string		`xml:"methodName"`
-	Params XmlRPCParams		`xml:"params"`
+	XMLName    xml.Name     `xml:"methodCall"`
+	MethodName string       `xml:"methodName"`
+	Params     XmlRPCParams `xml:"params"`
 }
 
 func (rpc *XmlRPCMethodCall) Source() string {
@@ -31,13 +31,13 @@ func (rpc *XmlRPCMethodCall) Target() string {
 }
 
 type XmlRPCParams struct {
-	XMLName xml.Name		`xml:"params"`
+	XMLName    xml.Name      `xml:"params"`
 	Parameters []XmlRPCParam `xml:"param"`
 }
 
 type XmlRPCParam struct {
-	XMLName xml.Name		`xml:"param"`
-	Value XmlRPCValue		`xml:"value"`
+	XMLName xml.Name    `xml:"param"`
+	Value   XmlRPCValue `xml:"value"`
 }
 
 type XmlRPCValue struct {

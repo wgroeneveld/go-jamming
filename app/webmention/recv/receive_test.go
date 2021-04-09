@@ -1,10 +1,9 @@
-
 package recv
 
 import (
+	"brainbaking.com/go-jamming/app/mf"
 	"errors"
 	"github.com/stretchr/testify/assert"
-	"brainbaking.com/go-jamming/app/mf"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -15,12 +14,11 @@ import (
 )
 
 var conf = &common.Config{
-	AllowedWebmentionSources: []string {
+	AllowedWebmentionSources: []string{
 		"jefklakscodex.com",
 	},
 	DataPath: "testdata",
 }
-
 
 func TestConvertWebmentionToPath(t *testing.T) {
 	wm := mf.Mention{
@@ -37,7 +35,7 @@ func TestConvertWebmentionToPath(t *testing.T) {
 func writeSomethingTo(filename string) {
 	file, _ := os.Create(filename)
 	file.WriteString("lolz")
-	defer file.Close()	
+	defer file.Close()
 }
 
 func TestReceive(t *testing.T) {
@@ -45,7 +43,7 @@ func TestReceive(t *testing.T) {
 		label string
 		wm    mf.Mention
 		json  string
-	} {
+	}{
 		{
 			label: "receive a Webmention bookmark via twitter",
 			wm: mf.Mention{
@@ -137,7 +135,7 @@ func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testi
 		GetBodyFunc: func(url string) (string, error) {
 			return "", errors.New("whoops")
 		},
-	}	
+	}
 	receiver := &Receiver{
 		Conf:       conf,
 		RestClient: client,
@@ -181,4 +179,3 @@ func TestProcessSourceBodyAbortsIfNoMentionOfTargetFoundInSourceHtml(t *testing.
 	receiver.processSourceBody("<html>my nice body</html>", wm)
 	assert.NoFileExists(t, wm.AsPath(conf))
 }
-

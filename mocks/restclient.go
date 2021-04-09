@@ -1,21 +1,20 @@
-
 package mocks
 
 import (
-	"strings"
-	"testing"
 	"io/ioutil"
 	"net/http"
+	"strings"
+	"testing"
 )
 
 // neat trick! https://medium.com/@matryer/meet-moq-easily-mock-interfaces-in-go-476444187d10
 type RestClientMock struct {
-	GetFunc func(string) (*http.Response, error)
+	GetFunc     func(string) (*http.Response, error)
 	GetBodyFunc func(string) (string, error)
-	PostFunc func(string, string, string) error
+	PostFunc    func(string, string, string) error
 }
 
-// although these are still requied to match the rest.Client interface. 
+// although these are still requied to match the rest.Client interface.
 func (m *RestClientMock) Get(url string) (*http.Response, error) {
 	return m.GetFunc(url)
 }

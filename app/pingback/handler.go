@@ -1,19 +1,18 @@
-
 package pingback
 
 import (
-	"encoding/xml"
-	"github.com/rs/zerolog/log"
 	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/app/webmention/recv"
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/rest"
+	"encoding/xml"
+	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 )
 
 func HandlePost(conf *common.Config) http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			pingbackError(w, "Unable to read request body")
@@ -94,5 +93,3 @@ func pingbackError(w http.ResponseWriter, msg string) {
 	w.WriteHeader(200)
 	w.Write([]byte(xml))
 }
-
-

@@ -1,10 +1,9 @@
-
 package webmention
 
 import (
-	"testing"
 	"errors"
 	"net/http"
+	"testing"
 
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/mocks"
@@ -17,14 +16,18 @@ type httpReqMock struct {
 type httpHeaderMock struct {
 	contentType string
 }
+
 func (mock *httpHeaderMock) Get(key string) string {
 	return mock.contentType
 }
 func (mock *httpReqMock) FormValue(key string) string {
 	switch key {
-	case "source": return mock.source
-	case "target": return mock.target
-	default: return ""
+	case "source":
+		return mock.source
+	case "target":
+		return mock.target
+	default:
+		return ""
 	}
 }
 func buildHttpReq(source string, target string) *httpReqMock {
@@ -38,12 +41,12 @@ var config = common.Configure()
 
 func TestValidate(t *testing.T) {
 	cases := []struct {
-		label string
-		source string
-		target string
+		label       string
+		source      string
+		target      string
 		contentType string
-		expected bool
-	} {
+		expected    bool
+	}{
 		{
 			"is valid if source and target https urls",
 			"http://brainbaking.com/bla1",
@@ -105,14 +108,14 @@ func TestValidate(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.label, func(t *testing.T) {
 			httpReq := buildHttpReq(tc.source, tc.target)
-			httpHeader := &httpHeaderMock{ contentType: tc.contentType }
+			httpHeader := &httpHeaderMock{contentType: tc.contentType}
 
 			actual := validate(httpReq, httpHeader, config)
 			if actual != tc.expected {
 				t.Fatalf("got %v, want %v", actual, tc.expected)
 			}
 		})
-	}	
+	}
 }
 
 func TestIsValidTargetUrlFalseIfGetFails(t *testing.T) {

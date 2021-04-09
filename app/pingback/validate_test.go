@@ -1,9 +1,9 @@
 package pingback
 
 import (
+	"brainbaking.com/go-jamming/common"
 	"encoding/xml"
 	"github.com/stretchr/testify/assert"
-	"brainbaking.com/go-jamming/common"
 	"testing"
 )
 
@@ -16,8 +16,8 @@ var conf *common.Config = &common.Config{
 
 func TestValidate(t *testing.T) {
 	cases := []struct {
-		label string
-		xml   string
+		label    string
+		xml      string
 		expected bool
 	}{
 		{

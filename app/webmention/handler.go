@@ -1,12 +1,11 @@
-
 package webmention
 
 import (
-	"fmt"
-	"github.com/gorilla/mux"
 	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/app/webmention/recv"
 	"brainbaking.com/go-jamming/app/webmention/send"
+	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 
 	"brainbaking.com/go-jamming/common"
@@ -16,13 +15,13 @@ import (
 var httpClient = &rest.HttpClient{}
 
 func HandleGet(conf *common.Config) http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request) {
-    	fmt.Println("handling get")
-    }
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("handling get")
+	}
 }
 
 func HandlePut(conf *common.Config) http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		since := getSinceQueryParam(r)
 		domain := mux.Vars(r)["domain"]
 
@@ -45,30 +44,29 @@ func getSinceQueryParam(r *http.Request) string {
 }
 
 func HandlePost(conf *common.Config) http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request) {
-    	r.ParseForm()
-    	if !validate(r, r.Header, conf) {
-    		rest.BadRequest(w)
-    		return
-    	}
-    	
-    	target := r.FormValue("target")
-    	if !isValidTargetUrl(target, httpClient) {
-    		rest.BadRequest(w)
-    		return
-    	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		if !validate(r, r.Header, conf) {
+			rest.BadRequest(w)
+			return
+		}
 
-    	wm := mf.Mention{
-            Source: r.FormValue("source"),
-            Target: target,
-        }
-        recv := &recv.Receiver{
-            RestClient: httpClient,
-            Conf:       conf,
-        }
+		target := r.FormValue("target")
+		if !isValidTargetUrl(target, httpClient) {
+			rest.BadRequest(w)
+			return
+		}
 
-        go recv.Receive(wm)
-        rest.Accept(w)
-    }
+		wm := mf.Mention{
+			Source: r.FormValue("source"),
+			Target: target,
+		}
+		recv := &recv.Receiver{
+			RestClient: httpClient,
+			Conf:       conf,
+		}
+
+		go recv.Receive(wm)
+		rest.Accept(w)
+	}
 }
-
