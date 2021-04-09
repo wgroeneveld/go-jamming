@@ -22,11 +22,11 @@ func (m *RestClientMock) GetBody(url string) (string, error) {
 	return m.GetBodyFunc(url)
 }
 
-func RelPathGetBodyFunc(t *testing.T) func(string) (string, error) {
+func RelPathGetBodyFunc(t *testing.T, relPath string) func(string) (string, error) {
 	return func(url string) (string, error) {
 		// url: https://brainbaking.com/something-something.html
 		// want: ../../mocks/something-something.html
-		mockfile := "../../mocks/" + strings.ReplaceAll(url, "https://brainbaking.com/", "")
+		mockfile := relPath + strings.ReplaceAll(url, "https://brainbaking.com/", "")
 		html, err := ioutil.ReadFile(mockfile)
 		if err != nil {
 			t.Error(err)

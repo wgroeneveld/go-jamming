@@ -1,22 +1,23 @@
-package webmention
+package mf
 
 import (
 	"strings"
 	"time"
 	"willnorris.com/go/microformats"
+	"github.com/wgroeneveld/go-jamming/common"
 )
 
 const (
 	DateFormat = "2006-01-02T15:04:05"
 )
 
-type indiewebAuthor struct {
+type IndiewebAuthor struct {
 	Name string				`json:"name"`
 	Picture string			`json:"picture"`
 }
 
-type indiewebData struct {
-	Author indiewebAuthor	`json:"author"`
+type IndiewebData struct {
+	Author IndiewebAuthor	`json:"author"`
 	Name string				`json:"name"`
 	Content string			`json:"content"`
 	Published string		`json:"published"`
@@ -26,9 +27,8 @@ type indiewebData struct {
 	Target string			`json:"target"`
 }
 
-var now = time.Now
-func publishedNow(utcOffset int) string {
-	return now().UTC().Add(time.Duration(utcOffset) * time.Minute).Format("2006-01-02T15:04:05")
+func PublishedNow(utcOffset int) string {
+	return common.Now().UTC().Add(time.Duration(utcOffset) * time.Minute).Format("2006-01-02T15:04:05")
 }
 
 func shorten(txt string) string {
@@ -41,7 +41,7 @@ func shorten(txt string) string {
 // Go stuff: entry.Properties["name"][0].(string),
 // JS stuff: hEntry.properties?.name?.[0]
 // The problem: convoluted syntax and no optional chaining!
-func mfStr(mf *microformats.Microformat, key string) string {
+func Str(mf *microformats.Microformat, key string) string {
 	val := mf.Properties[key]
 	if len(val) == 0 {
 		return ""
@@ -60,7 +60,7 @@ func mfStr(mf *microformats.Microformat, key string) string {
 	return str
 }
 
-func mfMap(mf *microformats.Microformat, key string) map[string]string {
+func Map(mf *microformats.Microformat, key string) map[string]string {
 	val := mf.Properties[key]
 	if len(val) == 0 {
 		return map[string]string{}
@@ -72,7 +72,7 @@ func mfMap(mf *microformats.Microformat, key string) map[string]string {
 	return mapVal
 }
 
-func mfProp(mf *microformats.Microformat, key string) *microformats.Microformat {
+func Prop(mf *microformats.Microformat, key string) *microformats.Microformat {
 	val := mf.Properties[key]
 	if len(val) == 0 {
 		return &microformats.Microformat{
@@ -82,28 +82,28 @@ func mfProp(mf *microformats.Microformat, key string) *microformats.Microformat 
 	return val[0].(*microformats.Microformat)
 }
 
-func determinePublishedDate(hEntry *microformats.Microformat, utcOffset int) string {
-	publishedDate := mfStr(hEntry, "published")
+func DeterminePublishedDate(hEntry *microformats.Microformat, utcOffset int) string {
+	publishedDate := Str(hEntry, "published")
 	if publishedDate == "" {
-		return publishedNow(utcOffset)
+		return PublishedNow(utcOffset)
 	}
 	return publishedDate
 }
 
-func determineAuthorName(hEntry *microformats.Microformat) string {
-	authorName := mfStr(mfProp(hEntry, "author"), "name")
+func DetermineAuthorName(hEntry *microformats.Microformat) string {
+	authorName := Str(Prop(hEntry, "author"), "name")
 	if authorName == "" {
-		return mfProp(hEntry, "author").Value
+		return Prop(hEntry, "author").Value
 	}
 	return authorName
 }
 
-func determineMfType(hEntry *microformats.Microformat) string {
-	likeOf := mfStr(hEntry, "like-of")
+func DetermineType(hEntry *microformats.Microformat) string {
+	likeOf := Str(hEntry, "like-of")
 	if likeOf != "" {
 		return "like"
 	}
-	bookmarkOf := mfStr(hEntry, "bookmark-of")
+	bookmarkOf := Str(hEntry, "bookmark-of")
 	if bookmarkOf != "" {
 		return "bookmark"
 	}
@@ -111,27 +111,27 @@ func determineMfType(hEntry *microformats.Microformat) string {
 }
 
 // Mastodon uids start with "tag:server", but we do want indieweb uids from other sources
-func determineUrl(hEntry *microformats.Microformat, source string) string {
-	uid := mfStr(hEntry, "uid")
+func DetermineUrl(hEntry *microformats.Microformat, source string) string {
+	uid := Str(hEntry, "uid")
 	if uid != "" && strings.HasPrefix(uid, "http") {
 		return uid
 	}
-	url := mfStr(hEntry, "url")
+	url := Str(hEntry, "url")
 	if url != "" {
 		return url
 	}
 	return source
 }
 
-func determineContent(hEntry *microformats.Microformat) string {
-	bridgyTwitterContent := mfStr(hEntry, "bridgy-twitter-content")
+func DetermineContent(hEntry *microformats.Microformat) string {
+	bridgyTwitterContent := Str(hEntry, "bridgy-twitter-content")
 	if bridgyTwitterContent != "" {
 		return shorten(bridgyTwitterContent)
 	}
-	summary := mfStr(hEntry, "summary")
+	summary := Str(hEntry, "summary")
 	if summary != "" {
 		return shorten(summary)
 	}
-	contentEntry := mfMap(hEntry, "content")["value"]
+	contentEntry := Map(hEntry, "content")["value"]
 	return shorten(contentEntry)
 }

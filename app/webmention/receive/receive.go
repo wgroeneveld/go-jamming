@@ -1,15 +1,13 @@
 
-package webmention
+package receive
 
 import (
-	"crypto/md5"
 	"encoding/json"
-	"fmt"
+	"github.com/wgroeneveld/go-jamming/app/mf"
 	"github.com/wgroeneveld/go-jamming/common"
 	"github.com/wgroeneveld/go-jamming/rest"
 	"io/fs"
 	"io/ioutil"
-	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -18,25 +16,6 @@ import (
 	"willnorris.com/go/microformats"
 )
 
-type Mention struct {
-	Source string
-	Target string
-}
-
-func (wm *Mention) String() string {
-    return fmt.Sprintf("source: %s, target: %s", wm.Source, wm.Target)
-}
-
-func (wm *Mention) asPath(conf *common.Config) string {
-	filename := fmt.Sprintf("%x", md5.Sum([]byte("source=" + wm.Source+ ",target=" + wm.Target)))
-	domain, _ := conf.FetchDomain(wm.Target)
-	return conf.DataPath + "/" + domain + "/" + filename + ".json"
-}
-
-func (wm *Mention) sourceUrl() *url.URL {
-	url, _ := url.Parse(wm.Source)
-	return url
-}
 
 // used as a "class" to iject dependencies, just to be able to test. Do NOT like htis. 
 // Is there a better way? e.g. in validate, I just pass rest.Client as an arg. Not great either. 
@@ -45,7 +24,7 @@ type Receiver struct {
 	Conf       *common.Config
 }
 
-func (recv *Receiver) Receive(wm Mention) {
+func (recv *Receiver) Receive(wm mf.Mention) {
 	log.Info().Str("Webmention", wm.String()).Msg("OK: looks valid")
 	body, geterr := recv.RestClient.GetBody(wm.Source)
 
@@ -58,8 +37,8 @@ func (recv *Receiver) Receive(wm Mention) {
 	recv.processSourceBody(body, wm)
 }
 
-func (recv *Receiver) deletePossibleOlderWebmention(wm Mention) {
-	os.Remove(wm.asPath(recv.Conf))
+func (recv *Receiver) deletePossibleOlderWebmention(wm mf.Mention) {
+	os.Remove(wm.AsPath(recv.Conf))
 }
 
 func getHEntry(data *microformats.Data) *microformats.Microformat {
@@ -72,32 +51,32 @@ func getHEntry(data *microformats.Data) *microformats.Microformat {
 }
 
 
-func (recv *Receiver) processSourceBody(body string, wm Mention) {
+func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 	if !strings.Contains(body, wm.Target) {
 		log.Warn().Str("target", wm.Target).Msg("ABORT: no mention of target found in html src of source!")
 		return
 	}
 
-	data := microformats.Parse(strings.NewReader(body), wm.sourceUrl())
+	data := microformats.Parse(strings.NewReader(body), wm.SourceUrl())
 	indieweb := recv.convertBodyToIndiewebData(body, wm, getHEntry(data))
 
 	recv.saveWebmentionToDisk(wm, indieweb)
-	log.Info().Str("file", wm.asPath(recv.Conf)).Msg("OK: Webmention processed.")
+	log.Info().Str("file", wm.AsPath(recv.Conf)).Msg("OK: Webmention processed.")
 }
 
-func (recv *Receiver) convertBodyToIndiewebData(body string, wm Mention, hEntry *microformats.Microformat) *indiewebData {
+func (recv *Receiver) convertBodyToIndiewebData(body string, wm mf.Mention, hEntry *microformats.Microformat) *mf.IndiewebData {
 	if hEntry == nil {
 		return recv.parseBodyAsNonIndiewebSite(body, wm)
 	}
 	return recv.parseBodyAsIndiewebSite(hEntry, wm)
 }
 
-func (recv *Receiver) saveWebmentionToDisk(wm Mention, indieweb *indiewebData) {
+func (recv *Receiver) saveWebmentionToDisk(wm mf.Mention, indieweb *mf.IndiewebData) {
 	jsonData, jsonErr := json.Marshal(indieweb)
 	if jsonErr != nil {
 		log.Err(jsonErr).Msg("Unable to serialize Webmention into JSON")
 	}
-	err := ioutil.WriteFile(wm.asPath(recv.Conf), jsonData, fs.ModePerm)
+	err := ioutil.WriteFile(wm.AsPath(recv.Conf), jsonData, fs.ModePerm)
 	if err != nil {
 		log.Err(err).Msg("Unable to save Webmention to disk")
 	}
@@ -105,40 +84,40 @@ func (recv *Receiver) saveWebmentionToDisk(wm Mention, indieweb *indiewebData) {
 
 // TODO I'm smelling very unstable code, apply https://golang.org/doc/effective_go#recover here?
 // see https://github.com/willnorris/microformats/blob/main/microformats.go
-func (recv *Receiver) parseBodyAsIndiewebSite(hEntry *microformats.Microformat, wm Mention) *indiewebData {
-	name := mfStr(hEntry, "name")
-	pic := mfStr(mfProp(hEntry, "author"), "photo")
-	mfType := determineMfType(hEntry)
+func (recv *Receiver) parseBodyAsIndiewebSite(hEntry *microformats.Microformat, wm mf.Mention) *mf.IndiewebData {
+	name := mf.Str(hEntry, "name")
+	pic := mf.Str(mf.Prop(hEntry, "author"), "photo")
+	mfType := mf.DetermineType(hEntry)
 
-	return &indiewebData{
+	return &mf.IndiewebData{
 		Name: name,
-		Author: indiewebAuthor{
-			Name: determineAuthorName(hEntry),
+		Author: mf.IndiewebAuthor{
+			Name: mf.DetermineAuthorName(hEntry),
 			Picture: pic,
 		},
-		Content: determineContent(hEntry),
-		Url: determineUrl(hEntry, wm.Source),
-		Published: determinePublishedDate(hEntry, recv.Conf.UtcOffset),
+		Content: mf.DetermineContent(hEntry),
+		Url: mf.DetermineUrl(hEntry, wm.Source),
+		Published: mf.DeterminePublishedDate(hEntry, recv.Conf.UtcOffset),
 		Source: wm.Source,
 		Target: wm.Target,
 		IndiewebType: mfType,
 	}
 }
 
-func (recv *Receiver) parseBodyAsNonIndiewebSite(body string, wm Mention) *indiewebData {
+func (recv *Receiver) parseBodyAsNonIndiewebSite(body string, wm mf.Mention) *mf.IndiewebData {
 	r := regexp.MustCompile(`<title>(.*?)<\/title>`)
 	titleMatch := r.FindStringSubmatch(body)
 	title := wm.Source
 	if titleMatch != nil {
 		title = titleMatch[1]
 	}
-	return &indiewebData{
-		Author: indiewebAuthor{
+	return &mf.IndiewebData{
+		Author: mf.IndiewebAuthor{
 			Name: wm.Source,
 		},
 		Name: title,
 		Content: title,
-		Published: publishedNow(recv.Conf.UtcOffset),
+		Published: mf.PublishedNow(recv.Conf.UtcOffset),
 		Url: wm.Source,
 		IndiewebType: "mention",
 		Source: wm.Source,

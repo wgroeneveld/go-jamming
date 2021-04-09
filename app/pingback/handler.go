@@ -4,7 +4,8 @@ package pingback
 import (
 	"encoding/xml"
 	"github.com/rs/zerolog/log"
-	"github.com/wgroeneveld/go-jamming/app/webmention"
+	"github.com/wgroeneveld/go-jamming/app/mf"
+	"github.com/wgroeneveld/go-jamming/app/webmention/receive"
 	"github.com/wgroeneveld/go-jamming/rest"
 	"io/ioutil"
 	"net/http"
@@ -30,11 +31,11 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
 			return
 		}
 
-		wm := webmention.Mention{
+		wm := mf.Mention{
 			Source: rpc.Source(),
 			Target: rpc.Target(),
 		}
-		receiver := webmention.Receiver{
+		receiver := receive.Receiver{
 			RestClient: &rest.HttpClient{},
 			Conf:       conf,
 		}

@@ -1,9 +1,10 @@
 
-package webmention
+package receive
 
 import (
 	"errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/wgroeneveld/go-jamming/app/mf"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -22,12 +23,12 @@ var conf = &common.Config{
 
 
 func TestConvertWebmentionToPath(t *testing.T) {
-	wm := Mention{
+	wm := mf.Mention{
 		Source: "https://brainbaking.com",
 		Target: "https://jefklakscodex.com/articles",
 	}
 
-	result := wm.asPath(conf)
+	result := wm.AsPath(conf)
 	if result != "testdata/jefklakscodex.com/99be66594fdfcf482545fead8e7e4948.json" {
 		t.Fatalf("md5 hash check failed, got " + result)
 	}
@@ -42,12 +43,12 @@ func writeSomethingTo(filename string) {
 func TestReceive(t *testing.T) {
 	cases := []struct {
 		label string
-		wm    Mention
+		wm    mf.Mention
 		json  string
 	} {
 		{
 			label: "receive a Webmention bookmark via twitter",
-			wm: Mention{
+			wm: mf.Mention{
 				Source: "https://brainbaking.com/valid-bridgy-twitter-source.html",
 				Target: "https://brainbaking.com/post/2021/03/the-indieweb-mixed-bag",
 			},
@@ -55,7 +56,7 @@ func TestReceive(t *testing.T) {
 		},
 		{
 			label: "receive a brid.gy Webmention like",
-			wm: Mention{
+			wm: mf.Mention{
 				Source: "https://brainbaking.com/valid-bridgy-like.html",
 				// wrapped in a a class="u-like-of" tag
 				Target: "https://brainbaking.com/valid-indieweb-target.html",
@@ -65,7 +66,7 @@ func TestReceive(t *testing.T) {
 		},
 		{
 			label: "receive a brid.gy Webmention that has a url and photo without value",
-			wm: Mention{
+			wm: mf.Mention{
 				Source: "https://brainbaking.com/valid-bridgy-source.html",
 				Target: "https://brainbaking.com/valid-indieweb-target.html",
 			},
@@ -73,7 +74,7 @@ func TestReceive(t *testing.T) {
 		},
 		{
 			label: "receive saves a JSON file of indieweb-metadata if all is valid",
-			wm: Mention{
+			wm: mf.Mention{
 				Source: "https://brainbaking.com/valid-indieweb-source.html",
 				Target: "https://jefklakscodex.com/articles",
 			},
@@ -81,7 +82,7 @@ func TestReceive(t *testing.T) {
 		},
 		{
 			label: "receive saves a JSON file of indieweb-metadata with summary as content if present",
-			wm: Mention{
+			wm: mf.Mention{
 				Source: "https://brainbaking.com/valid-indieweb-source-with-summary.html",
 				Target: "https://brainbaking.com/valid-indieweb-target.html",
 			},
@@ -89,7 +90,7 @@ func TestReceive(t *testing.T) {
 		},
 		{
 			label: "receive saves a JSON file of non-indieweb-data such as title if all is valid",
-			wm: Mention{
+			wm: mf.Mention{
 				Source: "https://brainbaking.com/valid-nonindieweb-source.html",
 				Target: "https://brainbaking.com/valid-indieweb-target.html",
 			},
@@ -102,20 +103,20 @@ func TestReceive(t *testing.T) {
 			os.MkdirAll("testdata/brainbaking.com", os.ModePerm)
 			os.MkdirAll("testdata/jefklakscodex.com", os.ModePerm)
 			defer os.RemoveAll("testdata")
-			now = func() time.Time {
+			common.Now = func() time.Time {
 				return time.Date(2020, time.January, 1, 12, 30, 0, 0, time.UTC)
 			}
 
 			receiver := &Receiver{
 				Conf: conf,
 				RestClient: &mocks.RestClientMock{
-					GetBodyFunc: mocks.RelPathGetBodyFunc(t),
+					GetBodyFunc: mocks.RelPathGetBodyFunc(t, "../../../mocks/"),
 				},
 			}
 
 			receiver.Receive(tc.wm)
 
-			actualJson, _ := ioutil.ReadFile(tc.wm.asPath(conf))
+			actualJson, _ := ioutil.ReadFile(tc.wm.AsPath(conf))
 			assert.JSONEq(t, tc.json, string(actualJson))
 		})
 	}
@@ -125,11 +126,11 @@ func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testi
 	os.MkdirAll("testdata/jefklakscodex.com", os.ModePerm)
 	defer os.RemoveAll("testdata")
 
-	wm := Mention{
+	wm := mf.Mention{
 		Source: "https://brainbaking.com",
 		Target: "https://jefklakscodex.com/articles",
 	}
-	filename := wm.asPath(conf)
+	filename := wm.AsPath(conf)
 	writeSomethingTo(filename)
 
 	client := &mocks.RestClientMock{
@@ -147,17 +148,17 @@ func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testi
 }
 
 func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {
-	wm := Mention{
+	wm := mf.Mention{
 		Source: "https://brainbaking.com/valid-indieweb-source.html",
 		Target: "https://brainbaking.com/valid-indieweb-source.html",
 	}
-	filename := wm.asPath(conf)
+	filename := wm.AsPath(conf)
 	writeSomethingTo(filename)
 
 	receiver := &Receiver{
 		Conf: conf,
 		RestClient: &mocks.RestClientMock{
-			GetBodyFunc: mocks.RelPathGetBodyFunc(t),
+			GetBodyFunc: mocks.RelPathGetBodyFunc(t, "../../../mocks/"),
 		},
 	}
 
@@ -169,7 +170,7 @@ func TestProcessSourceBodyAbortsIfNoMentionOfTargetFoundInSourceHtml(t *testing.
 	os.MkdirAll("testdata/jefklakscodex.com", os.ModePerm)
 	defer os.RemoveAll("testdata")
 
-	wm := Mention{
+	wm := mf.Mention{
 		Source: "https://brainbaking.com",
 		Target: "https://jefklakscodex.com/articles",
 	}
@@ -178,6 +179,6 @@ func TestProcessSourceBodyAbortsIfNoMentionOfTargetFoundInSourceHtml(t *testing.
 	}
 
 	receiver.processSourceBody("<html>my nice body</html>", wm)
-	assert.NoFileExists(t, wm.asPath(conf))
+	assert.NoFileExists(t, wm.AsPath(conf))
 }
 

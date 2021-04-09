@@ -2,6 +2,8 @@
 package webmention
 
 import (
+	"github.com/wgroeneveld/go-jamming/app/mf"
+	"github.com/wgroeneveld/go-jamming/app/webmention/receive"
 	"net/http"
 	"fmt"
 
@@ -37,11 +39,11 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
     		return
     	}
 
-    	wm := Mention{
+    	wm := mf.Mention{
             Source: r.FormValue("source"),
             Target: target,
         }
-        recv := &Receiver{
+        recv := &receive.Receiver{
             RestClient: httpClient,
             Conf:       conf,
         }
