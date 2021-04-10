@@ -6,6 +6,7 @@ import (
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/rest"
 	"github.com/rs/zerolog/log"
+	"time"
 )
 
 type Sender struct {
@@ -15,6 +16,17 @@ type Sender struct {
 
 func (snder *Sender) Send(domain string, since string) {
 	log.Info().Str("domain", domain).Str("since", since).Msg(` OK: someone wants to send mentions`)
+	feed, err := snder.RestClient.GetBody("https://" + domain + "/index.xml")
+	if err != nil {
+		log.Err(err).Str("domain", domain).Msg("Unable to retrieve RSS feed, aborting send")
+		return
+	}
+
+	snder.parseRssFeed(feed, common.IsoToTime(since))
+}
+
+func (snder *Sender) parseRssFeed(feed string, since time.Time) {
+
 }
 
 func mention() {
