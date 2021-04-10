@@ -2,6 +2,8 @@ package send
 
 import (
 	"brainbaking.com/go-jamming/app/rss"
+	"brainbaking.com/go-jamming/common"
+	"regexp"
 	"time"
 )
 
@@ -35,7 +37,7 @@ type RSSItem struct {
       '          '
   }
 **/
-func Collect(xml string, since time.Time) ([]RSSItem, error) {
+func (snder *Sender) Collect(xml string, since time.Time) ([]RSSItem, error) {
 	feed, err := rss.ParseFeed([]byte(xml))
 	if err != nil {
 		return nil, err
@@ -44,9 +46,25 @@ func Collect(xml string, since time.Time) ([]RSSItem, error) {
 	for _, rssitem := range feed.ItemList {
 		if since.Before(rssitem.PubDateAsTime()) {
 			items = append(items, RSSItem{
-				link: rssitem.Link,
+				link:  rssitem.Link,
+				hrefs: snder.collectUniqueHrefsFromDescription(rssitem.Description),
 			})
 		}
 	}
 	return items, nil
+}
+
+func (snder *Sender) collectUniqueHrefsFromDescription(html string) []string {
+	r := regexp.MustCompile(`href="(.+?)"`)
+	ext := regexp.MustCompile(`\.(gif|zip|rar|bz2|gz|7z|jpe?g|tiff?|png|webp|bmp)$`)
+	urlmap := common.NewSet()
+
+	for _, match := range r.FindAllStringSubmatch(html, -1) {
+		url := match[1] // [0] is the match of the entire expression, [1] is the capture group
+		if !ext.MatchString(url) && !snder.Conf.ContainsDisallowedDomain(url) {
+			urlmap.Add(url)
+		}
+	}
+
+	return urlmap.Keys()
 }

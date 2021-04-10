@@ -5,7 +5,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"github.com/rs/zerolog/log"
-	"html/template"
 	"time"
 )
 
@@ -24,13 +23,13 @@ type Rss2 struct {
 
 type Item struct {
 	// Required
-	Title       string        `xml:"title"`
-	Link        string        `xml:"link"`
-	Description template.HTML `xml:"description"`
+	Title       string `xml:"title"`
+	Link        string `xml:"link"`
+	Description string `xml:"description"` // could also be template.HTML, not interested in that
 	// Optional
-	Content  template.HTML `xml:"encoded"`
-	PubDate  string        `xml:"pubDate"`
-	Comments string        `xml:"comments"`
+	Content  string `xml:"encoded"`
+	PubDate  string `xml:"pubDate"`
+	Comments string `xml:"comments"`
 }
 
 func (itm Item) PubDateAsTime() time.Time {
@@ -62,9 +61,9 @@ type Entry struct {
 	Author  Author `xml:"author"`
 }
 
-func ParseFeed(content []byte) (Rss2, error) {
-	v := Rss2{}
-	err := xml.Unmarshal(content, &v)
+func ParseFeed(content []byte) (*Rss2, error) {
+	v := &Rss2{}
+	err := xml.Unmarshal(content, v)
 	if err != nil {
 		return v, err
 	}

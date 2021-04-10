@@ -18,6 +18,15 @@ type Config struct {
 	DisallowedWebmentionDomains []string
 }
 
+func (c *Config) ContainsDisallowedDomain(url string) bool {
+	for _, domain := range c.DisallowedWebmentionDomains {
+		if strings.Contains(url, domain) {
+			return true
+		}
+	}
+	return false
+}
+
 func (c *Config) IsAnAllowedDomain(url string) bool {
 	for _, domain := range c.AllowedWebmentionSources {
 		if domain == url {
