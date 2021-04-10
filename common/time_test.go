@@ -34,12 +34,12 @@ func (s *TimeSuite) TestIsoToTimeInISOString() {
 	assert.Equal(s.T(), expectedtime.Second(), since.Second())
 }
 
-func (s *TimeSuite) TestIsoToTimeInvalidStringReturnsNow() {
+func (s *TimeSuite) TestIsoToTimeInvalidStringReturnsNowTime() {
 	since := IsoToTime("woef ik ben een hondje")
 	assert.Equal(s.T(), s.nowtime, since)
 }
 
-func (s *TimeSuite) TestIsoToTimeEmptyReturnsNow() {
+func (s *TimeSuite) TestIsoToTimeEmptyReturnsZeroTime() {
 	since := IsoToTime("")
-	assert.Equal(s.T(), s.nowtime, since)
+	assert.True(s.T(), since.IsZero())
 }

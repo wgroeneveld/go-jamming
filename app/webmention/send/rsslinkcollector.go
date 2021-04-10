@@ -44,7 +44,7 @@ func (snder *Sender) Collect(xml string, since time.Time) ([]RSSItem, error) {
 	}
 	var items []RSSItem
 	for _, rssitem := range feed.ItemList {
-		if since.Before(rssitem.PubDateAsTime()) {
+		if since.IsZero() || since.Before(rssitem.PubDateAsTime()) {
 			items = append(items, RSSItem{
 				link:  rssitem.Link,
 				hrefs: snder.collectUniqueHrefsFromDescription(rssitem.Description),
