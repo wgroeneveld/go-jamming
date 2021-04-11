@@ -24,7 +24,7 @@ type Receiver struct {
 
 func (recv *Receiver) Receive(wm mf.Mention) {
 	log.Info().Str("Webmention", wm.String()).Msg("OK: looks valid")
-	body, geterr := recv.RestClient.GetBody(wm.Source)
+	_, body, geterr := recv.RestClient.GetBody(wm.Source)
 
 	if geterr != nil {
 		log.Warn().Str("source", wm.Source).Msg("  ABORT: invalid url")
@@ -39,15 +39,6 @@ func (recv *Receiver) deletePossibleOlderWebmention(wm mf.Mention) {
 	os.Remove(wm.AsPath(recv.Conf))
 }
 
-func getHEntry(data *microformats.Data) *microformats.Microformat {
-	for _, itm := range data.Items {
-		if common.Includes(itm.Type, "h-entry") {
-			return itm
-		}
-	}
-	return nil
-}
-
 func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 	if !strings.Contains(body, wm.Target) {
 		log.Warn().Str("target", wm.Target).Msg("ABORT: no mention of target found in html src of source!")
@@ -55,7 +46,7 @@ func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 	}
 
 	data := microformats.Parse(strings.NewReader(body), wm.SourceUrl())
-	indieweb := recv.convertBodyToIndiewebData(body, wm, getHEntry(data))
+	indieweb := recv.convertBodyToIndiewebData(body, wm, mf.HEntry(data))
 
 	recv.saveWebmentionToDisk(wm, indieweb)
 	log.Info().Str("file", wm.AsPath(recv.Conf)).Msg("OK: Webmention processed.")

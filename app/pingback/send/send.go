@@ -44,7 +44,8 @@ type Sender struct {
 func (sender *Sender) SendPingbackToEndpoint(endpoint string, mention mf.Mention) {
 	err := sender.RestClient.Post(endpoint, "text/xml", body.fill(mention))
 	if err != nil {
-		log.Err(err).Str("wm", mention.String()).Msg("Unable to send pingback")
+		log.Err(err).Str("endpoint", endpoint).Str("wm", mention.String()).Msg("Unable to send pingback")
+		return
 	}
-	log.Info().Str("wm", mention.String()).Msg("Pingback sent")
+	log.Info().Str("endpoint", endpoint).Str("wm", mention.String()).Msg("Pingback sent")
 }

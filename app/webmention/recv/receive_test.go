@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"testing"
 	"time"
@@ -132,8 +133,8 @@ func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testi
 	writeSomethingTo(filename)
 
 	client := &mocks.RestClientMock{
-		GetBodyFunc: func(url string) (string, error) {
-			return "", errors.New("whoops")
+		GetBodyFunc: func(url string) (http.Header, string, error) {
+			return nil, "", errors.New("whoops")
 		},
 	}
 	receiver := &Receiver{

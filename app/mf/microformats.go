@@ -72,6 +72,15 @@ func Map(mf *microformats.Microformat, key string) map[string]string {
 	return mapVal
 }
 
+func HEntry(data *microformats.Data) *microformats.Microformat {
+	for _, itm := range data.Items {
+		if common.Includes(itm.Type, "h-entry") {
+			return itm
+		}
+	}
+	return nil
+}
+
 func Prop(mf *microformats.Microformat, key string) *microformats.Microformat {
 	val := mf.Properties[key]
 	if len(val) == 0 {
