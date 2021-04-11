@@ -1,12 +1,24 @@
 package rest
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/url"
 )
 
+// mimicing NotFound: https://golang.org/src/net/http/server.go?s=64787:64830#L2076
 func BadRequest(w http.ResponseWriter) {
 	http.Error(w, "400 bad request", http.StatusBadRequest)
+}
+
+func Unauthorized(w http.ResponseWriter) {
+	http.Error(w, "401 unauthorized", http.StatusUnauthorized)
+}
+
+func Json(w http.ResponseWriter, data interface{}) {
+	w.WriteHeader(200)
+	bytes, _ := json.Marshal(data)
+	w.Write(bytes)
 }
 
 func Accept(w http.ResponseWriter) {

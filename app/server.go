@@ -1,6 +1,7 @@
 package app
 
 import (
+	"brainbaking.com/go-jamming/rest"
 	"net/http"
 	"strconv"
 
@@ -15,16 +16,11 @@ type server struct {
 	conf   *common.Config
 }
 
-// mimicing NotFound: https://golang.org/src/net/http/server.go?s=64787:64830#L2076
-func unauthorized(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "401 unauthorized", http.StatusUnauthorized)
-}
-
 func (s *server) authorizedOnly(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		if vars["token"] != s.conf.Token || !s.conf.IsAnAllowedDomain(vars["domain"]) {
-			unauthorized(w, r)
+			rest.Unauthorized(w)
 			return
 		}
 		h(w, r)

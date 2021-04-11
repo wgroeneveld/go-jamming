@@ -2,9 +2,9 @@ package webmention
 
 import (
 	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/app/webmention/load"
 	"brainbaking.com/go-jamming/app/webmention/recv"
 	"brainbaking.com/go-jamming/app/webmention/send"
-	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 
@@ -16,7 +16,10 @@ var httpClient = &rest.HttpClient{}
 
 func HandleGet(conf *common.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("handling get")
+		domain := mux.Vars(r)["domain"]
+		result := load.FromDisk(domain, conf.DataPath)
+
+		rest.Json(w, result)
 	}
 }
 
