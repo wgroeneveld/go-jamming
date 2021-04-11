@@ -19,6 +19,42 @@ Inspect how it's used on https://brainbaking.com/ - usually, a `<link/>` in your
 
 If you want to support the older pingback protocol, you can leverage webmenton.io's forward capabilities. Although I developed this primarily because webmention.io is _not_ reliable - you've been warned. 
 
+## Building and running
+
+Well, that's easy!
+
+1. Build: `go build`
+2. Run: `./go-jamming`
+3. ???
+4. Profit!
+
+## Configuration
+
+Place a `config.json` file in the same directory that looks like this:
+
+```json
+{
+  "port": 1337,
+  "host": "localhost",
+  "token": "sometoken",
+  "dataPath": "data",
+  "utcOffset": 60,
+  "allowedWebmentionSources":  [
+    "blah.com"
+  ],
+  "disallowedWebmentionDomains":  [
+    "youtube.com"
+  ]
+}
+```
+
+- port, host: http server params
+- token, allowedWebmentionSources: see below, used for authentication
+- utcOffset: offset in minutes for date processing, starting from UTC time.
+- dataPath: path to store all mentions as md5-encoded JSON filenames.
+
+If a config file is missing, or required keys are missing, a warning will be generated and default values will be used instead. See `common/config.go`.
+
 ## What's in it?
 
 ### 1. Webmentions
@@ -38,11 +74,11 @@ Accepted form format:
     target=https://aaronpk.example/post-by-aaron
 ```
 
-Will result in a `202 Accepted` - it handles things async. Stores in `.json` files in `data/domain`. 
+Will result in a `202 Accepted` - it handles things async. Stores in `.json` files in `[dataPath]/domain`. 
 
 #### 1.2 `GET /webmention/:domain/:token`
 
-Retrieves a JSON array with relevant webmentions stored for that domain. The token should match. See `config.js` to fiddle with it yourself. Environment variables are supported, although I haven't used them yet. 
+Retrieves a JSON array with relevant webmentions stored for that domain. The token should match. See configuration to fiddle with it yourself. Environment variables are supported, although I haven't used them yet. 
 
 #### 1.3 `PUT /webmention/:domain/:token`
 
@@ -95,8 +131,3 @@ Will result in a `200 OK` - that returns XML according to [The W3 pingback XML-R
 
 Happens automatically through `PUT /webmention/:domain/:token`! Links that are discovered as `rel="pingback"` that **do not** already have a webmention link will be processed as XML-RPC requests to be send. 
 
-
-## TODOs
-
-- `published` date is not well-formatted and blindly taken over from feed
-- Implement a Brid.gy-like system that converts links from domains in the config found on [public Mastodon timelines](https://docs.joinmastodon.org/methods/timelines/) into webmentions. (And check if it's ok to only use the public line)

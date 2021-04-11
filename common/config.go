@@ -1,21 +1,39 @@
 package common
 
 import (
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/rs/zerolog/log"
 )
 
 type Config struct {
-	Port                        int
-	Token                       string
-	UtcOffset                   int
-	DataPath                    string
-	AllowedWebmentionSources    []string
-	DisallowedWebmentionDomains []string
+	Port                        int      `json:"port"`
+	Token                       string   `json:"token"`
+	UtcOffset                   int      `json:"utcOffset"`
+	DataPath                    string   `json:"dataPath"`
+	AllowedWebmentionSources    []string `json:"allowedWebmentionSources"`
+	DisallowedWebmentionDomains []string `json:"disallowedWebmentionDomains"`
+}
+
+func (c *Config) missingKeys() []string {
+	keys := []string{}
+	if c.Port == 0 {
+		keys = append(keys, "port")
+	}
+	if c.Token == "" {
+		keys = append(keys, "token")
+	}
+	if c.DataPath == "" {
+		keys = append(keys, "dataPath")
+	}
+	if len(c.AllowedWebmentionSources) == 0 {
+		keys = append(keys, "allowedWebmentionSources")
+	}
+	return keys
 }
 
 func (c *Config) ContainsDisallowedDomain(url string) bool {
@@ -53,23 +71,33 @@ func (c *Config) SetupDataDirs() {
 }
 
 func Configure() (c *Config) {
-	portstr := os.Getenv("PORT")
-	port, err := strconv.Atoi(portstr)
+	confData, err := ioutil.ReadFile("config.json")
 	if err != nil {
-		port = 1337
-	}
-	token := os.Getenv("TOKEN")
-	if token == "" {
-		token = "miauwkes"
+		log.Warn().Msg("No config.json file found, reverting to defaults...")
+		return defaultConfig()
 	}
 
-	c = &Config{
-		Port:                        port,
-		Token:                       token,
+	conf := &Config{}
+	err = json.Unmarshal(confData, conf)
+	if err != nil {
+		log.Warn().Msg("config.json malformed JSON, reverting to defaults...")
+		return defaultConfig()
+	}
+	someMissingKeys := conf.missingKeys()
+	if len(someMissingKeys) > 0 {
+		log.Warn().Str("keys", strings.Join(someMissingKeys, ", ")).Msg("config.json is missing required keys, reverting to defaults...")
+		return defaultConfig()
+	}
+	return conf
+}
+
+func defaultConfig() *Config {
+	return &Config{
+		Port:                        1337,
+		Token:                       "miauwkes",
 		UtcOffset:                   60,
 		DataPath:                    "data",
 		AllowedWebmentionSources:    []string{"brainbaking.com", "jefklakscodex.com"},
 		DisallowedWebmentionDomains: []string{"youtube.com"},
 	}
-	return
 }
