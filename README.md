@@ -175,10 +175,10 @@ Happens automatically through `PUT /webmention/:domain/:token`! Links that are d
 
 ## Troubleshooting
 
-Run in verbose mode: use `-versbose`. This also logs debug info. Structured JSON is outputted through os.Stderr - which is usually `/var/log/syslog`. 
+Run in verbose mode: use `-verbose`. This also logs debug info. Structured JSON is outputted through os.Stderr - which is usually `/var/log/syslog`. 
 
 If rolling files in a separate location is required, [lumberjack](https://github.com/natefinch/lumberjack) could be added in `main.go`.
 
 There's a **rate limiting** system implemented with a rate limit of 5 requests per second and a maximum burst rate of 10. 
 That's pretty flexible. I have not taken the trouble to put this into the config, it should do in most cases. If you get a `429 too many requests`, you've hit the limiter. 
-A separate goroutine cleans up ips each 2 minutes, the TTL is 5 minuts. See `limiter.go`. 
+A separate goroutine cleans up ips each 2 minutes, the TTL is 5 minutes. See `limiter.go`. 
