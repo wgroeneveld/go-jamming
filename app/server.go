@@ -43,5 +43,5 @@ func Start() {
 	r.Use(NewRateLimiter(5, 10).Middleware)
 
 	log.Info().Int("port", server.conf.Port).Msg("Serving...")
-	http.ListenAndServe(":"+strconv.Itoa(server.conf.Port), nil)
+	log.Fatal().Err(http.ListenAndServe(":"+strconv.Itoa(server.conf.Port), nil))
 }

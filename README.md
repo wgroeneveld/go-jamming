@@ -28,19 +28,59 @@ Well, that's easy!
 3. ???
 4. Profit!
 
+It's very much a fire-and-forget thing. Put it behind a reverse proxy such as nginx using something like this:
+
+```
+server {
+        listen 443 ssl http2;
+        listen [::]:443 ssl http2;
+
+        server_name [your-domain];
+
+        location / {
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $remote_addr;
+                proxy_set_header Host $host;
+                proxy_pass http://127.0.0.1:[your-port];
+        }
+    ssl_certificate /etc/letsencrypt/live/[your-domain]/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/[your-domain]/privkey.pem;
+}
+```
+
+Create a very simple Linux system service that fires up the jam:
+
+```
+[Unit]
+Description=Go-Jamming
+After=network.target
+
+[Service]
+User=[myuser]
+WorkingDirectory=/var/www/gojamming
+ExecStart=/var/www/gojamming/go-jamming
+SuccessExitStatus=0
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Now install using `sudo systemctl enable/install gojamming` and you're done!
+
 ## Configuration
 
-Place a `config.json` file in the same directory that looks like this:
+Place a `config.json` file in the same directory that looks like this: (below are the default values)
 
 ```json
 {
   "port": 1337,
   "host": "localhost",
-  "token": "sometoken",
+  "token": "miauwkes",
   "dataPath": "data",
   "utcOffset": 60,
   "allowedWebmentionSources":  [
-    "blah.com"
+    "brainbaking.com",
+    "jefklakscodex.com"
   ],
   "disallowedWebmentionDomains":  [
     "youtube.com"
@@ -54,6 +94,8 @@ Place a `config.json` file in the same directory that looks like this:
 - dataPath: path to store all mentions as md5-encoded JSON filenames.
 
 If a config file is missing, or required keys are missing, a warning will be generated and default values will be used instead. See `common/config.go`.
+
+---
 
 ## What's in it?
 
@@ -131,3 +173,12 @@ Will result in a `200 OK` - that returns XML according to [The W3 pingback XML-R
 
 Happens automatically through `PUT /webmention/:domain/:token`! Links that are discovered as `rel="pingback"` that **do not** already have a webmention link will be processed as XML-RPC requests to be send. 
 
+## Troubleshooting
+
+Run in verbose mode: use `-versbose`. This also logs debug info. Structured JSON is outputted through os.Stderr - which is usually `/var/log/syslog`. 
+
+If rolling files in a separate location is required, [lumberjack](https://github.com/natefinch/lumberjack) could be added in `main.go`.
+
+There's a **rate limiting** system implemented with a rate limit of 5 requests per second and a maximum burst rate of 10. 
+That's pretty flexible. I have not taken the trouble to put this into the config, it should do in most cases. If you get a `429 too many requests`, you've hit the limiter. 
+A separate goroutine cleans up ips each 2 minutes, the TTL is 5 minuts. See `limiter.go`. 

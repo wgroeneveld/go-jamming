@@ -6,6 +6,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -76,7 +77,7 @@ func (rl *RateLimiter) cleanupVisitors() {
 // with the help of https://www.alexedwards.net/blog/how-to-rate-limit-http-requests, TY!
 func (rl *RateLimiter) limiterMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ip := r.RemoteAddr // also contains port, but don't care
+		ip := rl.guessIp(r)
 		limiter := rl.getVisitor(ip)
 
 		if limiter.Allow() == false {
@@ -87,4 +88,16 @@ func (rl *RateLimiter) limiterMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func (rl *RateLimiter) guessIp(r *http.Request) string {
+	realIp := r.Header.Get("X-Real-IP")
+	forwardedFor := r.Header.Get("X-Forwarded-For")
+	if realIp != "" { // in case of proxy. is IP itself
+		return realIp
+	}
+	if forwardedFor != "" { // in case of proxy. Could be: clientip, proxy1, proxy2, ...
+		return strings.Split(forwardedFor, ",")[0]
+	}
+	return r.RemoteAddr // also contains port, but don't care
 }
