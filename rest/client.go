@@ -2,10 +2,13 @@ package rest
 
 import (
 	"fmt"
+	"github.com/hashicorp/go-cleanhttp"
+	"github.com/hashicorp/go-retryablehttp"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type Client interface {
@@ -18,8 +21,21 @@ type Client interface {
 type HttpClient struct {
 }
 
+var (
+	// do not use retryablehttp default impl - inject own logger and retry policies
+	jammingHttp = &retryablehttp.Client{
+		HTTPClient:   cleanhttp.DefaultPooledClient(),
+		Logger:       &zeroLogWrapper{},
+		RetryWaitMin: 1 * time.Second,
+		RetryWaitMax: 30 * time.Second,
+		RetryMax:     5,
+		CheckRetry:   retryablehttp.DefaultRetryPolicy,
+		Backoff:      retryablehttp.DefaultBackoff,
+	}
+)
+
 func (client *HttpClient) PostForm(url string, formData url.Values) error {
-	resp, err := http.PostForm(url, formData)
+	resp, err := jammingHttp.PostForm(url, formData)
 	if err != nil {
 		return err
 	}
@@ -30,7 +46,7 @@ func (client *HttpClient) PostForm(url string, formData url.Values) error {
 }
 
 func (client *HttpClient) Post(url string, contenType string, body string) error {
-	resp, err := http.Post(url, contenType, strings.NewReader(body))
+	resp, err := jammingHttp.Post(url, contenType, strings.NewReader(body))
 	if err != nil {
 		return err
 	}
@@ -73,5 +89,5 @@ func isStatusOk(resp *http.Response) bool {
 }
 
 func (client *HttpClient) Get(url string) (*http.Response, error) {
-	return http.Get(url)
+	return jammingHttp.Get(url)
 }
