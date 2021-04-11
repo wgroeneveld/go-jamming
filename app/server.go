@@ -2,6 +2,7 @@ package app
 
 import (
 	"brainbaking.com/go-jamming/rest"
+	"github.com/MagnusFrater/helmet"
 	"net/http"
 	"strconv"
 
@@ -31,11 +32,14 @@ func Start() {
 	r := mux.NewRouter()
 	config := common.Configure()
 	config.SetupDataDirs()
+	helmet := helmet.Default()
+
 	server := &server{router: r, conf: config}
 
 	server.routes()
 	http.Handle("/", r)
 	r.Use(LoggingMiddleware)
+	r.Use(helmet.Secure)
 	r.Use(NewRateLimiter(5, 10).Middleware)
 
 	log.Info().Int("port", server.conf.Port).Msg("Serving...")

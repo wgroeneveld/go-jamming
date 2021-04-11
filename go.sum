@@ -1,3 +1,5 @@
+github.com/MagnusFrater/helmet v1.0.0 h1:xzKXDZIXg4ik05MCVHZN3mTOc+3Skzm552nujJ5PzYI=
+github.com/MagnusFrater/helmet v1.0.0/go.mod h1:giGWX/jKRWjf+jxEmKOXyBdtz7VmAK3SEbadVV2pdxA=
 github.com/PuerkitoBio/goquery v1.5.0/go.mod h1:qD2PgZ9lccMbQlc7eEOjaeRlFQON7xY8kdmcsrnKqMg=
 github.com/andybalholm/cascadia v1.0.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9PqHO0sqidkEA4Y=
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
