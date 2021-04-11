@@ -8,11 +8,15 @@ import (
 
 // mimicing NotFound: https://golang.org/src/net/http/server.go?s=64787:64830#L2076
 func BadRequest(w http.ResponseWriter) {
-	http.Error(w, "400 bad request", http.StatusBadRequest)
+	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+}
+
+func TooManyRequests(w http.ResponseWriter) {
+	http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
 }
 
 func Unauthorized(w http.ResponseWriter) {
-	http.Error(w, "401 unauthorized", http.StatusUnauthorized)
+	http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 }
 
 func Json(w http.ResponseWriter, data interface{}) {

@@ -35,7 +35,8 @@ func Start() {
 
 	server.routes()
 	http.Handle("/", r)
-	r.Use(loggingMiddleware)
+	r.Use(LoggingMiddleware)
+	r.Use(NewRateLimiter(5, 10).Middleware)
 
 	log.Info().Int("port", server.conf.Port).Msg("Serving...")
 	http.ListenAndServe(":"+strconv.Itoa(server.conf.Port), nil)
