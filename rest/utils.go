@@ -17,7 +17,7 @@ func Unauthorized(w http.ResponseWriter) {
 
 func Json(w http.ResponseWriter, data interface{}) {
 	w.WriteHeader(200)
-	bytes, _ := json.Marshal(data)
+	bytes, _ := json.MarshalIndent(data, "", "  ")
 	w.Write(bytes)
 }
 

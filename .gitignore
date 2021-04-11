@@ -1,4 +1,6 @@
 
+.DS_Store
+
 config.json
 
 data/*
