@@ -137,7 +137,7 @@ As with the `POST` call, will result in a `202 Accepted` and handles things asyn
 
 **Does this thing take updates into account**?
 
-Yes and no. It checks the `<pubDate/>` `<item/>` RSS tag by default, but if a `<time datetime="..."/>` tag is present in the `<description/>`, it treats that date as the "last modified" date. There is no such thing in the RSS 2.0 W3.org specs, so I had to come up with my own hacks! Remember that if you want this to work, you also need to include a time tag in your RSS feed (e.g. `.Lastmod` gitinfo in Hugo). 
+Yes and no. It checks the `<pubDate/>` `<item/>` RSS tag by default. I decided against porting the more complicated `<timestamp/>` HTML check as it would only spam possible receivers. So if you consider your article to be updated, you should also update the publication date! 
 
 ### 2. Pingbacks
 
