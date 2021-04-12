@@ -15,16 +15,18 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			pingbackError(w, "Unable to read request body")
+			pingbackError(w, "Unable to read request body", []byte("<not-parsaeble>"))
+			return
 		}
 		rpc := &XmlRPCMethodCall{}
 		err = xml.Unmarshal(body, rpc)
 		if err != nil {
-			pingbackError(w, "Unable to unmarshal XMLRPC request body")
+			pingbackError(w, "Unable to unmarshal XMLRPC request body", body)
+			return
 		}
 
 		if !validate(rpc, conf) {
-			pingbackError(w, "malformed pingback request")
+			pingbackError(w, "malformed pingback request", body)
 			return
 		}
 
@@ -59,7 +61,7 @@ func pingbackSuccess(w http.ResponseWriter) {
 }
 
 // according to the XML-RPC spec, always return a 200, but encode it into the XML.
-func pingbackError(w http.ResponseWriter, msg string) {
+func pingbackError(w http.ResponseWriter, msg string, body []byte) {
 	xml := `<?xml version="1.0" encoding="UTF-8"?>
 <methodResponse>
     <fault>
@@ -89,7 +91,7 @@ func pingbackError(w http.ResponseWriter, msg string) {
         </value>
     </fault>
 </methodResponse>`
-	log.Error().Str("msg", msg).Msg("Pingback receive went wrong")
+	log.Error().Str("msg", msg).Str("xml", string(body)).Msg("Pingback receive went wrong")
 	w.WriteHeader(200)
 	w.Write([]byte(xml))
 }
