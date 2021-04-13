@@ -37,7 +37,7 @@ var (
 func (client *HttpClient) PostForm(url string, formData url.Values) error {
 	resp, err := jammingHttp.PostForm(url, formData)
 	if err != nil {
-		return err
+		return fmt.Errorf("POST Form to %s: %v", url, err)
 	}
 	if !isStatusOk(resp) {
 		return fmt.Errorf("POST Form to %s: Status code is not OK (%d)", url, resp.StatusCode)
@@ -48,7 +48,7 @@ func (client *HttpClient) PostForm(url string, formData url.Values) error {
 func (client *HttpClient) Post(url string, contenType string, body string) error {
 	resp, err := jammingHttp.Post(url, contenType, strings.NewReader(body))
 	if err != nil {
-		return err
+		return fmt.Errorf("POST to %s: %v", url, err)
 	}
 	if !isStatusOk(resp) {
 		return fmt.Errorf("POST to %s: Status code is not OK (%d)", url, resp.StatusCode)
@@ -60,28 +60,19 @@ func (client *HttpClient) Post(url string, contenType string, body string) error
 func (client *HttpClient) GetBody(url string) (http.Header, string, error) {
 	resp, geterr := client.Get(url)
 	if geterr != nil {
-		return nil, "", geterr
+		return nil, "", fmt.Errorf("GET from %s: %v", url, geterr)
 	}
 
-	body, err := ReadBodyFromResponse(resp)
-	if err != nil {
-		return nil, "", err
-	}
-
-	return resp.Header, body, nil
-}
-
-func ReadBodyFromResponse(resp *http.Response) (string, error) {
 	if !isStatusOk(resp) {
-		return "", fmt.Errorf("Status code is not OK (%d)", resp.StatusCode)
+		return nil, "", fmt.Errorf("GET from %s: Status code is not OK (%d)", url, resp.StatusCode)
 	}
 
 	body, readerr := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if readerr != nil {
-		return "", readerr
+		return nil, "", fmt.Errorf("GET from %s: unable to read body: %v", url, readerr)
 	}
-	return string(body), nil
+	return resp.Header, string(body), nil
 }
 
 func isStatusOk(resp *http.Response) bool {

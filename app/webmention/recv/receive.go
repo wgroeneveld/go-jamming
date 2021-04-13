@@ -23,11 +23,11 @@ type Receiver struct {
 }
 
 func (recv *Receiver) Receive(wm mf.Mention) {
-	log.Info().Str("Webmention", wm.String()).Msg("OK: looks valid")
+	log.Info().Stringer("wm", wm).Msg("OK: looks valid")
 	_, body, geterr := recv.RestClient.GetBody(wm.Source)
 
 	if geterr != nil {
-		log.Warn().Str("source", wm.Source).Msg("  ABORT: invalid url")
+		log.Warn().Err(geterr).Msg("  ABORT: invalid url")
 		recv.deletePossibleOlderWebmention(wm)
 		return
 	}
@@ -35,6 +35,7 @@ func (recv *Receiver) Receive(wm mf.Mention) {
 	recv.processSourceBody(body, wm)
 }
 
+// Deletes a possible webmention. Ignores remove errors.
 func (recv *Receiver) deletePossibleOlderWebmention(wm mf.Mention) {
 	os.Remove(wm.AsPath(recv.Conf))
 }
@@ -48,7 +49,9 @@ func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 	data := microformats.Parse(strings.NewReader(body), wm.SourceUrl())
 	indieweb := recv.convertBodyToIndiewebData(body, wm, mf.HEntry(data))
 
-	recv.saveWebmentionToDisk(wm, indieweb)
+	if err := recv.saveWebmentionToDisk(wm, indieweb); err != nil {
+		log.Err(err).Msg("Unable to save Webmention to disk")
+	}
 	log.Info().Str("file", wm.AsPath(recv.Conf)).Msg("OK: Webmention processed.")
 }
 
@@ -59,46 +62,41 @@ func (recv *Receiver) convertBodyToIndiewebData(body string, wm mf.Mention, hEnt
 	return recv.parseBodyAsIndiewebSite(hEntry, wm)
 }
 
-func (recv *Receiver) saveWebmentionToDisk(wm mf.Mention, indieweb *mf.IndiewebData) {
+func (recv *Receiver) saveWebmentionToDisk(wm mf.Mention, indieweb *mf.IndiewebData) error {
 	jsonData, jsonErr := json.Marshal(indieweb)
 	if jsonErr != nil {
-		log.Err(jsonErr).Msg("Unable to serialize Webmention into JSON")
+		return jsonErr
 	}
 	err := ioutil.WriteFile(wm.AsPath(recv.Conf), jsonData, fs.ModePerm)
 	if err != nil {
-		log.Err(err).Msg("Unable to save Webmention to disk")
+		return err
 	}
+	return nil
 }
 
-// TODO I'm smelling very unstable code, apply https://golang.org/doc/effective_go#recover here?
 // see https://github.com/willnorris/microformats/blob/main/microformats.go
 func (recv *Receiver) parseBodyAsIndiewebSite(hEntry *microformats.Microformat, wm mf.Mention) *mf.IndiewebData {
-	name := mf.Str(hEntry, "name")
-	pic := mf.Str(mf.Prop(hEntry, "author"), "photo")
-	mfType := mf.DetermineType(hEntry)
-
 	return &mf.IndiewebData{
-		Name: name,
+		Name: mf.Str(hEntry, "name"),
 		Author: mf.IndiewebAuthor{
 			Name:    mf.DetermineAuthorName(hEntry),
-			Picture: pic,
+			Picture: mf.Str(mf.Prop(hEntry, "author"), "photo"),
 		},
-		Content:      mf.DetermineContent(hEntry),
-		Url:          mf.DetermineUrl(hEntry, wm.Source),
-		Published:    mf.DeterminePublishedDate(hEntry, recv.Conf.UtcOffset),
+		Content:      mf.Content(hEntry),
+		Url:          mf.Url(hEntry, wm.Source),
+		Published:    mf.Published(hEntry, recv.Conf.UtcOffset),
 		Source:       wm.Source,
 		Target:       wm.Target,
-		IndiewebType: mfType,
+		IndiewebType: mf.Type(hEntry),
 	}
 }
 
+var (
+	titleRegexp = regexp.MustCompile(`<title>(.*?)<\/title>`)
+)
+
 func (recv *Receiver) parseBodyAsNonIndiewebSite(body string, wm mf.Mention) *mf.IndiewebData {
-	r := regexp.MustCompile(`<title>(.*?)<\/title>`)
-	titleMatch := r.FindStringSubmatch(body)
-	title := wm.Source
-	if titleMatch != nil {
-		title = titleMatch[1]
-	}
+	title := nonIndiewebTitle(body, wm)
 	return &mf.IndiewebData{
 		Author: mf.IndiewebAuthor{
 			Name: wm.Source,
@@ -107,8 +105,17 @@ func (recv *Receiver) parseBodyAsNonIndiewebSite(body string, wm mf.Mention) *mf
 		Content:      title,
 		Published:    mf.PublishedNow(recv.Conf.UtcOffset),
 		Url:          wm.Source,
-		IndiewebType: "mention",
+		IndiewebType: mf.TypeMention,
 		Source:       wm.Source,
 		Target:       wm.Target,
 	}
+}
+
+func nonIndiewebTitle(body string, wm mf.Mention) string {
+	titleMatch := titleRegexp.FindStringSubmatch(body)
+	title := wm.Source
+	if titleMatch != nil {
+		title = titleMatch[1]
+	}
+	return title
 }

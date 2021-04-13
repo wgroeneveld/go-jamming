@@ -34,7 +34,7 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
 			Source: rpc.Source(),
 			Target: rpc.Target(),
 		}
-		receiver := recv.Receiver{
+		receiver := &recv.Receiver{
 			RestClient: &rest.HttpClient{},
 			Conf:       conf,
 		}

@@ -34,7 +34,7 @@ type IndiewebData struct {
 	Content      string         `json:"content"`
 	Published    string         `json:"published"`
 	Url          string         `json:"url"`
-	IndiewebType string         `json:"type"`
+	IndiewebType MfType         `json:"type"`
 	Source       string         `json:"source"`
 	Target       string         `json:"target"`
 }
@@ -47,7 +47,7 @@ func shorten(txt string) string {
 	if len(txt) <= 250 {
 		return txt
 	}
-	return txt[0:250] + "..."
+	return txt[:250] + "..."
 }
 
 // Go stuff: entry.Properties["name"][0].(string),
@@ -103,7 +103,7 @@ func Prop(mf *microformats.Microformat, key string) *microformats.Microformat {
 	return val[0].(*microformats.Microformat)
 }
 
-func DeterminePublishedDate(hEntry *microformats.Microformat, utcOffset int) string {
+func Published(hEntry *microformats.Microformat, utcOffset int) string {
 	publishedDate := Str(hEntry, "published")
 	if publishedDate == "" {
 		return PublishedNow(utcOffset)
@@ -119,20 +119,28 @@ func DetermineAuthorName(hEntry *microformats.Microformat) string {
 	return authorName
 }
 
-func DetermineType(hEntry *microformats.Microformat) string {
+type MfType string
+
+const (
+	TypeLike     MfType = "like"
+	TypeBookmark MfType = "bookmark"
+	TypeMention  MfType = "mention"
+)
+
+func Type(hEntry *microformats.Microformat) MfType {
 	likeOf := Str(hEntry, "like-of")
 	if likeOf != "" {
-		return "like"
+		return TypeLike
 	}
 	bookmarkOf := Str(hEntry, "bookmark-of")
 	if bookmarkOf != "" {
-		return "bookmark"
+		return TypeBookmark
 	}
-	return "mention"
+	return TypeMention
 }
 
 // Mastodon uids start with "tag:server", but we do want indieweb uids from other sources
-func DetermineUrl(hEntry *microformats.Microformat, source string) string {
+func Url(hEntry *microformats.Microformat, source string) string {
 	uid := Str(hEntry, "uid")
 	if uid != "" && strings.HasPrefix(uid, "http") {
 		return uid
@@ -144,7 +152,7 @@ func DetermineUrl(hEntry *microformats.Microformat, source string) string {
 	return source
 }
 
-func DetermineContent(hEntry *microformats.Microformat) string {
+func Content(hEntry *microformats.Microformat) string {
 	bridgyTwitterContent := Str(hEntry, "bridgy-twitter-content")
 	if bridgyTwitterContent != "" {
 		return shorten(bridgyTwitterContent)

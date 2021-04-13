@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// someone already did this for me, yay! https://siongui.github.io/2015/03/03/go-parse-web-feed-rss-atom/
+// someone already did this for me, yay!
 type Rss2 struct {
 	XMLName xml.Name `xml:"rss"`
 	Version string   `xml:"version,attr"`
@@ -61,6 +61,7 @@ type Entry struct {
 	Author  Author `xml:"author"`
 }
 
+// Based on https://siongui.github.io/2015/03/03/go-parse-web-feed-rss-atom/
 func ParseFeed(content []byte) (*Rss2, error) {
 	v := &Rss2{}
 	err := xml.Unmarshal(content, v)
@@ -77,5 +78,5 @@ func ParseFeed(content []byte) (*Rss2, error) {
 		return v, nil
 	}
 
-	return v, errors.New("not RSS 2.0")
+	return v, errors.New("ParseFeed: not RSS 2.0")
 }

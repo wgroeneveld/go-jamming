@@ -17,21 +17,22 @@ type Sender struct {
 
 func (snder *Sender) Send(domain string, since string) {
 	log.Info().Str("domain", domain).Str("since", since).Msg(` OK: someone wants to send mentions`)
-	_, feed, err := snder.RestClient.GetBody("https://" + domain + "/index.xml")
+	feedUrl := "https://" + domain + "/index.xml"
+	_, feed, err := snder.RestClient.GetBody(feedUrl)
 	if err != nil {
-		log.Err(err).Str("domain", domain).Msg("Unable to retrieve RSS feed, aborting send")
+		log.Err(err).Str("url", feedUrl).Msg("Unable to retrieve RSS feed, send aborted")
 		return
 	}
 
-	snder.parseRssFeed(feed, common.IsoToTime(since))
-	log.Info().Str("domain", domain).Str("since", since).Msg(` OK: sending done.`)
+	if err = snder.parseRssFeed(feed, common.IsoToTime(since)); err != nil {
+		log.Err(err).Str("url", feedUrl).Msg("Unable to parse RSS feed, send aborted")
+	}
 }
 
-func (snder *Sender) parseRssFeed(feed string, since time.Time) {
+func (snder *Sender) parseRssFeed(feed string, since time.Time) error {
 	items, err := snder.Collect(feed, since)
 	if err != nil {
-		log.Err(err).Msg("Unable to parse RSS fed, aborting send")
-		return
+		return err
 	}
 
 	var wg sync.WaitGroup
@@ -51,12 +52,13 @@ func (snder *Sender) parseRssFeed(feed string, since time.Time) {
 		}
 	}
 	wg.Wait()
+	return nil
 }
 
 var mentionFuncs = map[string]func(snder *Sender, mention mf.Mention, endpoint string){
-	TypeUnknown:    func(snder *Sender, mention mf.Mention, endpoint string) {},
-	TypeWebmention: sendMentionAsWebmention,
-	TypePingback:   sendMentionAsPingback,
+	typeUnknown:    func(snder *Sender, mention mf.Mention, endpoint string) {},
+	typeWebmention: sendMentionAsWebmention,
+	typePingback:   sendMentionAsPingback,
 }
 
 func (snder *Sender) sendMention(mention mf.Mention) {
@@ -67,10 +69,10 @@ func (snder *Sender) sendMention(mention mf.Mention) {
 func sendMentionAsWebmention(snder *Sender, mention mf.Mention, endpoint string) {
 	err := snder.RestClient.PostForm(endpoint, mention.AsFormValues())
 	if err != nil {
-		log.Err(err).Str("endpoint", endpoint).Str("wm", mention.String()).Msg("Webmention send failed")
+		log.Err(err).Str("endpoint", endpoint).Stringer("wm", mention).Msg("Webmention send failed")
 		return
 	}
-	log.Info().Str("endpoint", endpoint).Str("wm", mention.String()).Msg("OK: webmention sent.")
+	log.Info().Str("endpoint", endpoint).Stringer("wm", mention).Msg("OK: webmention sent.")
 }
 
 func sendMentionAsPingback(snder *Sender, mention mf.Mention, endpoint string) {

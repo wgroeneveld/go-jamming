@@ -12,7 +12,9 @@ import (
 	"brainbaking.com/go-jamming/rest"
 )
 
-var httpClient = &rest.HttpClient{}
+var (
+	httpClient = &rest.HttpClient{}
+)
 
 func HandleGet(conf *common.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

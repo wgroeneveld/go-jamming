@@ -54,14 +54,17 @@ func (snder *Sender) Collect(xml string, since time.Time) ([]RSSItem, error) {
 	return items, nil
 }
 
+var (
+	hrefRegexp = regexp.MustCompile(`href="(.+?)"`)
+	extRegexp  = regexp.MustCompile(`\.(gif|zip|rar|bz2|gz|7z|jpe?g|tiff?|png|webp|bmp)$`)
+)
+
 func (snder *Sender) collectUniqueHrefsFromDescription(html string) []string {
-	r := regexp.MustCompile(`href="(.+?)"`)
-	ext := regexp.MustCompile(`\.(gif|zip|rar|bz2|gz|7z|jpe?g|tiff?|png|webp|bmp)$`)
 	urlmap := common.NewSet()
 
-	for _, match := range r.FindAllStringSubmatch(html, -1) {
+	for _, match := range hrefRegexp.FindAllStringSubmatch(html, -1) {
 		url := match[1] // [0] is the match of the entire expression, [1] is the capture group
-		if !ext.MatchString(url) && !snder.Conf.ContainsDisallowedDomain(url) {
+		if !extRegexp.MatchString(url) && !snder.Conf.ContainsDisallowedDomain(url) {
 			urlmap.Add(url)
 		}
 	}
