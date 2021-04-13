@@ -6,6 +6,14 @@ import (
 	"testing"
 )
 
+func TestMarshallXmlSpamFromProductionWithMissingDecoderCharset(t *testing.T) {
+	xmlString := `<?xml version="1.0" encoding="utf-16" standalone="yes"?><methodCall><methodName>pingback.ping</methodName><params><param><value><string>https://teramassage.com/gwangju/</string></value></param><param><value><string>https://brainbaking.com/projects/</string></value></param></params></methodCall>`
+	var rpc XmlRPCMethodCall
+	err := xml.Unmarshal([]byte(xmlString), &rpc)
+
+	assert.EqualError(t, err, `xml: encoding "utf-16" declared but Decoder.CharsetReader is nil`)
+}
+
 // See https://www.hixie.ch/specs/pingback/pingback#refsXMLRPC
 func TestMarshallValidXMLRPC(t *testing.T) {
 	xmlString := `<?xml version="1.0" encoding="UTF-8"?>

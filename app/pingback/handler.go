@@ -6,6 +6,7 @@ import (
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/rest"
 	"encoding/xml"
+	"fmt"
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
@@ -15,18 +16,18 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			pingbackError(w, "Unable to read request body", []byte("<not-parsaeble>"))
+			pingbackError(w, fmt.Errorf("pingback POST: Unable to read body: %v", err))
 			return
 		}
 		rpc := &XmlRPCMethodCall{}
 		err = xml.Unmarshal(body, rpc)
 		if err != nil {
-			pingbackError(w, "Unable to unmarshal XMLRPC request body", body)
+			pingbackError(w, fmt.Errorf("pingback POST: Unable to unmarshal XMLRPC %s: %v", body, err))
 			return
 		}
 
 		if !validate(rpc, conf) {
-			pingbackError(w, "malformed pingback request", body)
+			pingbackError(w, fmt.Errorf("pingback POST: malformed pingback request: %s", body))
 			return
 		}
 
@@ -61,7 +62,7 @@ func pingbackSuccess(w http.ResponseWriter) {
 }
 
 // according to the XML-RPC spec, always return a 200, but encode it into the XML.
-func pingbackError(w http.ResponseWriter, msg string, body []byte) {
+func pingbackError(w http.ResponseWriter, err error) {
 	xml := `<?xml version="1.0" encoding="UTF-8"?>
 <methodResponse>
     <fault>
@@ -91,7 +92,7 @@ func pingbackError(w http.ResponseWriter, msg string, body []byte) {
         </value>
     </fault>
 </methodResponse>`
-	log.Error().Str("msg", msg).Str("xml", string(body)).Msg("Pingback receive went wrong")
+	log.Error().Err(err).Msg("Pingback receive went wrong")
 	w.WriteHeader(200)
 	w.Write([]byte(xml))
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/MagnusFrater/helmet"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"brainbaking.com/go-jamming/common"
 
@@ -26,6 +27,18 @@ func (s *server) authorizedOnly(h http.HandlerFunc) http.HandlerFunc {
 		}
 		h(w, r)
 	}
+}
+
+func ipFrom(r *http.Request) string {
+	realIp := r.Header.Get("X-Real-IP")
+	forwardedFor := r.Header.Get("X-Forwarded-For")
+	if realIp != "" { // in case of proxy. is IP itself
+		return realIp
+	}
+	if forwardedFor != "" { // in case of proxy. Could be: clientip, proxy1, proxy2, ...
+		return strings.Split(forwardedFor, ",")[0]
+	}
+	return r.RemoteAddr // also contains port, but don't care
 }
 
 func Start() {
