@@ -2,6 +2,8 @@ package mf
 
 import (
 	"brainbaking.com/go-jamming/common"
+	"encoding/json"
+	"io/ioutil"
 	"strings"
 	"time"
 	"willnorris.com/go/microformats"
@@ -37,6 +39,19 @@ type IndiewebData struct {
 	IndiewebType MfType         `json:"type"`
 	Source       string         `json:"source"`
 	Target       string         `json:"target"`
+}
+
+func (id *IndiewebData) IsEmpty() bool {
+	return id.Url == ""
+}
+
+// RequireFromFile converts the file JSON contents into the indieweb struct.
+// This ignores read and marshall errors and returns an emtpy struct instead.
+func RequireFromFile(file string) *IndiewebData {
+	indiewebData := &IndiewebData{}
+	data, _ := ioutil.ReadFile(file)
+	json.Unmarshal(data, indiewebData)
+	return indiewebData
 }
 
 func PublishedNow(utcOffset int) string {

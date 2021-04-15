@@ -1,0 +1,23 @@
+{
+  "domain": "brainbaking.com",
+  "repositories": [
+    {
+      "prefix": "go-jamming",
+      "subs": [
+        "app",
+        "app/index",
+        "app/mf",
+        "app/pingback",
+        "app/pingback/send",
+        "app/rss",
+        "app/webmention",
+        "app/webmention/load",
+        "app/webmention/recv",
+        "app/webmention/send",
+        "common",
+        "rest"
+      ],
+      "url": "https://github.com/wgroeneveld/go-jamming"
+    }
+  ]
+}
