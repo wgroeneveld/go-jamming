@@ -44,7 +44,6 @@ func ipFrom(r *http.Request) string {
 func Start() {
 	r := mux.NewRouter()
 	config := common.Configure()
-	config.SetupDataDirs()
 	helmet := helmet.Default()
 
 	server := &server{router: r, conf: config}

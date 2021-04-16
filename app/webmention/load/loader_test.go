@@ -13,7 +13,8 @@ import (
 // stress tests to see what concurrent disk access is like. Runs fine, even with 5000 runs and 100 files.
 // this means worker pools do not have to be implemented in FromDisk().
 // However, if runs := 10000, some results are empty. At other times, even ioutil.ReadDir() panics...
-// The rate limiter should catch this.
+// The rate limiter should catch this, combined with a domain read lock in the caller.
+// Furthermore, a run of 1 and files of 50k breaks the OS without using a semaphore to limit the nr. of open files!
 func TestFromDiskStressTest(t *testing.T) {
 	runs := 100
 	files := 100

@@ -23,6 +23,14 @@ func TestSendSuite(t *testing.T) {
 	suite.Run(t, new(TimeSuite))
 }
 
+func (s *TimeSuite) TestTimeToIso() {
+	theTime := time.Date(2021, time.March, 9, 15, 51, 43, 732, time.UTC)
+	expected := "2021-03-09T15:51:43.000Z"
+	actual := TimeToIso(theTime)
+
+	assert.Equal(s.T(), expected, actual)
+}
+
 func (s *TimeSuite) TestIsoToTimeInISOString() {
 	expectedtime := time.Date(2021, time.March, 9, 15, 51, 43, 732, time.UTC)
 	since := IsoToTime("2021-03-09T15:51:43.732Z")

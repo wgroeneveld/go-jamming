@@ -17,6 +17,7 @@ import (
 var conf = &common.Config{
 	AllowedWebmentionSources: []string{
 		"jefklakscodex.com",
+		"brainbaking.com",
 	},
 	DataPath: "testdata",
 }
@@ -107,7 +108,7 @@ func TestReceive(t *testing.T) {
 			}
 
 			receiver := &Receiver{
-				Conf: conf,
+				Conf: common.NewConfig(conf),
 				RestClient: &mocks.RestClientMock{
 					GetBodyFunc: mocks.RelPathGetBodyFunc(t, "../../../mocks/"),
 				},
@@ -138,7 +139,7 @@ func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testi
 		},
 	}
 	receiver := &Receiver{
-		Conf:       conf,
+		Conf:       common.NewConfig(conf),
 		RestClient: client,
 	}
 
@@ -155,7 +156,7 @@ func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {
 	writeSomethingTo(filename)
 
 	receiver := &Receiver{
-		Conf: conf,
+		Conf: common.NewConfig(conf),
 		RestClient: &mocks.RestClientMock{
 			GetBodyFunc: mocks.RelPathGetBodyFunc(t, "../../../mocks/"),
 		},
@@ -174,7 +175,7 @@ func TestProcessSourceBodyAbortsIfNoMentionOfTargetFoundInSourceHtml(t *testing.
 		Target: "https://jefklakscodex.com/articles",
 	}
 	receiver := &Receiver{
-		Conf: conf,
+		Conf: common.NewConfig(conf),
 	}
 
 	receiver.processSourceBody("<html>my nice body</html>", wm)

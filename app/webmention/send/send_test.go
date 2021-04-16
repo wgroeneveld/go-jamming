@@ -7,11 +7,67 @@ import (
 	"brainbaking.com/go-jamming/rest"
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"sync"
 	"testing"
+	"time"
 )
+
+func TestSinceForDomain(t *testing.T) {
+	cases := []struct {
+		label        string
+		sinceInParam string
+		sinceInFile  string
+		expected     time.Time
+	}{
+		{
+			"Is since parameter if provided",
+			"2021-03-09T15:51:43.732Z",
+			"",
+			time.Date(2021, time.March, 9, 15, 51, 43, 732, time.UTC),
+		},
+		{
+			"Is file contents if since parameter is empty and file is not",
+			"",
+			"2021-03-09T15:51:43.732Z",
+			time.Date(2021, time.March, 9, 15, 51, 43, 732, time.UTC),
+		},
+		{
+			"Is empty time if both parameter and file are not present",
+			"",
+			"",
+			time.Time{},
+		},
+	}
+
+	snder := Sender{
+		Conf: &common.Config{
+			DataPath: "testdata",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.label, func(t *testing.T) {
+			os.MkdirAll("testdata", os.ModePerm)
+			defer os.RemoveAll("testdata")
+
+			if tc.sinceInFile != "" {
+				ioutil.WriteFile("testdata/domain-since.txt", []byte(tc.sinceInFile), os.ModePerm)
+			}
+
+			actual := snder.sinceForDomain("domain", tc.sinceInParam)
+			assert.Equal(t, tc.expected.Year(), actual.Year())
+			assert.Equal(t, tc.expected.Month(), actual.Month())
+			assert.Equal(t, tc.expected.Day(), actual.Day())
+			assert.Equal(t, tc.expected.Hour(), actual.Hour())
+			assert.Equal(t, tc.expected.Minute(), actual.Minute())
+			assert.Equal(t, tc.expected.Second(), actual.Second())
+		})
+	}
+}
 
 func TestSendMentionAsWebmention(t *testing.T) {
 	passedFormValues := url.Values{}
@@ -42,6 +98,7 @@ func TestSendMentionIntegrationStressTest(t *testing.T) {
 		Conf:       common.Configure(),
 		RestClient: &rest.HttpClient{},
 	}
+	defer os.RemoveAll("data")
 
 	runs := 100
 	responses := make(chan bool, runs)
@@ -85,21 +142,22 @@ func TestSendMentionIntegrationStressTest(t *testing.T) {
 
 func TestSendIntegrationTestCanSendBothWebmentionsAndPingbacks(t *testing.T) {
 	posted := map[string]interface{}{}
-	var lock = sync.RWMutex{}
+	var lock = sync.Mutex{}
+	defer os.RemoveAll("data")
 
 	snder := Sender{
 		Conf: common.Configure(),
 		RestClient: &mocks.RestClientMock{
 			GetBodyFunc: mocks.RelPathGetBodyFunc(t, "./../../../mocks/"),
 			PostFunc: func(url string, contentType string, body string) error {
-				lock.RLock()
-				defer lock.RUnlock()
+				lock.Lock()
+				defer lock.Unlock()
 				posted[url] = body
 				return nil
 			},
 			PostFormFunc: func(endpoint string, formValues url.Values) error {
-				lock.RLock()
-				defer lock.RUnlock()
+				lock.Lock()
+				defer lock.Unlock()
 				posted[endpoint] = formValues
 				return nil
 			},

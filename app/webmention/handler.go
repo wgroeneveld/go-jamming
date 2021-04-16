@@ -19,6 +19,8 @@ var (
 func HandleGet(conf *common.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		domain := mux.Vars(r)["domain"]
+		conf.Lock(domain)
+		defer conf.Unlock(domain)
 		result := load.FromDisk(domain, conf.DataPath)
 
 		rest.Json(w, result)

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/rs/zerolog/log"
 )
@@ -17,6 +18,21 @@ type Config struct {
 	DataPath                    string   `json:"dataPath"`
 	AllowedWebmentionSources    []string `json:"allowedWebmentionSources"`
 	DisallowedWebmentionDomains []string `json:"disallowedWebmentionDomains"`
+
+	domainLocks map[string]*sync.RWMutex
+}
+
+func (c *Config) Lock(domain string) {
+	c.domainLocks[domain].Lock()
+}
+func (c *Config) RLock(domain string) {
+	c.domainLocks[domain].RLock()
+}
+func (c *Config) RUnLock(domain string) {
+	c.domainLocks[domain].RUnlock()
+}
+func (c *Config) Unlock(domain string) {
+	c.domainLocks[domain].Unlock()
 }
 
 func (c *Config) missingKeys() []string {
@@ -63,14 +79,37 @@ func (c *Config) FetchDomain(url string) (string, error) {
 	return "", errors.New("no allowed domain found for url " + url)
 }
 
-func (c *Config) SetupDataDirs() {
-	for _, domain := range c.AllowedWebmentionSources {
-		os.MkdirAll(c.DataPath+"/"+domain, os.ModePerm)
+func NewConfig(c *Config) *Config {
+	conf := &Config{
+		Port:                        c.Port,
+		Token:                       c.Token,
+		UtcOffset:                   c.UtcOffset,
+		DataPath:                    c.DataPath,
+		AllowedWebmentionSources:    c.AllowedWebmentionSources,
+		DisallowedWebmentionDomains: c.DisallowedWebmentionDomains,
+		domainLocks:                 map[string]*sync.RWMutex{},
+	}
+	initConfig(conf)
+	return conf
+}
+
+func Configure() *Config {
+	conf := config()
+	initConfig(conf)
+	return conf
+}
+
+func initConfig(conf *Config) {
+	conf.domainLocks = map[string]*sync.RWMutex{}
+	for _, domain := range conf.AllowedWebmentionSources {
+		conf.domainLocks[domain] = &sync.RWMutex{}
+		os.MkdirAll(conf.DataPath+"/"+domain, os.ModePerm)
+
 		log.Info().Str("allowedDomain", domain).Msg("Configured")
 	}
 }
 
-func Configure() (c *Config) {
+func config() *Config {
 	confData, err := ioutil.ReadFile("config.json")
 	if err != nil {
 		log.Warn().Msg("No config.json file found, reverting to defaults...")

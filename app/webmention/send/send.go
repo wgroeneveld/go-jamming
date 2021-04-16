@@ -5,7 +5,11 @@ import (
 	"brainbaking.com/go-jamming/app/pingback/send"
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/rest"
+	"fmt"
 	"github.com/rs/zerolog/log"
+	"io/fs"
+	"io/ioutil"
+	"strings"
 	"sync"
 	"time"
 )
@@ -15,8 +19,27 @@ type Sender struct {
 	Conf       *common.Config
 }
 
+func (snder *Sender) sinceForDomain(domain string, since string) time.Time {
+	if since != "" {
+		return common.IsoToTime(since)
+	}
+	sinceConf, err := ioutil.ReadFile(fmt.Sprintf("%s/%s-since.txt", snder.Conf.DataPath, domain))
+	if err != nil {
+		log.Warn().Str("since", since).Msg("No query param, and no config found. Reverting to beginning of time...")
+		return time.Time{}
+	}
+	return common.IsoToTime(string(sinceConf))
+}
+
+func (snder *Sender) saveSinceForDomain(domain string, since time.Time) {
+	ioutil.WriteFile(fmt.Sprintf("%s/%s-since.txt", snder.Conf.DataPath, domain), []byte(common.TimeToIso(since)), fs.ModePerm)
+}
+
 func (snder *Sender) Send(domain string, since string) {
-	log.Info().Str("domain", domain).Str("since", since).Msg(` OK: someone wants to send mentions`)
+	snder.Conf.Lock(domain)
+	defer snder.Conf.Unlock(domain)
+	timeSince := snder.sinceForDomain(domain, since)
+	log.Info().Str("domain", domain).Time("since", timeSince).Msg(` OK: someone wants to send mentions`)
 	feedUrl := "https://" + domain + "/index.xml"
 	_, feed, err := snder.RestClient.GetBody(feedUrl)
 	if err != nil {
@@ -24,9 +47,12 @@ func (snder *Sender) Send(domain string, since string) {
 		return
 	}
 
-	if err = snder.parseRssFeed(feed, common.IsoToTime(since)); err != nil {
+	if err = snder.parseRssFeed(feed, timeSince); err != nil {
 		log.Err(err).Str("url", feedUrl).Msg("Unable to parse RSS feed, send aborted")
+		return
 	}
+
+	snder.saveSinceForDomain(domain, timeSince)
 }
 
 func (snder *Sender) parseRssFeed(feed string, since time.Time) error {
@@ -36,19 +62,25 @@ func (snder *Sender) parseRssFeed(feed string, since time.Time) error {
 	}
 
 	var wg sync.WaitGroup
+	sema := make(chan struct{}, 20)
+
 	for _, item := range items {
 		for _, href := range item.hrefs {
-			mention := mf.Mention{
-				// SOURCE is own domain this time, TARGET = outbound
-				Source: item.link,
-				Target: href,
-			}
+			if strings.HasPrefix(href, "http") {
+				mention := mf.Mention{
+					// SOURCE is own domain this time, TARGET = outbound
+					Source: item.link,
+					Target: href,
+				}
 
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				snder.sendMention(mention)
-			}()
+				wg.Add(1)
+				go func() {
+					sema <- struct{}{}
+					defer func() { <-sema }()
+					defer wg.Done()
+					snder.sendMention(mention)
+				}()
+			}
 		}
 	}
 	wg.Wait()

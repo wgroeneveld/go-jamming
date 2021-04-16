@@ -63,6 +63,9 @@ func (recv *Receiver) convertBodyToIndiewebData(body string, wm mf.Mention, hEnt
 }
 
 func (recv *Receiver) saveWebmentionToDisk(wm mf.Mention, indieweb *mf.IndiewebData) error {
+	domain, _ := recv.Conf.FetchDomain(wm.Target)
+	recv.Conf.Lock(domain)
+	defer recv.Conf.Unlock(domain)
 	jsonData, jsonErr := json.Marshal(indieweb)
 	if jsonErr != nil {
 		return jsonErr
