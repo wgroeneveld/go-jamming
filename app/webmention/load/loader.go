@@ -9,6 +9,7 @@ import (
 // FromDisk assumes that params have already been validated.
 func FromDisk(domain string, dataPath string) mf.IndiewebDataResult {
 	loadPath := path.Join(dataPath, domain)
+
 	info, _ := ioutil.ReadDir(loadPath)
 	amountOfFiles := len(info)
 	results := make(chan *mf.IndiewebData, amountOfFiles)

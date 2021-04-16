@@ -4,7 +4,10 @@ import (
 	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/mocks"
+	"brainbaking.com/go-jamming/rest"
+	"fmt"
 	"github.com/stretchr/testify/assert"
+	"net/http"
 	"net/url"
 	"sync"
 	"testing"
@@ -28,6 +31,56 @@ func TestSendMentionAsWebmention(t *testing.T) {
 
 	assert.Equal(t, "mysource", passedFormValues.Get("source"))
 	assert.Equal(t, "mytarget", passedFormValues.Get("target"))
+}
+
+// Stress test for opening HTTP connections en masse.
+// Works great for up to 1000 runs. 10k hits: "http: Accept error: accept tcp [::]:6666: accept: too many open files in system; retrying in 10ms"
+// Crashed even GoLand and the open Spotify client...
+// The rate limiter fixes this, and in reality, we never send out 10k links anyway.
+func TestSendMentionIntegrationStressTest(t *testing.T) {
+	snder := Sender{
+		Conf:       common.Configure(),
+		RestClient: &rest.HttpClient{},
+	}
+
+	runs := 100
+	responses := make(chan bool, runs)
+
+	http.HandleFunc("/pingback", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(200)
+		writer.Write([]byte("pingbacked stuff."))
+		responses <- true
+	})
+	http.HandleFunc("/target", func(writer http.ResponseWriter, request *http.Request) {
+		target := `<html>
+							<head>
+								<link rel="pingback" href="http://localhost:6666/pingback" />
+							</head>
+							<body>sup!</body>
+						</html>
+						`
+		writer.WriteHeader(200)
+		writer.Write([]byte(target))
+	})
+
+	go func() {
+		fmt.Println("Serving stub at 6666...")
+		http.ListenAndServe(":6666", nil)
+		fmt.Println("Stub stopped?")
+	}()
+
+	fmt.Println("Bootstrapping runs...")
+	for i := 0; i < runs; i++ {
+		snder.sendMention(mf.Mention{
+			Source: "http://localhost:6666/source",
+			Target: "http://localhost:6666/target",
+		})
+	}
+	fmt.Println("Asserting...")
+	for i := 0; i < runs; i++ {
+		pingbacked := <-responses
+		assert.True(t, pingbacked)
+	}
 }
 
 func TestSendIntegrationTestCanSendBothWebmentionsAndPingbacks(t *testing.T) {
