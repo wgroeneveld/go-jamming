@@ -4,11 +4,9 @@ import (
 	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/app/pingback/send"
 	"brainbaking.com/go-jamming/common"
+	"brainbaking.com/go-jamming/db"
 	"brainbaking.com/go-jamming/rest"
-	"fmt"
 	"github.com/rs/zerolog/log"
-	"io/fs"
-	"io/ioutil"
 	"strings"
 	"sync"
 	"time"
@@ -17,27 +15,27 @@ import (
 type Sender struct {
 	RestClient rest.Client
 	Conf       *common.Config
+	Repo       db.MentionRepo
 }
 
 func (snder *Sender) sinceForDomain(domain string, since string) time.Time {
 	if since != "" {
 		return common.IsoToTime(since)
 	}
-	sinceConf, err := ioutil.ReadFile(fmt.Sprintf("%s/%s-since.txt", snder.Conf.DataPath, domain))
+
+	sinceConf, err := snder.Repo.Since(domain)
 	if err != nil {
-		log.Warn().Str("since", since).Msg("No query param, and no config found. Reverting to beginning of time...")
+		log.Warn().Str("domain", domain).Msg("No query param, and no config found. Reverting to beginning of time...")
 		return time.Time{}
 	}
-	return common.IsoToTime(string(sinceConf))
+	return sinceConf
 }
 
-func (snder *Sender) saveSinceForDomain(domain string, since time.Time) {
-	ioutil.WriteFile(fmt.Sprintf("%s/%s-since.txt", snder.Conf.DataPath, domain), []byte(common.TimeToIso(since)), fs.ModePerm)
+func (snder *Sender) updateSinceForDomain(domain string) {
+	snder.Repo.UpdateSince(domain, common.Now())
 }
 
 func (snder *Sender) Send(domain string, since string) {
-	snder.Conf.Lock(domain)
-	defer snder.Conf.Unlock(domain)
 	timeSince := snder.sinceForDomain(domain, since)
 	log.Info().Str("domain", domain).Time("since", timeSince).Msg(` OK: someone wants to send mentions`)
 	feedUrl := "https://" + domain + "/index.xml"
@@ -52,7 +50,7 @@ func (snder *Sender) Send(domain string, since string) {
 		return
 	}
 
-	snder.saveSinceForDomain(domain, timeSince)
+	snder.updateSinceForDomain(domain)
 }
 
 func (snder *Sender) parseRssFeed(feed string, since time.Time) error {

@@ -23,7 +23,7 @@ type IndiewebDataResult struct {
 	Data   []*IndiewebData `json:"json"`
 }
 
-func WrapResult(data []*IndiewebData) IndiewebDataResult {
+func ResultSuccess(data []*IndiewebData) IndiewebDataResult {
 	return IndiewebDataResult{
 		Status: "success",
 		Data:   data,

@@ -3,24 +3,30 @@ package send
 import (
 	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/common"
+	"brainbaking.com/go-jamming/db"
 	"brainbaking.com/go-jamming/mocks"
 	"brainbaking.com/go-jamming/rest"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"sync"
 	"testing"
 	"time"
 )
 
+var conf = &common.Config{
+	Connection: ":memory:",
+	AllowedWebmentionSources: []string{
+		"domain",
+	},
+}
+
 func TestSinceForDomain(t *testing.T) {
 	cases := []struct {
 		label        string
 		sinceInParam string
-		sinceInFile  string
+		sinceInDb    string
 		expected     time.Time
 	}{
 		{
@@ -43,19 +49,14 @@ func TestSinceForDomain(t *testing.T) {
 		},
 	}
 
-	snder := Sender{
-		Conf: &common.Config{
-			DataPath: "testdata",
-		},
-	}
-
 	for _, tc := range cases {
 		t.Run(tc.label, func(t *testing.T) {
-			os.MkdirAll("testdata", os.ModePerm)
-			defer os.RemoveAll("testdata")
-
-			if tc.sinceInFile != "" {
-				ioutil.WriteFile("testdata/domain-since.txt", []byte(tc.sinceInFile), os.ModePerm)
+			snder := Sender{
+				Conf: conf,
+				Repo: db.NewMentionRepo(conf),
+			}
+			if tc.sinceInDb != "" {
+				snder.Repo.UpdateSince("domain", common.IsoToTime(tc.sinceInDb))
 			}
 
 			actual := snder.sinceForDomain("domain", tc.sinceInParam)
@@ -95,10 +96,9 @@ func TestSendMentionAsWebmention(t *testing.T) {
 // The rate limiter fixes this, and in reality, we never send out 10k links anyway.
 func TestSendMentionIntegrationStressTest(t *testing.T) {
 	snder := Sender{
-		Conf:       common.Configure(),
+		Conf:       conf,
 		RestClient: &rest.HttpClient{},
 	}
-	defer os.RemoveAll("data")
 
 	runs := 100
 	responses := make(chan bool, runs)
@@ -143,10 +143,10 @@ func TestSendMentionIntegrationStressTest(t *testing.T) {
 func TestSendIntegrationTestCanSendBothWebmentionsAndPingbacks(t *testing.T) {
 	posted := map[string]interface{}{}
 	var lock = sync.Mutex{}
-	defer os.RemoveAll("data")
 
 	snder := Sender{
-		Conf: common.Configure(),
+		Conf: conf,
+		Repo: db.NewMentionRepo(conf),
 		RestClient: &mocks.RestClientMock{
 			GetBodyFunc: mocks.RelPathGetBodyFunc(t, "./../../../mocks/"),
 			PostFunc: func(url string, contentType string, body string) error {

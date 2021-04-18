@@ -4,6 +4,7 @@ import (
 	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/app/webmention/recv"
 	"brainbaking.com/go-jamming/common"
+	"brainbaking.com/go-jamming/db"
 	"brainbaking.com/go-jamming/rest"
 	"encoding/xml"
 	"fmt"
@@ -12,7 +13,7 @@ import (
 	"net/http"
 )
 
-func HandlePost(conf *common.Config) http.HandlerFunc {
+func HandlePost(conf *common.Config, db db.MentionRepo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -38,6 +39,7 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
 		receiver := &recv.Receiver{
 			RestClient: &rest.HttpClient{},
 			Conf:       conf,
+			Repo:       db,
 		}
 		go receiver.Receive(wm)
 		pingbackSuccess(w)

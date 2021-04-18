@@ -1,6 +1,7 @@
 package app
 
 import (
+	"brainbaking.com/go-jamming/db"
 	"brainbaking.com/go-jamming/rest"
 	"github.com/MagnusFrater/helmet"
 	"net/http"
@@ -16,6 +17,7 @@ import (
 type server struct {
 	router *mux.Router
 	conf   *common.Config
+	repo   db.MentionRepo
 }
 
 func (s *server) authorizedOnly(h http.HandlerFunc) http.HandlerFunc {
@@ -44,9 +46,10 @@ func ipFrom(r *http.Request) string {
 func Start() {
 	r := mux.NewRouter()
 	config := common.Configure()
+	repo := db.NewMentionRepo(config)
 	helmet := helmet.Default()
 
-	server := &server{router: r, conf: config}
+	server := &server{router: r, conf: config, repo: repo}
 
 	server.routes()
 	http.Handle("/", r)

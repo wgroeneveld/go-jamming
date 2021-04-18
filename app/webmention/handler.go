@@ -2,9 +2,9 @@ package webmention
 
 import (
 	"brainbaking.com/go-jamming/app/mf"
-	"brainbaking.com/go-jamming/app/webmention/load"
 	"brainbaking.com/go-jamming/app/webmention/recv"
 	"brainbaking.com/go-jamming/app/webmention/send"
+	"brainbaking.com/go-jamming/db"
 	"github.com/gorilla/mux"
 	"net/http"
 
@@ -16,18 +16,14 @@ var (
 	httpClient = &rest.HttpClient{}
 )
 
-func HandleGet(conf *common.Config) http.HandlerFunc {
+func HandleGet(repo db.MentionRepo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		domain := mux.Vars(r)["domain"]
-		conf.Lock(domain)
-		defer conf.Unlock(domain)
-		result := load.FromDisk(domain, conf.DataPath)
-
-		rest.Json(w, result)
+		rest.Json(w, repo.GetAll(domain))
 	}
 }
 
-func HandlePut(conf *common.Config) http.HandlerFunc {
+func HandlePut(conf *common.Config, repo db.MentionRepo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		since := getSinceQueryParam(r)
 		domain := mux.Vars(r)["domain"]
@@ -35,6 +31,7 @@ func HandlePut(conf *common.Config) http.HandlerFunc {
 		snder := &send.Sender{
 			RestClient: httpClient,
 			Conf:       conf,
+			Repo:       repo,
 		}
 		go snder.Send(domain, since)
 		rest.Accept(w)
@@ -50,7 +47,7 @@ func getSinceQueryParam(r *http.Request) string {
 	return since
 }
 
-func HandlePost(conf *common.Config) http.HandlerFunc {
+func HandlePost(conf *common.Config, repo db.MentionRepo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		if !validate(r, r.Header, conf) {
@@ -71,6 +68,7 @@ func HandlePost(conf *common.Config) http.HandlerFunc {
 		recv := &recv.Receiver{
 			RestClient: httpClient,
 			Conf:       conf,
+			Repo:       repo,
 		}
 
 		go recv.Receive(wm)

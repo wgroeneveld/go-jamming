@@ -2,11 +2,11 @@ package recv
 
 import (
 	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/db"
+	"encoding/json"
 	"errors"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 	"net/http"
-	"os"
 	"testing"
 	"time"
 
@@ -19,25 +19,7 @@ var conf = &common.Config{
 		"jefklakscodex.com",
 		"brainbaking.com",
 	},
-	DataPath: "testdata",
-}
-
-func TestConvertWebmentionToPath(t *testing.T) {
-	wm := mf.Mention{
-		Source: "https://brainbaking.com",
-		Target: "https://jefklakscodex.com/articles",
-	}
-
-	result := wm.AsPath(conf)
-	if result != "testdata/jefklakscodex.com/99be66594fdfcf482545fead8e7e4948.json" {
-		t.Fatalf("md5 hash check failed, got " + result)
-	}
-}
-
-func writeSomethingTo(filename string) {
-	file, _ := os.Create(filename)
-	file.WriteString("lolz")
-	defer file.Close()
+	Connection: ":memory:",
 }
 
 func TestReceive(t *testing.T) {
@@ -100,15 +82,14 @@ func TestReceive(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.label, func(t *testing.T) {
-			os.MkdirAll("testdata/brainbaking.com", os.ModePerm)
-			os.MkdirAll("testdata/jefklakscodex.com", os.ModePerm)
-			defer os.RemoveAll("testdata")
 			common.Now = func() time.Time {
 				return time.Date(2020, time.January, 1, 12, 30, 0, 0, time.UTC)
 			}
 
+			repo := db.NewMentionRepo(conf)
 			receiver := &Receiver{
-				Conf: common.NewConfig(conf),
+				Conf: conf,
+				Repo: repo,
 				RestClient: &mocks.RestClientMock{
 					GetBodyFunc: mocks.RelPathGetBodyFunc(t, "../../../mocks/"),
 				},
@@ -116,22 +97,23 @@ func TestReceive(t *testing.T) {
 
 			receiver.Receive(tc.wm)
 
-			actualJson, _ := ioutil.ReadFile(tc.wm.AsPath(conf))
+			actual := repo.Get(tc.wm)
+			actualJson, _ := json.Marshal(actual)
 			assert.JSONEq(t, tc.json, string(actualJson))
 		})
 	}
 }
 
 func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testing.T) {
-	os.MkdirAll("testdata/jefklakscodex.com", os.ModePerm)
-	defer os.RemoveAll("testdata")
+	repo := db.NewMentionRepo(conf)
 
 	wm := mf.Mention{
 		Source: "https://brainbaking.com",
 		Target: "https://jefklakscodex.com/articles",
 	}
-	filename := wm.AsPath(conf)
-	writeSomethingTo(filename)
+	repo.Save(wm, &mf.IndiewebData{
+		Name: "something something",
+	})
 
 	client := &mocks.RestClientMock{
 		GetBodyFunc: func(url string) (http.Header, string, error) {
@@ -139,12 +121,14 @@ func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testi
 		},
 	}
 	receiver := &Receiver{
-		Conf:       common.NewConfig(conf),
+		Conf:       conf,
 		RestClient: client,
+		Repo:       repo,
 	}
 
 	receiver.Receive(wm)
-	assert.NoFileExists(t, filename)
+	indb := repo.Get(wm)
+	assert.Empty(t, indb)
 }
 
 func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {
@@ -152,32 +136,31 @@ func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {
 		Source: "https://brainbaking.com/valid-indieweb-source.html",
 		Target: "https://brainbaking.com/valid-indieweb-source.html",
 	}
-	filename := wm.AsPath(conf)
-	writeSomethingTo(filename)
 
+	repo := db.NewMentionRepo(conf)
 	receiver := &Receiver{
-		Conf: common.NewConfig(conf),
+		Conf: conf,
+		Repo: repo,
 		RestClient: &mocks.RestClientMock{
 			GetBodyFunc: mocks.RelPathGetBodyFunc(t, "../../../mocks/"),
 		},
 	}
 
 	receiver.Receive(wm)
-	assert.NoFileExists(t, filename)
+	assert.Empty(t, repo.GetAll("brainbaking.com").Data)
 }
 
 func TestProcessSourceBodyAbortsIfNoMentionOfTargetFoundInSourceHtml(t *testing.T) {
-	os.MkdirAll("testdata/jefklakscodex.com", os.ModePerm)
-	defer os.RemoveAll("testdata")
-
 	wm := mf.Mention{
 		Source: "https://brainbaking.com",
 		Target: "https://jefklakscodex.com/articles",
 	}
+	repo := db.NewMentionRepo(conf)
 	receiver := &Receiver{
-		Conf: common.NewConfig(conf),
+		Conf: conf,
+		Repo: repo,
 	}
 
 	receiver.processSourceBody("<html>my nice body</html>", wm)
-	assert.NoFileExists(t, wm.AsPath(conf))
+	assert.Empty(t, repo.Get(wm))
 }

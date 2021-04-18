@@ -3,12 +3,9 @@ package common
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
-	"os"
-	"strings"
-	"sync"
-
 	"github.com/rs/zerolog/log"
+	"io/ioutil"
+	"strings"
 )
 
 type Config struct {
@@ -16,23 +13,9 @@ type Config struct {
 	Token                       string   `json:"token"`
 	UtcOffset                   int      `json:"utcOffset"`
 	DataPath                    string   `json:"dataPath"`
+	Connection                  string   `json:"conString"`
 	AllowedWebmentionSources    []string `json:"allowedWebmentionSources"`
 	DisallowedWebmentionDomains []string `json:"disallowedWebmentionDomains"`
-
-	domainLocks map[string]*sync.RWMutex
-}
-
-func (c *Config) Lock(domain string) {
-	c.domainLocks[domain].Lock()
-}
-func (c *Config) RLock(domain string) {
-	c.domainLocks[domain].RLock()
-}
-func (c *Config) RUnLock(domain string) {
-	c.domainLocks[domain].RUnlock()
-}
-func (c *Config) Unlock(domain string) {
-	c.domainLocks[domain].Unlock()
 }
 
 func (c *Config) missingKeys() []string {
@@ -79,34 +62,12 @@ func (c *Config) FetchDomain(url string) (string, error) {
 	return "", errors.New("no allowed domain found for url " + url)
 }
 
-func NewConfig(c *Config) *Config {
-	conf := &Config{
-		Port:                        c.Port,
-		Token:                       c.Token,
-		UtcOffset:                   c.UtcOffset,
-		DataPath:                    c.DataPath,
-		AllowedWebmentionSources:    c.AllowedWebmentionSources,
-		DisallowedWebmentionDomains: c.DisallowedWebmentionDomains,
-		domainLocks:                 map[string]*sync.RWMutex{},
-	}
-	initConfig(conf)
-	return conf
-}
-
 func Configure() *Config {
 	conf := config()
-	initConfig(conf)
-	return conf
-}
-
-func initConfig(conf *Config) {
-	conf.domainLocks = map[string]*sync.RWMutex{}
 	for _, domain := range conf.AllowedWebmentionSources {
-		conf.domainLocks[domain] = &sync.RWMutex{}
-		os.MkdirAll(conf.DataPath+"/"+domain, os.ModePerm)
-
 		log.Info().Str("allowedDomain", domain).Msg("Configured")
 	}
+	return conf
 }
 
 func config() *Config {
@@ -136,6 +97,7 @@ func defaultConfig() *Config {
 		Token:                       "miauwkes",
 		UtcOffset:                   60,
 		DataPath:                    "data",
+		Connection:                  "data/mentions.db",
 		AllowedWebmentionSources:    []string{"brainbaking.com", "jefklakscodex.com"},
 		DisallowedWebmentionDomains: []string{"youtube.com"},
 	}

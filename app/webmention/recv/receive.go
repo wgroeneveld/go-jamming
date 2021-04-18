@@ -3,11 +3,8 @@ package recv
 import (
 	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/common"
+	"brainbaking.com/go-jamming/db"
 	"brainbaking.com/go-jamming/rest"
-	"encoding/json"
-	"io/fs"
-	"io/ioutil"
-	"os"
 	"regexp"
 	"strings"
 
@@ -20,6 +17,7 @@ import (
 type Receiver struct {
 	RestClient rest.Client
 	Conf       *common.Config
+	Repo       db.MentionRepo
 }
 
 func (recv *Receiver) Receive(wm mf.Mention) {
@@ -28,16 +26,11 @@ func (recv *Receiver) Receive(wm mf.Mention) {
 
 	if geterr != nil {
 		log.Warn().Err(geterr).Msg("  ABORT: invalid url")
-		recv.deletePossibleOlderWebmention(wm)
+		recv.Repo.Delete(wm)
 		return
 	}
 
 	recv.processSourceBody(body, wm)
-}
-
-// Deletes a possible webmention. Ignores remove errors.
-func (recv *Receiver) deletePossibleOlderWebmention(wm mf.Mention) {
-	os.Remove(wm.AsPath(recv.Conf))
 }
 
 func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
@@ -49,10 +42,11 @@ func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 	data := microformats.Parse(strings.NewReader(body), wm.SourceUrl())
 	indieweb := recv.convertBodyToIndiewebData(body, wm, mf.HEntry(data))
 
-	if err := recv.saveWebmentionToDisk(wm, indieweb); err != nil {
-		log.Err(err).Msg("Unable to save Webmention to disk")
+	key, err := recv.Repo.Save(wm, indieweb)
+	if err != nil {
+		log.Error().Err(err).Stringer("wm", wm).Msg("processSourceBody: failed to save json to db")
 	}
-	log.Info().Str("file", wm.AsPath(recv.Conf)).Msg("OK: Webmention processed.")
+	log.Info().Str("key", key).Msg("OK: Webmention processed.")
 }
 
 func (recv *Receiver) convertBodyToIndiewebData(body string, wm mf.Mention, hEntry *microformats.Microformat) *mf.IndiewebData {
@@ -60,21 +54,6 @@ func (recv *Receiver) convertBodyToIndiewebData(body string, wm mf.Mention, hEnt
 		return recv.parseBodyAsNonIndiewebSite(body, wm)
 	}
 	return recv.parseBodyAsIndiewebSite(hEntry, wm)
-}
-
-func (recv *Receiver) saveWebmentionToDisk(wm mf.Mention, indieweb *mf.IndiewebData) error {
-	domain, _ := recv.Conf.FetchDomain(wm.Target)
-	recv.Conf.Lock(domain)
-	defer recv.Conf.Unlock(domain)
-	jsonData, jsonErr := json.Marshal(indieweb)
-	if jsonErr != nil {
-		return jsonErr
-	}
-	err := ioutil.WriteFile(wm.AsPath(recv.Conf), jsonData, fs.ModePerm)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // see https://github.com/willnorris/microformats/blob/main/microformats.go
