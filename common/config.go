@@ -13,7 +13,7 @@ type Config struct {
 	Token                       string   `json:"token"`
 	UtcOffset                   int      `json:"utcOffset"`
 	DataPath                    string   `json:"dataPath"`
-	Connection                  string   `json:"conString"`
+	ConString                   string   `json:"conString"`
 	AllowedWebmentionSources    []string `json:"allowedWebmentionSources"`
 	DisallowedWebmentionDomains []string `json:"disallowedWebmentionDomains"`
 }
@@ -28,6 +28,9 @@ func (c *Config) missingKeys() []string {
 	}
 	if c.DataPath == "" {
 		keys = append(keys, "dataPath")
+	}
+	if c.ConString == "" {
+		keys = append(keys, "conString")
 	}
 	if len(c.AllowedWebmentionSources) == 0 {
 		keys = append(keys, "allowedWebmentionSources")
@@ -97,7 +100,7 @@ func defaultConfig() *Config {
 		Token:                       "miauwkes",
 		UtcOffset:                   60,
 		DataPath:                    "data",
-		Connection:                  "data/mentions.db",
+		ConString:                   "data/mentions.db",
 		AllowedWebmentionSources:    []string{"brainbaking.com", "jefklakscodex.com"},
 		DisallowedWebmentionDomains: []string{"youtube.com"},
 	}

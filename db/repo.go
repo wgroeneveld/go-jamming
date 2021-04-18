@@ -13,8 +13,7 @@ import (
 )
 
 type MentionRepoBunt struct {
-	db   *buntdb.DB
-	conf *common.Config
+	db *buntdb.DB
 }
 
 type MentionRepo interface {
@@ -79,7 +78,7 @@ func (r *MentionRepoBunt) Save(wm mf.Mention, data *mf.IndiewebData) (string, er
 }
 
 func (r *MentionRepoBunt) mentionToKey(wm mf.Mention) string {
-	return fmt.Sprintf("%s:%s", wm.Key(), wm.Domain(r.conf))
+	return fmt.Sprintf("%s:%s", wm.Key(), wm.Domain())
 }
 
 // Get returns a single unmarshalled json value based on the mention key.
@@ -129,12 +128,10 @@ func (r *MentionRepoBunt) GetAll(domain string) mf.IndiewebDataResult {
 // It also creates necessary indexes based on the passed domain config.
 // This panics if it cannot open the db.
 func NewMentionRepo(c *common.Config) *MentionRepoBunt {
-	repo := &MentionRepoBunt{
-		conf: c,
-	}
-	db, err := buntdb.Open(c.Connection)
+	repo := &MentionRepoBunt{}
+	db, err := buntdb.Open(c.ConString)
 	if err != nil {
-		log.Fatal().Str("constr", c.Connection).Msg("new mention repo: cannot open db")
+		log.Fatal().Str("constr", c.ConString).Msg("new mention repo: cannot open db")
 	}
 	repo.db = db
 

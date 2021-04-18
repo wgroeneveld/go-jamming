@@ -19,7 +19,7 @@ var conf = &common.Config{
 		"jefklakscodex.com",
 		"brainbaking.com",
 	},
-	Connection: ":memory:",
+	ConString: ":memory:",
 }
 
 func TestReceive(t *testing.T) {

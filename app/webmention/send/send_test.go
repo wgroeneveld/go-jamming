@@ -16,7 +16,7 @@ import (
 )
 
 var conf = &common.Config{
-	Connection: ":memory:",
+	ConString: ":memory:",
 	AllowedWebmentionSources: []string{
 		"domain",
 	},

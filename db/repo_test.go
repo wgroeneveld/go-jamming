@@ -13,7 +13,7 @@ import (
 
 var (
 	conf = &common.Config{
-		Connection: ":memory:",
+		ConString: ":memory:",
 		AllowedWebmentionSources: []string{
 			"pussycat.com",
 		},
@@ -23,7 +23,7 @@ var (
 func TestDelete(t *testing.T) {
 	db := NewMentionRepo(conf)
 	wm := mf.Mention{
-		Target: "pussycat.com/coolpussy.html",
+		Target: "https://pussycat.com/coolpussy.html",
 	}
 	db.Save(wm, &mf.IndiewebData{
 		Name: "lolz",
@@ -56,7 +56,7 @@ func TestSinceFirstTimeIsEmptytime(t *testing.T) {
 func TestGet(t *testing.T) {
 	db := NewMentionRepo(conf)
 	wm := mf.Mention{
-		Target: "pussycat.com/coolpussy.html",
+		Target: "https://pussycat.com/coolpussy.html",
 	}
 	db.Save(wm, &mf.IndiewebData{
 		Name: "lolz",
@@ -69,7 +69,7 @@ func TestGet(t *testing.T) {
 func BenchmarkMentionRepoBunt_GetAll(b *testing.B) {
 	defer os.Remove("test.db")
 	db := NewMentionRepo(&common.Config{
-		Connection: "test.db",
+		ConString: "test.db",
 		AllowedWebmentionSources: []string{
 			"pussycat.com",
 		},
@@ -99,7 +99,7 @@ func BenchmarkMentionRepoBunt_GetAll(b *testing.B) {
 func TestGetAllAndSaveSomeJson(t *testing.T) {
 	db := NewMentionRepo(conf)
 	db.Save(mf.Mention{
-		Target: "pussycat.com/coolpussy.html",
+		Target: "https://pussycat.com/coolpussy.html",
 	}, &mf.IndiewebData{
 		Name: "lolz",
 	})
@@ -112,12 +112,12 @@ func TestGetAllAndSaveSomeJson(t *testing.T) {
 func TestGetFiltersBasedOnDomain(t *testing.T) {
 	db := NewMentionRepo(conf)
 	db.Save(mf.Mention{
-		Target: "pussycat.com/coolpussy.html",
+		Target: "https://pussycat.com/coolpussy.html",
 	}, &mf.IndiewebData{
 		Name: "lolz",
 	})
 	db.Save(mf.Mention{
-		Target: "dingeling.com/dogshateus.html",
+		Target: "https://dingeling.com/dogshateus.html",
 	}, &mf.IndiewebData{
 		Name: "amaigat",
 	})

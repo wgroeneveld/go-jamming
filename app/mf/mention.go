@@ -1,10 +1,10 @@
 package mf
 
 import (
-	"brainbaking.com/go-jamming/common"
 	"crypto/md5"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 // this should be passed along as a value object, not as a pointer
@@ -24,9 +24,16 @@ func (wm Mention) String() string {
 	return fmt.Sprintf("source: %s, target: %s", wm.Source, wm.Target)
 }
 
-func (wm Mention) Domain(conf *common.Config) string {
-	domain, _ := conf.FetchDomain(wm.Target)
-	return domain
+// Domain parses the target url to extract the domain as part of the allowed webmention targets.
+// This is the same as conf.FetchDomain(wm.Target), only without config, and without error handling.
+// Assumes http(s) protocol, which should have been validated by now.
+func (wm Mention) Domain() string {
+	withPossibleSubdomain := strings.Split(wm.Target, "/")[2]
+	split := strings.Split(withPossibleSubdomain, ".")
+	if len(split) == 2 {
+		return withPossibleSubdomain // that was the extention, not the subdomain.
+	}
+	return fmt.Sprintf("%s.%s", split[1], split[2])
 }
 
 func (wm Mention) Key() string {
