@@ -2,6 +2,7 @@ package recv
 
 import (
 	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/app/pictures"
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/db"
 	"brainbaking.com/go-jamming/rest"
@@ -97,16 +98,22 @@ func (recv *Receiver) parseBodyAsNonIndiewebSite(body string, wm mf.Mention) *mf
 	}
 }
 
+// saveAuthorPictureLocally tries to download the author picture.
+// If it succeeds, it alters the picture path to a local /pictures/x one.
+// If it fails, it falls back to a local default image.
+// This *should* also validate image byte headers, like https://stackoverflow.com/questions/670546/determine-if-file-is-an-image
 func (recv *Receiver) saveAuthorPictureLocally(indieweb *mf.IndiewebData) {
 	_, picData, err := recv.RestClient.GetBody(indieweb.Author.Picture)
 	if err != nil {
-		log.Warn().Err(err).Str("url", indieweb.Author.Picture).Msg("Unable to download author picture. Ignoring.")
+		log.Warn().Err(err).Str("url", indieweb.Author.Picture).Msg("Unable to download author picture. Reverting to anonymous.")
+		indieweb.Author.Picture = fmt.Sprintf("/pictures/%s", pictures.Anonymous)
 		return
 	}
 	srcDomain := rest.Domain(indieweb.Source)
 	_, dberr := recv.Repo.SavePicture(picData, srcDomain)
 	if dberr != nil {
-		log.Warn().Err(err).Str("url", indieweb.Author.Picture).Msg("Unable to save downloaded author picture. Ignoring.")
+		log.Warn().Err(err).Str("url", indieweb.Author.Picture).Msg("Unable to save downloaded author picture. Reverting to anonymous.")
+		indieweb.Author.Picture = fmt.Sprintf("/pictures/%s", pictures.Anonymous)
 		return
 	}
 

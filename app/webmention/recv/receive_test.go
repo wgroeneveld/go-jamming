@@ -22,6 +22,48 @@ var conf = &common.Config{
 	ConString: ":memory:",
 }
 
+func TestSaveAuthorPictureLocally(t *testing.T) {
+	cases := []struct {
+		label              string
+		pictureUrl         string
+		expectedPictureUrl string
+	}{
+		{
+			"Absolute URL gets 'downloaded' and replaced by relative",
+			"https://brainbaking.com/picture.jpg",
+			"/pictures/brainbaking.com",
+		},
+		{
+			"Absolute URL gets replaced by anonymous if download fails",
+			"https://brainbaking.com/thedogatemypic-nowitsmissing-shiii.png",
+			"/pictures/anonymous",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.label, func(t *testing.T) {
+			repo := db.NewMentionRepo(conf)
+			recv := &Receiver{
+				Conf: conf,
+				Repo: repo,
+				RestClient: &mocks.RestClientMock{
+					GetBodyFunc: mocks.RelPathGetBodyFunc(t, "../../../mocks/"),
+				},
+			}
+
+			indieweb := &mf.IndiewebData{
+				Source: "https://brainbaking.com",
+				Author: mf.IndiewebAuthor{
+					Picture: tc.pictureUrl,
+				},
+			}
+			recv.saveAuthorPictureLocally(indieweb)
+
+			assert.Equal(t, tc.expectedPictureUrl, indieweb.Author.Picture)
+		})
+	}
+}
+
 func TestReceive(t *testing.T) {
 	cases := []struct {
 		label string

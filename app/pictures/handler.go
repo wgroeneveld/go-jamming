@@ -2,22 +2,47 @@ package pictures
 
 import (
 	"brainbaking.com/go-jamming/db"
+	_ "embed"
 	"github.com/gorilla/mux"
+	"github.com/rs/zerolog/log"
 	"net/http"
 )
+
+//go:embed anonymous.jpg
+var anonymous []byte
+
+const (
+	Anonymous = "anonymous"
+)
+
+func init() {
+	if anonymous == nil {
+		log.Fatal().Msg("embedded anonymous image missing?")
+	}
+}
 
 // Handle handles picture GET calls.
 // It does not validate the picture query as it's part of a composite key anyway.
 func Handle(repo db.MentionRepo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		picDomain := mux.Vars(r)["picture"]
+		if picDomain == Anonymous {
+			servePicture(w, anonymous)
+			return
+		}
+
 		picData := repo.GetPicture(picDomain)
 		if picData == nil {
 			http.NotFound(w, r)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
-		// TODO response headers? is this a jpeg, png, gif, webm? should we?
-		w.Write(picData)
+		servePicture(w, picData)
 	}
+}
+
+// servePicture writes an OK and raw bytes.
+// For some reason, headers - although they should be there - aren't needed?
+func servePicture(w http.ResponseWriter, bytes []byte) {
+	w.WriteHeader(http.StatusOK)
+	w.Write(bytes)
 }

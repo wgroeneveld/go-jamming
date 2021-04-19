@@ -50,7 +50,7 @@ func RelPathGetBodyFunc(t *testing.T, relPath string) func(string) (http.Header,
 		mockfile := relPath + strings.ReplaceAll(url, "https://brainbaking.com/", "")
 		html, err := ioutil.ReadFile(mockfile)
 		if err != nil {
-			t.Error(err)
+			return nil, "", err
 		}
 
 		headerData, headerFileErr := ioutil.ReadFile(strings.ReplaceAll(mockfile, ".html", "-headers.json"))
