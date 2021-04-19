@@ -18,17 +18,19 @@ type MentionRepoBunt struct {
 
 type MentionRepo interface {
 	Save(key mf.Mention, data *mf.IndiewebData) (string, error)
+	SavePicture(bytes string, domain string) (string, error)
 	Delete(key mf.Mention)
 	Since(domain string) (time.Time, error)
 	UpdateSince(domain string, since time.Time)
 	Get(key mf.Mention) *mf.IndiewebData
+	GetPicture(domain string) []byte
 	GetAll(domain string) mf.IndiewebDataResult
 }
 
 // UpdateSince updates the since timestamp to now. Logs but ignores errors.
 func (r *MentionRepoBunt) UpdateSince(domain string, since time.Time) {
 	err := r.db.Update(func(tx *buntdb.Tx) error {
-		_, _, err := tx.Set(fmt.Sprintf("%s:since", domain), common.TimeToIso(since), nil)
+		_, _, err := tx.Set(sinceKey(domain), common.TimeToIso(since), nil)
 		return err
 	})
 	if err != nil {
@@ -41,7 +43,7 @@ func (r *MentionRepoBunt) UpdateSince(domain string, since time.Time) {
 func (r *MentionRepoBunt) Since(domain string) (time.Time, error) {
 	var since string
 	err := r.db.View(func(tx *buntdb.Tx) error {
-		val, err := tx.Get(fmt.Sprintf("%s:since", domain))
+		val, err := tx.Get(sinceKey(domain))
 		since = val
 		return err
 	})
@@ -51,6 +53,10 @@ func (r *MentionRepoBunt) Since(domain string) (time.Time, error) {
 	return common.IsoToTime(since), nil
 }
 
+func sinceKey(domain string) string {
+	return fmt.Sprintf("%s:since", domain)
+}
+
 // Delete removes a possibly present mention by key. Ignores possible errors.
 func (r *MentionRepoBunt) Delete(wm mf.Mention) {
 	key := r.mentionToKey(wm)
@@ -58,6 +64,22 @@ func (r *MentionRepoBunt) Delete(wm mf.Mention) {
 		tx.Delete(key)
 		return nil
 	})
+}
+
+func (r *MentionRepoBunt) SavePicture(bytes string, domain string) (string, error) {
+	key := pictureKey(domain)
+	err := r.db.Update(func(tx *buntdb.Tx) error {
+		_, _, err := tx.Set(key, bytes, nil)
+		return err
+	})
+	if err != nil {
+		return "", err
+	}
+	return key, nil
+}
+
+func pictureKey(domain string) string {
+	return fmt.Sprintf("%s:picture", domain)
 }
 
 // Save saves the mention by marshalling data. Returns the key or a marshal/persist error.
@@ -104,6 +126,24 @@ func (r *MentionRepoBunt) Get(wm mf.Mention) *mf.IndiewebData {
 	return &data
 }
 
+func (r *MentionRepoBunt) GetPicture(domain string) []byte {
+	var data []byte
+	key := pictureKey(domain)
+	err := r.db.View(func(tx *buntdb.Tx) error {
+		val, err := tx.Get(key)
+		if err != nil {
+			return err
+		}
+		data = []byte(val)
+		return nil
+	})
+	if err != nil {
+		log.Error().Err(err).Str("key", key).Msg("repo getpicture: unable to retrieve key")
+		return nil
+	}
+	return data
+}
+
 // GetAll returns a wrapped data result for all mentions for a particular domain.
 // Intentionally ignores marshal errors, db should be consistent!
 // Warning, this will potentially marshall 10k strings!
@@ -117,6 +157,7 @@ func (r *MentionRepoBunt) GetAll(domain string) mf.IndiewebDataResult {
 			return true
 		})
 	})
+
 	if err != nil {
 		log.Error().Err(err).Msg("get all: failed to ascend from view")
 		return mf.IndiewebDataResult{}

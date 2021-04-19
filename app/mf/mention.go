@@ -1,10 +1,10 @@
 package mf
 
 import (
+	"brainbaking.com/go-jamming/rest"
 	"crypto/md5"
 	"fmt"
 	"net/url"
-	"strings"
 )
 
 // this should be passed along as a value object, not as a pointer
@@ -28,12 +28,7 @@ func (wm Mention) String() string {
 // This is the same as conf.FetchDomain(wm.Target), only without config, and without error handling.
 // Assumes http(s) protocol, which should have been validated by now.
 func (wm Mention) Domain() string {
-	withPossibleSubdomain := strings.Split(wm.Target, "/")[2]
-	split := strings.Split(withPossibleSubdomain, ".")
-	if len(split) == 2 {
-		return withPossibleSubdomain // that was the extention, not the subdomain.
-	}
-	return fmt.Sprintf("%s.%s", split[1], split[2])
+	return rest.Domain(wm.Target)
 }
 
 func (wm Mention) Key() string {

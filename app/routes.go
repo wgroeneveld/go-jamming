@@ -2,6 +2,7 @@ package app
 
 import (
 	"brainbaking.com/go-jamming/app/index"
+	"brainbaking.com/go-jamming/app/pictures"
 	"brainbaking.com/go-jamming/app/pingback"
 	"brainbaking.com/go-jamming/app/webmention"
 )
@@ -14,6 +15,7 @@ func (s *server) routes() {
 	db := s.repo
 
 	s.router.HandleFunc("/", index.Handle(c)).Methods("GET")
+	s.router.HandleFunc("/pictures/{picture}", pictures.Handle(db)).Methods("GET")
 	s.router.HandleFunc("/pingback", pingback.HandlePost(c, db)).Methods("POST")
 	s.router.HandleFunc("/webmention", webmention.HandlePost(c, db)).Methods("POST")
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandleGet(db))).Methods("GET")

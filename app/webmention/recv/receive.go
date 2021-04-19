@@ -5,6 +5,7 @@ import (
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/db"
 	"brainbaking.com/go-jamming/rest"
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -41,6 +42,9 @@ func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 
 	data := microformats.Parse(strings.NewReader(body), wm.SourceUrl())
 	indieweb := recv.convertBodyToIndiewebData(body, wm, mf.HEntry(data))
+	if indieweb.Author.Picture != "" {
+		recv.saveAuthorPictureLocally(indieweb)
+	}
 
 	key, err := recv.Repo.Save(wm, indieweb)
 	if err != nil {
@@ -91,6 +95,22 @@ func (recv *Receiver) parseBodyAsNonIndiewebSite(body string, wm mf.Mention) *mf
 		Source:       wm.Source,
 		Target:       wm.Target,
 	}
+}
+
+func (recv *Receiver) saveAuthorPictureLocally(indieweb *mf.IndiewebData) {
+	_, picData, err := recv.RestClient.GetBody(indieweb.Author.Picture)
+	if err != nil {
+		log.Warn().Err(err).Str("url", indieweb.Author.Picture).Msg("Unable to download author picture. Ignoring.")
+		return
+	}
+	srcDomain := rest.Domain(indieweb.Source)
+	_, dberr := recv.Repo.SavePicture(picData, srcDomain)
+	if dberr != nil {
+		log.Warn().Err(err).Str("url", indieweb.Author.Picture).Msg("Unable to save downloaded author picture. Ignoring.")
+		return
+	}
+
+	indieweb.Author.Picture = fmt.Sprintf("/pictures/%s", srcDomain)
 }
 
 func nonIndiewebTitle(body string, wm mf.Mention) string {

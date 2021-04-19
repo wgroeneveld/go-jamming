@@ -26,9 +26,6 @@ func (c *Config) missingKeys() []string {
 	if c.Token == "" {
 		keys = append(keys, "token")
 	}
-	if c.DataPath == "" {
-		keys = append(keys, "dataPath")
-	}
 	if c.ConString == "" {
 		keys = append(keys, "conString")
 	}
@@ -66,11 +63,11 @@ func (c *Config) FetchDomain(url string) (string, error) {
 }
 
 func Configure() *Config {
-	conf := config()
-	for _, domain := range conf.AllowedWebmentionSources {
+	c := config()
+	for _, domain := range c.AllowedWebmentionSources {
 		log.Info().Str("allowedDomain", domain).Msg("Configured")
 	}
-	return conf
+	return c
 }
 
 func config() *Config {
@@ -99,7 +96,6 @@ func defaultConfig() *Config {
 		Port:                        1337,
 		Token:                       "miauwkes",
 		UtcOffset:                   60,
-		DataPath:                    "data",
 		ConString:                   "data/mentions.db",
 		AllowedWebmentionSources:    []string{"brainbaking.com", "jefklakscodex.com"},
 		DisallowedWebmentionDomains: []string{"youtube.com"},

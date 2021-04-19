@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/buntdb"
+	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -19,6 +20,19 @@ var (
 		},
 	}
 )
+
+func TestSaveAndGetPicture(t *testing.T) {
+	data, err := ioutil.ReadFile("../mocks/picture.jpg")
+	assert.NoError(t, err)
+
+	db := NewMentionRepo(conf)
+	key, dberr := db.SavePicture(string(data), "bloeberig.be")
+	assert.NoError(t, dberr)
+	assert.Equal(t, "bloeberig.be:picture", key)
+
+	picDataAfterSave := db.GetPicture("bloeberig.be")
+	assert.Equal(t, data, picDataAfterSave)
+}
 
 func TestDelete(t *testing.T) {
 	db := NewMentionRepo(conf)
