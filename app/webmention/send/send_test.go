@@ -103,12 +103,13 @@ func TestSendMentionIntegrationStressTest(t *testing.T) {
 	runs := 100
 	responses := make(chan bool, runs)
 
-	http.HandleFunc("/pingback", func(writer http.ResponseWriter, request *http.Request) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/pingback", func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(200)
 		writer.Write([]byte("pingbacked stuff."))
 		responses <- true
 	})
-	http.HandleFunc("/target", func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc("/target", func(writer http.ResponseWriter, request *http.Request) {
 		target := `<html>
 							<head>
 								<link rel="pingback" href="http://localhost:6666/pingback" />
@@ -119,10 +120,12 @@ func TestSendMentionIntegrationStressTest(t *testing.T) {
 		writer.WriteHeader(200)
 		writer.Write([]byte(target))
 	})
+	srv := &http.Server{Addr: ":6666", Handler: mux}
+	defer srv.Close()
 
 	go func() {
 		fmt.Println("Serving stub at 6666...")
-		http.ListenAndServe(":6666", nil)
+		srv.ListenAndServe()
 		fmt.Println("Stub stopped?")
 	}()
 
