@@ -14,7 +14,7 @@ Inspect how it's used on https://brainbaking.com/ - usually, a `<link/>` in your
 
 ```
 <link rel="webmention" href="https://jam.brainbaking.com/webmention" />
-<link rel="pingback" href="https://webmention.io/webmention?forward=https://jam.brainbaking.com/webmention" />
+<link rel="pingback" href="https://jam.brainbaking.com/pingback" />
 ```
 
 If you want to support the older pingback protocol, you can leverage webmenton.io's forward capabilities. Although I developed this primarily because webmention.io is _not_ reliable - you've been warned. 
@@ -76,7 +76,7 @@ Place a `config.json` file in the same directory that looks like this: (below ar
   "port": 1337,
   "host": "localhost",
   "token": "miauwkes",
-  "dataPath": "data",
+  "conString": "data/mentions.db",
   "utcOffset": 60,
   "allowedWebmentionSources":  [
     "brainbaking.com",
@@ -91,7 +91,7 @@ Place a `config.json` file in the same directory that looks like this: (below ar
 - port, host: http server params
 - token, allowedWebmentionSources: see below, used for authentication
 - utcOffset: offset in minutes for date processing, starting from UTC time.
-- dataPath: path to store all mentions as md5-encoded JSON filenames.
+- conString: file path to store all mentions and author avatars in a simple key/value store, based on [buntdb](https://github.com/tidwall/buntdb).
 
 If a config file is missing, or required keys are missing, a warning will be generated and default values will be used instead. See `common/config.go`.
 
@@ -118,9 +118,36 @@ Accepted form format:
 
 Will result in a `202 Accepted` - it handles things async. Stores in `.json` files in `[dataPath]/domain`. 
 
+This also saves the author picture/avatar locally - if present in the microformat. It does _not_ resize images, however, if it's bigger than 5 MB, it falls back to a default one. 
+
 #### 1.2 `GET /webmention/:domain/:token`
 
 Retrieves a JSON array with relevant webmentions stored for that domain. The token should match. See configuration to fiddle with it yourself. Environment variables are supported, although I haven't used them yet. 
+
+Example response:
+
+```js
+{
+  "status": "success",
+  "json": [
+    {
+      "author": {
+        "name": "Jefklak",
+        "picture": "/pictures/jefklakscodex.com"
+      },
+      "name": "Rainbow Six 3: Raven Shield - 17 Years Later",
+      "content": "It’s amazing that the second disk is still readable by my Retro WinXP machine. It has been heavily abused in 2003 and the years after that. Rainbow Six' third installment, Raven Shield (or simply RvS), is quite a departure from the crude looking Rogu...",
+      "published": "2020-11-01",
+      "url": "https://jefklakscodex.com/articles/retrospectives/raven-shield-17-years-later/",
+      "type": "mention",
+      "source": "https://jefklakscodex.com/articles/retrospectives/raven-shield-17-years-later/",
+      "target": "https://brainbaking.com/post/2020/10/building-a-core2duo-winxp-retro-pc/"
+    }
+  ]
+}
+```
+
+Author picture paths are relative to the jamming server since they're locally stored. 
 
 #### 1.3 `PUT /webmention/:domain/:token`
 
@@ -138,6 +165,10 @@ As with the `POST` call, will result in a `202 Accepted` and handles things asyn
 **Does this thing take updates into account**?
 
 Yes and no. It checks the `<pubDate/>` `<item/>` RSS tag by default. I decided against porting the more complicated `<timestamp/>` HTML check as it would only spam possible receivers. So if you consider your article to be updated, you should also update the publication date! 
+
+**Do I have to provide a ?since= parameter each time**?
+
+No. The server will automatically store the latest push, and if it's called again, it will not send out anything if nothing more recent was found in your RSS feed based on the last since timestamp. Providing the parameter merely lets you override the behavior.
 
 ### 2. Pingbacks
 
@@ -182,3 +213,5 @@ If rolling files in a separate location is required, [lumberjack](https://github
 There's a **rate limiting** system implemented with a rate limit of 5 requests per second and a maximum burst rate of 10. 
 That's pretty flexible. I have not taken the trouble to put this into the config, it should do in most cases. If you get a `429 too many requests`, you've hit the limiter. 
 A separate goroutine cleans up ips each 2 minutes, the TTL is 5 minutes. See `limiter.go`. 
+
+Database migrations are run using the `-migrate` flag. 
