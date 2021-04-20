@@ -79,7 +79,7 @@ func (rl *RateLimiter) limiterMiddleware(next http.Handler) http.Handler {
 		ip := ipFrom(r)
 		limiter := rl.getVisitor(ip)
 
-		if limiter.Allow() == false {
+		if !limiter.Allow() {
 			log.Error().Str("ip", ip).Msg("Someone spamming? Rate limit hit!")
 			rest.TooManyRequests(w)
 			return

@@ -28,7 +28,7 @@ func Domain(target string) string {
 	withPossibleSubdomain := strings.Split(target, "/")[2]
 	split := strings.Split(withPossibleSubdomain, ".")
 	if len(split) == 2 {
-		return withPossibleSubdomain // that was the extention, not the subdomain.
+		return withPossibleSubdomain // that was the extension, not the subdomain.
 	}
 	return fmt.Sprintf("%s.%s", split[1], split[2])
 }

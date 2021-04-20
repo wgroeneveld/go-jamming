@@ -20,12 +20,12 @@ func main() {
 
 	// logs by default to Stderr (/var/log/syslog). Rolling files possible via lumberjack.
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	if *verboseFlag == true || *migrateFlag == true {
+	if *verboseFlag || *migrateFlag {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 
-	if *migrateFlag == true {
+	if *migrateFlag {
 		migrate()
 		os.Exit(0)
 	}

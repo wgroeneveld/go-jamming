@@ -90,6 +90,7 @@ Place a `config.json` file in the same directory that looks like this: (below ar
 
 - port, host: http server params
 - token, allowedWebmentionSources: see below, used for authentication
+- disallowedWebmentionDomains: if an URL from that domain is encountered in your feed, ignore it. Does not send mentions to it. 
 - utcOffset: offset in minutes for date processing, starting from UTC time.
 - conString: file path to store all mentions and author avatars in a simple key/value store, based on [buntdb](https://github.com/tidwall/buntdb).
 
@@ -122,7 +123,7 @@ This also saves the author picture/avatar locally - if present in the microforma
 
 #### 1.2 `GET /webmention/:domain/:token`
 
-Retrieves a JSON array with relevant webmentions stored for that domain. The token should match. See configuration to fiddle with it yourself. Environment variables are supported, although I haven't used them yet. 
+Retrieves a JSON array with relevant webmentions stored for that domain. The token should match. See configuration to fiddle with it yourself. 
 
 Example response:
 
@@ -147,7 +148,12 @@ Example response:
 }
 ```
 
-Author picture paths are relative to the jamming server since they're locally stored. 
+A few remarks:
+
+- `picture`: Author picture paths are relative to the jamming server since they're locally stored. 
+- `published`: This is not processed and simply taken over from the microformat.
+- `target` is your domain, `source` is... well... the source. 
+- `content`: Does not contain HTML. Automatically capped at 250 characters if needed.
 
 #### 1.3 `PUT /webmention/:domain/:token`
 

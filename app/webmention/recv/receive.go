@@ -14,8 +14,6 @@ import (
 	"willnorris.com/go/microformats"
 )
 
-// used as a "class" to iject dependencies, just to be able to test. Do NOT like htis.
-// Is there a better way? e.g. in validate, I just pass rest.Client as an arg. Not great either.
 type Receiver struct {
 	RestClient rest.Client
 	Conf       *common.Config

@@ -39,7 +39,7 @@ func HandlePut(conf *common.Config, repo db.MentionRepo) http.HandlerFunc {
 }
 
 func getSinceQueryParam(r *http.Request) string {
-	sinceParam, _ := r.URL.Query()["since"]
+	sinceParam := r.URL.Query()["since"]
 	since := ""
 	if len(sinceParam) > 0 {
 		since = sinceParam[0]

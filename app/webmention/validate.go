@@ -16,10 +16,7 @@ func isValidUrl(url string) bool {
 
 func isValidDomain(url string, conf *common.Config) bool {
 	_, err := conf.FetchDomain(url)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func isValidTargetUrl(url string, httpClient rest.Client) bool {

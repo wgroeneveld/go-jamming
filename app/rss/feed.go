@@ -70,7 +70,7 @@ func ParseFeed(content []byte) (*Rss2, error) {
 	}
 
 	if v.Version == "2.0" {
-		for i, _ := range v.ItemList {
+		for i := range v.ItemList {
 			if v.ItemList[i].Content != "" {
 				v.ItemList[i].Description = v.ItemList[i].Content
 			}

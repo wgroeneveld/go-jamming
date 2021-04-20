@@ -146,7 +146,7 @@ func (r *MentionRepoBunt) GetPicture(domain string) []byte {
 
 // GetAll returns a wrapped data result for all mentions for a particular domain.
 // Intentionally ignores marshal errors, db should be consistent!
-// Warning, this will potentially marshall 10k strings!
+// Warning, this will potentially marshall 10k strings! See benchmark test.
 func (r *MentionRepoBunt) GetAll(domain string) mf.IndiewebDataResult {
 	var data []*mf.IndiewebData
 	err := r.db.View(func(tx *buntdb.Tx) error {
@@ -160,7 +160,7 @@ func (r *MentionRepoBunt) GetAll(domain string) mf.IndiewebDataResult {
 
 	if err != nil {
 		log.Error().Err(err).Msg("get all: failed to ascend from view")
-		return mf.IndiewebDataResult{}
+		return mf.ResultFailure(data)
 	}
 	return mf.ResultSuccess(data)
 }

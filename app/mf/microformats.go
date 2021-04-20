@@ -21,6 +21,13 @@ type IndiewebDataResult struct {
 	Data   []*IndiewebData `json:"json"`
 }
 
+func ResultFailure(data []*IndiewebData) IndiewebDataResult {
+	return IndiewebDataResult{
+		Status: "failure",
+		Data:   data,
+	}
+}
+
 func ResultSuccess(data []*IndiewebData) IndiewebDataResult {
 	return IndiewebDataResult{
 		Status: "success",
@@ -75,9 +82,9 @@ func Str(mf *microformats.Microformat, key string) string {
 		// in very weird cases, it could be a map holding a value, like in mf2's "photo"
 		valMap, ok2 := val[0].(map[string]string)
 		if !ok2 {
-			str = ""
+			return ""
 		}
-		str = valMap["value"]
+		return valMap["value"]
 	}
 
 	return str
