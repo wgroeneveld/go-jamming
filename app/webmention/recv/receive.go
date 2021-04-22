@@ -21,6 +21,8 @@ type Receiver struct {
 }
 
 var (
+	titleRegexp = regexp.MustCompile(`<title>(.*?)<\/title>`)
+
 	errPicUnableToDownload = errors.New("Unable to download author picture")
 	errPicNoRealImage      = errors.New("Downloaded author picture is not a real image")
 	errPicUnableToSave     = errors.New("Unable to save downloaded author picture")
@@ -85,10 +87,6 @@ func (recv *Receiver) parseBodyAsIndiewebSite(hEntry *microformats.Microformat, 
 		IndiewebType: mf.Type(hEntry),
 	}
 }
-
-var (
-	titleRegexp = regexp.MustCompile(`<title>(.*?)<\/title>`)
-)
 
 func (recv *Receiver) parseBodyAsNonIndiewebSite(body string, wm mf.Mention) *mf.IndiewebData {
 	title := nonIndiewebTitle(body, wm)
