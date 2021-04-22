@@ -27,16 +27,25 @@ func TestSaveAuthorPictureLocally(t *testing.T) {
 		label              string
 		pictureUrl         string
 		expectedPictureUrl string
+		expectedError      error
 	}{
 		{
 			"Absolute URL gets 'downloaded' and replaced by relative",
 			"https://brainbaking.com/picture.jpg",
 			"/pictures/brainbaking.com",
+			nil,
 		},
 		{
-			"Absolute URL gets replaced by anonymous if download fails",
+			"Absolute URL does not get replaced but error if no valid image",
+			"https://brainbaking.com/index.xml",
+			"https://brainbaking.com/index.xml",
+			errPicNoRealImage,
+		},
+		{
+			"Absolute URL does not get replaced but error if download fails",
 			"https://brainbaking.com/thedogatemypic-nowitsmissing-shiii.png",
-			"/pictures/anonymous",
+			"https://brainbaking.com/thedogatemypic-nowitsmissing-shiii.png",
+			errPicUnableToDownload,
 		},
 	}
 
@@ -57,9 +66,10 @@ func TestSaveAuthorPictureLocally(t *testing.T) {
 					Picture: tc.pictureUrl,
 				},
 			}
-			recv.saveAuthorPictureLocally(indieweb)
+			err := recv.saveAuthorPictureLocally(indieweb)
 
 			assert.Equal(t, tc.expectedPictureUrl, indieweb.Author.Picture)
+			assert.Equal(t, tc.expectedError, err)
 		})
 	}
 }

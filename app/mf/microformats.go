@@ -2,6 +2,7 @@ package mf
 
 import (
 	"brainbaking.com/go-jamming/common"
+	"fmt"
 	"strings"
 	"time"
 	"willnorris.com/go/microformats"
@@ -9,11 +10,16 @@ import (
 
 const (
 	DateFormat = "2006-01-02T15:04:05"
+	Anonymous  = "anonymous"
 )
 
 type IndiewebAuthor struct {
 	Name    string `json:"name"`
 	Picture string `json:"picture"`
+}
+
+func (ia IndiewebAuthor) Anonymize() {
+	ia.Picture = fmt.Sprintf("/pictures/%s", Anonymous)
 }
 
 type IndiewebDataResult struct {

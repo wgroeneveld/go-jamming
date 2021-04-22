@@ -1,6 +1,7 @@
 package pictures
 
 import (
+	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/db"
 	_ "embed"
 	"github.com/gorilla/mux"
@@ -10,10 +11,6 @@ import (
 
 //go:embed anonymous.jpg
 var anonymous []byte
-
-const (
-	Anonymous = "anonymous"
-)
 
 func init() {
 	if anonymous == nil {
@@ -26,7 +23,7 @@ func init() {
 func Handle(repo db.MentionRepo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		picDomain := mux.Vars(r)["picture"]
-		if picDomain == Anonymous {
+		if picDomain == mf.Anonymous {
 			servePicture(w, anonymous)
 			return
 		}

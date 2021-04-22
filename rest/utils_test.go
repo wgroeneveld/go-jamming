@@ -1,9 +1,69 @@
 package rest
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"testing"
 )
+
+func TestIsRealImage(t *testing.T) {
+	cases := []struct {
+		label    string
+		imgpath  string
+		expected bool
+	}{
+		{
+			"jpeg is a valid image",
+			"../mocks/picture.jpg",
+			true,
+		},
+		{
+			"bmp is a valid image",
+			"../mocks/picture.bmp",
+			true,
+		},
+		{
+			"xml is not a valid image",
+			"../mocks/index.xml",
+			false,
+		},
+		{
+			"empty data is not a valid image",
+			"",
+			false,
+		},
+		{
+			"png is a valid image",
+			"../mocks/picture.png",
+			true,
+		},
+		{
+			"gif is a valid image",
+			"../mocks/picture.gif",
+			true,
+		},
+		{
+			"webp is a valid image",
+			"../mocks/picture.webp",
+			true,
+		},
+		{
+			"tiff is a valid image",
+			"../mocks/picture.tiff",
+			true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.label, func(t *testing.T) {
+			data, _ := ioutil.ReadFile(tc.imgpath)
+			fmt.Printf("Path: %s, Data: % x\n", tc.imgpath, data)
+
+			assert.Equal(t, tc.expected, IsRealImage(data))
+		})
+	}
+}
 
 func TestDomainParseFromTarget(t *testing.T) {
 	cases := []struct {
