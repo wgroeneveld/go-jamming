@@ -2,7 +2,7 @@ package mocks
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -42,9 +42,9 @@ func toHttpHeader(header map[string]interface{}) http.Header {
 	return httpHeader
 }
 
-func RelPathGetBodyFunc(t *testing.T, relPath string) func(string) (http.Header, string, error) {
+func RelPathGetBodyFunc(relPath string) func(string) (http.Header, string, error) {
 	return func(url string) (http.Header, string, error) {
-		fmt.Println("  - GET call at " + url)
+		log.Debug().Str("url", url).Msg("  - GET call")
 		// url: https://brainbaking.com/something-something.html
 		// want: ../../mocks/something-something.html
 		mockfile := relPath + strings.ReplaceAll(url, "https://brainbaking.com/", "")

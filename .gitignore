@@ -1,6 +1,9 @@
 
 .DS_Store
 
+*.prof
+*.test
+
 config.json
 
 data/*

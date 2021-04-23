@@ -9,7 +9,7 @@ import (
 func TestDiscover(t *testing.T) {
 	var sender = &Sender{
 		RestClient: &mocks.RestClientMock{
-			GetBodyFunc: mocks.RelPathGetBodyFunc(t, "../../../mocks/"),
+			GetBodyFunc: mocks.RelPathGetBodyFunc("../../../mocks/"),
 		},
 	}
 

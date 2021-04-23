@@ -151,7 +151,7 @@ func TestSendIntegrationTestCanSendBothWebmentionsAndPingbacks(t *testing.T) {
 		Conf: conf,
 		Repo: db.NewMentionRepo(conf),
 		RestClient: &mocks.RestClientMock{
-			GetBodyFunc: mocks.RelPathGetBodyFunc(t, "./../../../mocks/"),
+			GetBodyFunc: mocks.RelPathGetBodyFunc("./../../../mocks/"),
 			PostFunc: func(url string, contentType string, body string) error {
 				lock.Lock()
 				defer lock.Unlock()

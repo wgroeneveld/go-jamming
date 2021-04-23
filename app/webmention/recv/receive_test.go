@@ -5,7 +5,9 @@ import (
 	"brainbaking.com/go-jamming/db"
 	"encoding/json"
 	"errors"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
@@ -56,7 +58,7 @@ func TestSaveAuthorPictureLocally(t *testing.T) {
 				Conf: conf,
 				Repo: repo,
 				RestClient: &mocks.RestClientMock{
-					GetBodyFunc: mocks.RelPathGetBodyFunc(t, "../../../mocks/"),
+					GetBodyFunc: mocks.RelPathGetBodyFunc("../../../mocks/"),
 				},
 			}
 
@@ -71,6 +73,36 @@ func TestSaveAuthorPictureLocally(t *testing.T) {
 			assert.Equal(t, tc.expectedPictureUrl, indieweb.Author.Picture)
 			assert.Equal(t, tc.expectedError, err)
 		})
+	}
+}
+
+func BenchmarkReceive(b *testing.B) {
+	origLog := zerolog.GlobalLevel()
+	zerolog.SetGlobalLevel(zerolog.Disabled)
+	defer zerolog.SetGlobalLevel(origLog)
+
+	wm := mf.Mention{
+		Source: "https://brainbaking.com/valid-indieweb-source.html",
+		Target: "https://jefklakscodex.com/articles",
+	}
+	data, err := ioutil.ReadFile("../../../mocks/valid-indieweb-source.html")
+	assert.NoError(b, err)
+	html := string(data)
+
+	repo := db.NewMentionRepo(conf)
+	recv := &Receiver{
+		Conf: conf,
+		Repo: repo,
+		RestClient: &mocks.RestClientMock{
+			GetBodyFunc: func(s string) (http.Header, string, error) {
+				return http.Header{}, html, nil
+			},
+		},
+	}
+
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		recv.Receive(wm)
 	}
 }
 
@@ -143,7 +175,7 @@ func TestReceive(t *testing.T) {
 				Conf: conf,
 				Repo: repo,
 				RestClient: &mocks.RestClientMock{
-					GetBodyFunc: mocks.RelPathGetBodyFunc(t, "../../../mocks/"),
+					GetBodyFunc: mocks.RelPathGetBodyFunc("../../../mocks/"),
 				},
 			}
 
@@ -194,7 +226,7 @@ func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {
 		Conf: conf,
 		Repo: repo,
 		RestClient: &mocks.RestClientMock{
-			GetBodyFunc: mocks.RelPathGetBodyFunc(t, "../../../mocks/"),
+			GetBodyFunc: mocks.RelPathGetBodyFunc("../../../mocks/"),
 		},
 	}
 
