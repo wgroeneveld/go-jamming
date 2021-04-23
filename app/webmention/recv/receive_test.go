@@ -76,7 +76,7 @@ func TestSaveAuthorPictureLocally(t *testing.T) {
 	}
 }
 
-func BenchmarkReceive(b *testing.B) {
+func BenchmarkReceiveWithoutRestCalls(b *testing.B) {
 	origLog := zerolog.GlobalLevel()
 	zerolog.SetGlobalLevel(zerolog.Disabled)
 	defer zerolog.SetGlobalLevel(origLog)

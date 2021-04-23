@@ -18,7 +18,7 @@ type IndiewebAuthor struct {
 	Picture string `json:"picture"`
 }
 
-func (ia IndiewebAuthor) Anonymize() {
+func (ia *IndiewebAuthor) Anonymize() {
 	ia.Picture = fmt.Sprintf("/pictures/%s", Anonymous)
 }
 
