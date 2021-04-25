@@ -6,6 +6,7 @@ import (
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/db"
 	"brainbaking.com/go-jamming/rest"
+	"fmt"
 	"github.com/rs/zerolog/log"
 	"strings"
 	"sync"
@@ -35,10 +36,35 @@ func (snder *Sender) updateSinceForDomain(domain string) {
 	snder.Repo.UpdateSince(domain, common.Now())
 }
 
+// SendSingle sends out webmentions serially for a single source.
+// It does validate the relative path against the domain, which is supposed to be served using https.
+func (snder *Sender) SendSingle(domain string, relSource string) {
+	source := fmt.Sprintf("https://%s/%s", domain, relSource)
+	log.Info().Str("url", source).Msg(` OK: someone wants to send a single mention`)
+
+	_, html, err := snder.RestClient.GetBody(source)
+	if err != nil {
+		log.Err(err).Str("url", source).Msg("Unable to validate source, send aborted")
+		return
+	}
+
+	for _, href := range snder.collectUniqueHrefsFromHtml(html) {
+		if strings.HasPrefix(href, "http") {
+			snder.sendMention(mf.Mention{
+				Source: source,
+				Target: href,
+			})
+		}
+	}
+}
+
+// Send sends out multiple webmentions based on since and what's posted in the RSS feed.
+// It first GETs domain/index.xml and goes from there.
 func (snder *Sender) Send(domain string, since string) {
 	timeSince := snder.sinceForDomain(domain, since)
-	log.Info().Str("domain", domain).Time("since", timeSince).Msg(` OK: someone wants to send mentions`)
 	feedUrl := "https://" + domain + "/index.xml"
+
+	log.Info().Str("domain", domain).Time("since", timeSince).Msg(` OK: someone wants to send mentions`)
 	_, feed, err := snder.RestClient.GetBody(feedUrl)
 	if err != nil {
 		log.Err(err).Str("url", feedUrl).Msg("Unable to retrieve RSS feed, send aborted")

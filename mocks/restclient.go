@@ -1,13 +1,13 @@
 package mocks
 
 import (
+	"brainbaking.com/go-jamming/rest"
 	"encoding/json"
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
-	"testing"
 )
 
 // neat trick! https://medium.com/@matryer/meet-moq-easily-mock-interfaces-in-go-476444187d10
@@ -37,6 +37,9 @@ func (m *RestClientMock) Post(url string, contentType string, body string) error
 func toHttpHeader(header map[string]interface{}) http.Header {
 	httpHeader := http.Header{}
 	for key, value := range header {
+		if key == "link1" || key == "link2" {
+			key = "link"
+		}
 		httpHeader.Add(key, value.(string))
 	}
 	return httpHeader
@@ -55,21 +58,15 @@ func RelPathGetBodyFunc(relPath string) func(string) (http.Header, string, error
 
 		headerData, headerFileErr := ioutil.ReadFile(strings.ReplaceAll(mockfile, ".html", "-headers.json"))
 		if headerFileErr != nil {
-			return http.Header{}, string(html), nil
+			header := http.Header{}
+			header.Set(rest.RequestUrl, url) // mimic actual implementation to track possible redirects
+			return header, string(html), nil
 		}
 		headerJson := map[string]interface{}{}
 		json.Unmarshal(headerData, &headerJson)
 
-		return toHttpHeader(headerJson), string(html), nil
-	}
-}
-
-func BodyFunc(t *testing.T, mockfile string) func(string) (string, error) {
-	html, err := ioutil.ReadFile(mockfile)
-	if err != nil {
-		t.Error(err)
-	}
-	return func(url string) (string, error) {
-		return string(html), nil
+		header := toHttpHeader(headerJson)
+		header.Set(rest.RequestUrl, url) // mimic actual implementation to track possible redirects
+		return header, string(html), nil
 	}
 }

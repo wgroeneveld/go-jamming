@@ -70,6 +70,44 @@ func TestSinceForDomain(t *testing.T) {
 	}
 }
 
+func TestSendSingleDoesNotSendIfRelPathNotFound(t *testing.T) {
+	var postedSomething bool
+	snder := Sender{
+		Conf: conf,
+		RestClient: &mocks.RestClientMock{
+			GetBodyFunc: mocks.RelPathGetBodyFunc("../../../mocks/"),
+			PostFormFunc: func(endpt string, formValues url.Values) error {
+				postedSomething = true
+				return nil
+			},
+		},
+	}
+
+	snder.SendSingle("brainbaking.com", "unknown-file")
+	assert.False(t, postedSomething)
+}
+
+func TestSendSingleSendsMentionsBasedOnRelativeDomain(t *testing.T) {
+	passedFormValues := url.Values{}
+	var endpoint string
+	snder := Sender{
+		Conf: conf,
+		RestClient: &mocks.RestClientMock{
+			GetBodyFunc: mocks.RelPathGetBodyFunc("../../../mocks/"),
+			PostFormFunc: func(endpt string, formValues url.Values) error {
+				passedFormValues = formValues
+				endpoint = endpt
+				return nil
+			},
+		},
+	}
+
+	snder.SendSingle("brainbaking.com", "single-send-test.html")
+	assert.Equal(t, "http://aaronpk.example/webmention-endpoint-body", endpoint)
+	assert.Equal(t, "https://brainbaking.com/single-send-test.html", passedFormValues.Get("source"))
+	assert.Equal(t, "https://brainbaking.com/link-discover-test-single.html", passedFormValues.Get("target"))
+}
+
 func TestSendMentionAsWebmention(t *testing.T) {
 	passedFormValues := url.Values{}
 	snder := Sender{

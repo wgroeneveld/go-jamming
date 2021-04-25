@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>Webmention Rocks!</title>
+    <link href="/assets/semantic.min.css" rel="stylesheet">
+    <link href="/assets/style.css" rel="stylesheet">
+    <link href="/assets/test.css" rel="stylesheet">
+
+    <script src="/assets/jquery-1.11.3.min.js"></script>
+    <script src="/assets/semantic.min.js"></script>
+    <script src="/assets/script.js"></script>
+
+    <link rel="webmention" href="">
+</head>
+<body>
+
+
+
+<div class="post-container h-entry">
+    <div class="post-main has-responses">
+        <div class="left p-author h-card">
+            <a href="/">
+                <img src="/assets/webmention-rocks-icon.png" width="80" class="u-photo" alt="Webmention Rocks!">
+            </a>
+        </div>
+        <div class="right">
+            <h1 class="p-name"><a href="/test/15">Discovery Test #15</a></h1>
+            <div class="e-content">This post has a &lt;link&gt; tag where the href value is an empty string, meaning the page is its own Webmention endpoint. This tests the relative URL resolver of the sender to ensure an empty string is resolved to the page's URL.</div>
+            <div class="meta">
+                <a href="/test/15" class="u-url">
+                    Published:
+                    <time class="dt-published" datetime="2016-04-14T23:26:48+02:00">
+                        Thursday April 14, 2016 11:26pm +02:00          </time>
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+    <div class="post-footer">
+        <p>Responses are stored for 48 hours and may be deleted after that time.</p>
+    </div>
+</div>
+
+<div id="test-num" data-num="15"></div>
+<script src="/assets/streaming.js"></script>
+
+</body>
+</html>

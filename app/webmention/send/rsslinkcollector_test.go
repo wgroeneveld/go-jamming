@@ -31,6 +31,11 @@ func TestCollectSuite(t *testing.T) {
 	suite.Run(t, new(CollectSuite))
 }
 
+func (s *CollectSuite) TestCollectUniqueHrefsFromHtmlShouldNotContainInlineLinks() {
+	links := s.snder.collectUniqueHrefsFromHtml(`<html><body><a href="#inline">sup</a></body></html>`)
+	assert.Empty(s.T(), links)
+}
+
 func (s *CollectSuite) TestCollectShouldNotContainHrefsFromBlockedDomains() {
 	items, err := s.snder.Collect(s.xml, common.IsoToTime("2021-03-10T00:00:00.000Z"))
 	assert.NoError(s.T(), err)

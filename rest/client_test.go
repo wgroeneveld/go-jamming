@@ -32,6 +32,29 @@ func TestGetBodyWithinLimitsReturnsHeadersAndBodyString(t *testing.T) {
 	assert.Contains(t, body, "<rss")
 }
 
+func TestGetBodyFollowsRedirect(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/1", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("location", "2")
+		w.WriteHeader(302)
+	})
+	mux.HandleFunc("/2", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Write([]byte("nice!"))
+	})
+	srv := &http.Server{Addr: ":6666", Handler: mux}
+	defer srv.Close()
+
+	go func() {
+		srv.ListenAndServe()
+	}()
+	headers, body, err := client.GetBody("http://localhost:6666/1")
+
+	assert.NoError(t, err)
+	assert.Equal(t, "http://localhost:6666/2", headers.Get(RequestUrl))
+	assert.Equal(t, "nice!", body)
+}
+
 func TestGetBodyOf404ReturnsError(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

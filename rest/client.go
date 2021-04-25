@@ -23,7 +23,8 @@ type HttpClient struct {
 }
 
 const (
-	MaxBytes = 5000000 // 5 MiB
+	MaxBytes          = 5000000 // 5 MiB
+	RequestUrl string = "requestUrl"
 )
 
 var (
@@ -80,6 +81,7 @@ func (client *HttpClient) GetBody(url string) (http.Header, string, error) {
 	if readerr != nil {
 		return nil, "", fmt.Errorf("GET from %s: unable to read body: %w", url, readerr)
 	}
+	resp.Header.Set(RequestUrl, resp.Request.URL.String())
 	return resp.Header, string(body), nil
 }
 

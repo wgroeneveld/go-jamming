@@ -22,7 +22,7 @@ func TestDiscover(t *testing.T) {
 		{
 			"discover 'unknown' if no link is present",
 			"https://brainbaking.com/link-discover-test-none.html",
-			"",
+			"https://brainbaking.com/link-discover-test-none.html",
 			typeUnknown,
 		},
 		{
@@ -53,6 +53,48 @@ func TestDiscover(t *testing.T) {
 			"webmentions: discover link if present in header",
 			"https://brainbaking.com/link-discover-test.html",
 			"http://aaronpk.example/webmention-endpoint",
+			typeWebmention,
+		},
+		{
+			"webmentions: https://webmention.rocks/test/1 relative path in header",
+			"https://brainbaking.com/webmention-rocks-1.html",
+			"https://brainbaking.com/test/1/webmention?head=true",
+			typeWebmention,
+		},
+		{
+			"webmentions: https://webmention.rocks/test/11 prefer links in the header even if in head or body also present",
+			"https://brainbaking.com/webmention-rocks-11.html",
+			"https://brainbaking.com/test/11/webmention",
+			typeWebmention,
+		},
+		{
+			"webmentions: https://webmention.rocks/test/15 empty link rel means it is its own endpoint",
+			"https://brainbaking.com/webmention-rocks-15.html",
+			"https://brainbaking.com/webmention-rocks-15.html",
+			typeWebmention,
+		},
+		{
+			"webmentions: https://webmention.rocks/test/18 discover link if multiple present in multiple headers",
+			"https://brainbaking.com/webmention-rocks-18.html",
+			"https://webmention.rocks/test/18/webmention?head=true",
+			typeWebmention,
+		},
+		{
+			"webmentions: https://webmention.rocks/test/19 discover link if multiple present comma-separated in single header",
+			"https://brainbaking.com/webmention-rocks-19.html",
+			"https://webmention.rocks/test/19/webmention?head=true",
+			typeWebmention,
+		},
+		{
+			"webmentions: https://webmention.rocks/test/20 discover link in body href if header is empty",
+			"https://brainbaking.com/webmention-rocks-20.html",
+			"https://brainbaking.com/test/20/webmention",
+			typeWebmention,
+		},
+		{
+			"webmentions: https://webmention.rocks/test/22 discover link relative to the page instead of the domain",
+			"https://brainbaking.com/blank/webmention-rocks-22.html",
+			"https://brainbaking.com/blank/22/webmention",
 			typeWebmention,
 		},
 		{
