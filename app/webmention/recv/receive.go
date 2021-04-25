@@ -48,7 +48,7 @@ func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 	}
 
 	data := microformats.Parse(strings.NewReader(body), wm.SourceUrl())
-	indieweb := recv.convertBodyToIndiewebData(body, wm, mf.HEntry(data))
+	indieweb := recv.convertBodyToIndiewebData(body, wm, data)
 	if indieweb.Author.Picture != "" {
 		err := recv.saveAuthorPictureLocally(indieweb)
 		if err != nil {
@@ -64,21 +64,20 @@ func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 	log.Info().Str("key", key).Msg("OK: Webmention processed.")
 }
 
-func (recv *Receiver) convertBodyToIndiewebData(body string, wm mf.Mention, hEntry *microformats.Microformat) *mf.IndiewebData {
+func (recv *Receiver) convertBodyToIndiewebData(body string, wm mf.Mention, mfRoot *microformats.Data) *mf.IndiewebData {
+	hEntry := mf.HEntry(mfRoot)
+	hCard := mf.HCard(mfRoot)
 	if hEntry == nil {
 		return recv.parseBodyAsNonIndiewebSite(body, wm)
 	}
-	return recv.parseBodyAsIndiewebSite(hEntry, wm)
+	return recv.parseBodyAsIndiewebSite(hEntry, hCard, wm)
 }
 
 // see https://github.com/willnorris/microformats/blob/main/microformats.go
-func (recv *Receiver) parseBodyAsIndiewebSite(hEntry *microformats.Microformat, wm mf.Mention) *mf.IndiewebData {
+func (recv *Receiver) parseBodyAsIndiewebSite(hEntry *microformats.Microformat, hCard *microformats.Microformat, wm mf.Mention) *mf.IndiewebData {
 	return &mf.IndiewebData{
-		Name: mf.Str(hEntry, "name"),
-		Author: mf.IndiewebAuthor{
-			Name:    mf.DetermineAuthorName(hEntry),
-			Picture: mf.Str(mf.Prop(hEntry, "author"), "photo"),
-		},
+		Name:         mf.Str(hEntry, "name"),
+		Author:       mf.NewAuthor(hEntry, hCard),
 		Content:      mf.Content(hEntry),
 		Url:          mf.Url(hEntry, wm.Source),
 		Published:    mf.Published(hEntry, recv.Conf.UtcOffset),

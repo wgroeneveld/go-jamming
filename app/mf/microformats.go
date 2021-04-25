@@ -109,22 +109,40 @@ func Map(mf *microformats.Microformat, key string) map[string]string {
 }
 
 func HEntry(data *microformats.Data) *microformats.Microformat {
+	return hItemType(data, "h-entry")
+}
+
+func HCard(data *microformats.Data) *microformats.Microformat {
+	return hItemType(data, "h-card")
+}
+
+func hItemType(data *microformats.Data, hType string) *microformats.Microformat {
 	for _, itm := range data.Items {
-		if common.Includes(itm.Type, "h-entry") {
+		if common.Includes(itm.Type, hType) {
 			return itm
 		}
 	}
 	return nil
 }
 
+func mfEmpty() *microformats.Microformat {
+	return &microformats.Microformat{
+		Properties: map[string][]interface{}{},
+	}
+}
+
 func Prop(mf *microformats.Microformat, key string) *microformats.Microformat {
 	val := mf.Properties[key]
 	if len(val) == 0 {
-		return &microformats.Microformat{
-			Properties: map[string][]interface{}{},
+		return mfEmpty()
+	}
+	for i := range val {
+		conv, ok := val[i].(*microformats.Microformat)
+		if ok {
+			return conv
 		}
 	}
-	return val[0].(*microformats.Microformat)
+	return mfEmpty()
 }
 
 func Published(hEntry *microformats.Microformat, utcOffset int) string {
@@ -135,10 +153,36 @@ func Published(hEntry *microformats.Microformat, utcOffset int) string {
 	return publishedDate
 }
 
+func NewAuthor(hEntry *microformats.Microformat, hCard *microformats.Microformat) IndiewebAuthor {
+	name := DetermineAuthorName(hEntry)
+	if name == "" {
+		name = DetermineAuthorName(hCard)
+	}
+	picture := DetermineAuthorPhoto(hEntry)
+	if picture == "" {
+		picture = DetermineAuthorPhoto(hCard)
+	}
+	return IndiewebAuthor{
+		Picture: picture,
+		Name:    name,
+	}
+}
+
+func DetermineAuthorPhoto(hEntry *microformats.Microformat) string {
+	photo := Str(Prop(hEntry, "author"), "photo")
+	if photo == "" {
+		photo = Str(hEntry, "photo")
+	}
+	return photo
+}
+
 func DetermineAuthorName(hEntry *microformats.Microformat) string {
 	authorName := Str(Prop(hEntry, "author"), "name")
 	if authorName == "" {
-		return Prop(hEntry, "author").Value
+		authorName = Prop(hEntry, "author").Value
+	}
+	if authorName == "" {
+		authorName = Str(hEntry, "author")
 	}
 	return authorName
 }

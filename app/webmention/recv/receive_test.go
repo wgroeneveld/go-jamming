@@ -113,6 +113,14 @@ func TestReceive(t *testing.T) {
 		json  string
 	}{
 		{
+			label: "bugfix interface conversion panic unusual author part in mf",
+			wm: mf.Mention{
+				Source: "https://brainbaking.com/bugfix-interface-conversion-panic.html",
+				Target: "https://brainbaking.com/",
+			},
+			json: `{"author":{"name":"Ton Zijlstra","picture":"/pictures/brainbaking.com"},"name":"","content":"De allereerste Nederlandstalige meet-up van Obsidian.md gebruikers was interessant en leuk! We waren met z’n vieren, Sebastiaan, Wouter, Frank en ik, en spraken bijna 2 uur met elkaar. Leuk om te vergelijken waarom en hoe we notities maken in Obsid...", "name":"Nabeschouwing: de eerste Nederlandstalige Obsidian meet-up", "published":"2021-04-25T11:24:48+02:00", "source":"https://brainbaking.com/bugfix-interface-conversion-panic.html", "target":"https://brainbaking.com/", "type":"mention", "url":"https://www.zylstra.org/blog/2021/04/nabeschouwing-de-eerste-nederlandstalige-obsidian-meet-up/"}`,
+		},
+		{
 			label: "receive a Webmention bookmark via twitter",
 			wm: mf.Mention{
 				Source: "https://brainbaking.com/valid-bridgy-twitter-source.html",
