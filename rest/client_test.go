@@ -39,6 +39,7 @@ func TestGetBodyFollowsRedirect(t *testing.T) {
 		w.WriteHeader(302)
 	})
 	mux.HandleFunc("/2", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("link", `<webmention-endpoint/KyetGUioV2x1lJoiw96V>; rel=webmention`)
 		w.WriteHeader(200)
 		w.Write([]byte("nice!"))
 	})
@@ -52,6 +53,7 @@ func TestGetBodyFollowsRedirect(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, "http://localhost:6666/2", headers.Get(RequestUrl))
+	assert.Equal(t, `<webmention-endpoint/KyetGUioV2x1lJoiw96V>; rel=webmention`, headers.Get("link"))
 	assert.Equal(t, "nice!", body)
 }
 

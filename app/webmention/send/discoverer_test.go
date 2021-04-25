@@ -2,9 +2,23 @@ package send
 
 import (
 	"brainbaking.com/go-jamming/mocks"
+	"brainbaking.com/go-jamming/rest"
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
+
+func TestDiscoverE2EWithRedirect(t *testing.T) {
+	t.Skip("Skipping TestDiscoverE2EWithRedirect, webmention.rocks is slow.")
+	var sender = &Sender{
+		RestClient: &rest.HttpClient{},
+	}
+
+	link, wmType := sender.discover("https://webmention.rocks/test/23/page")
+	assert.Equal(t, typeWebmention, wmType)
+	expectedUrl := "https://webmention.rocks/test/23/page/webmention-endpoint/"
+	assert.Truef(t, strings.HasPrefix(link, expectedUrl), "should start with %s, but was %s", expectedUrl, link)
+}
 
 func TestDiscover(t *testing.T) {
 	var sender = &Sender{

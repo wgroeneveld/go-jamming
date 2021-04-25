@@ -2,7 +2,6 @@ package send
 
 import (
 	"brainbaking.com/go-jamming/rest"
-	"fmt"
 	"github.com/rs/zerolog/log"
 	"net/url"
 	"regexp"
@@ -28,11 +27,12 @@ func (sndr *Sender) discover(target string) (link string, mentionType string) {
 		return
 	}
 	link = header.Get(rest.RequestUrl) // default to a possible redirect of the target
+	baseUrl, _ := url.Parse(link)
 
 	// prefer links in the header over the html itself.
 	for _, possibleLink := range header.Values("link") {
 		if relWebmention.MatchString(possibleLink) {
-			return buildWebmentionHeaderLink(possibleLink, rest.BaseUrlOf(link)), typeWebmention
+			return buildWebmentionHeaderLink(possibleLink, baseUrl), typeWebmention
 		}
 	}
 	if header.Get("X-Pingback") != "" {
@@ -40,7 +40,6 @@ func (sndr *Sender) discover(target string) (link string, mentionType string) {
 	}
 
 	// this also complies with w3.org regulations: relative endpoint could be possible
-	baseUrl, _ := url.Parse(link)
 	format := microformats.Parse(strings.NewReader(body), baseUrl)
 	if len(format.Rels[typeWebmention]) > 0 {
 		mentionType = typeWebmention
@@ -71,8 +70,9 @@ func buildWebmentionHeaderLink(link string, baseUrl *url.URL) (wm string) {
 	}
 	raw := strings.Split(link, ";")[0][1:]
 	wm = raw[:len(raw)-1]
-	if strings.HasPrefix(wm, "/") {
-		wm = fmt.Sprintf("%s%s", baseUrl, wm)
+	if !strings.HasPrefix(wm, "http") {
+		abs, _ := baseUrl.Parse(wm)
+		wm = abs.String()
 	}
 
 	return
