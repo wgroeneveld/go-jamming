@@ -46,6 +46,11 @@ func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 		log.Warn().Str("target", wm.Target).Msg("ABORT: no mention of target found in html src of source!")
 		return
 	}
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error().Str("panic", fmt.Sprintf("%q", r)).Stringer("wm", wm).Msg("ABORT: panic recovery while processing wm")
+		}
+	}()
 
 	data := microformats.Parse(strings.NewReader(body), wm.SourceUrl())
 	indieweb := recv.convertBodyToIndiewebData(body, wm, data)
