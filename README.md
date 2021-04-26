@@ -121,6 +121,9 @@ Will result in a `202 Accepted` - it handles things async. Stores in `.json` fil
 
 This also saves the author picture/avatar locally - if present in the microformat. It does _not_ resize images, however, if it's bigger than 5 MB, it falls back to a default one. 
 
+Publication dates are sanitized and stored in `published`. They should be formatted in ISO8601. See [RFC3339](https://www.ietf.org/rfc/rfc3339.txt). 
+If that is not the case, go-jamming falls back to the moment the mention was received. 
+
 #### 1.2 `GET /webmention/:domain/:token`
 
 Retrieves a JSON array with relevant webmentions stored for that domain. The token should match. See configuration to fiddle with it yourself. 

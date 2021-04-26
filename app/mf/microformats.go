@@ -9,8 +9,24 @@ import (
 )
 
 const (
-	DateFormat = "2006-01-02T15:04:05"
-	Anonymous  = "anonymous"
+	dateFormatWithTimeZone               = "2006-01-02T15:04:05-07:00"
+	dateFormatWithAbsoluteTimeZone       = "2006-01-02T15:04:05-0700"
+	dateFormatWithTimeZoneSuffixed       = "2006-01-02T15:04:05.000Z"
+	dateFormatWithoutTimeZone            = "2006-01-02T15:04:05"
+	dateFormatWithSecondsWithoutTimeZone = "2006-01-02T15:04:05.00Z"
+	dateFormatWithoutTime                = "2006-01-02"
+	Anonymous                            = "anonymous"
+)
+
+var (
+	supportedFormats = []string{
+		dateFormatWithTimeZone,
+		dateFormatWithAbsoluteTimeZone,
+		dateFormatWithTimeZoneSuffixed,
+		dateFormatWithSecondsWithoutTimeZone,
+		dateFormatWithoutTimeZone,
+		dateFormatWithoutTime,
+	}
 )
 
 type IndiewebAuthor struct {
@@ -63,8 +79,8 @@ func (id *IndiewebData) IsEmpty() bool {
 	return id.Url == ""
 }
 
-func PublishedNow(utcOffset int) string {
-	return common.Now().UTC().Add(time.Duration(utcOffset) * time.Minute).Format("2006-01-02T15:04:05")
+func PublishedNow(zone *time.Location) string {
+	return common.Now().UTC().In(zone).Format(dateFormatWithTimeZone)
 }
 
 func shorten(txt string) string {
@@ -145,12 +161,21 @@ func Prop(mf *microformats.Microformat, key string) *microformats.Microformat {
 	return mfEmpty()
 }
 
-func Published(hEntry *microformats.Microformat, utcOffset int) string {
+func Published(hEntry *microformats.Microformat, zone *time.Location) string {
 	publishedDate := Str(hEntry, "published")
 	if publishedDate == "" {
-		return PublishedNow(utcOffset)
+		return PublishedNow(zone)
 	}
-	return publishedDate
+
+	for _, format := range supportedFormats {
+		formatted, err := time.Parse(format, publishedDate)
+		if err != nil {
+			continue
+		}
+		return formatted.Format(dateFormatWithTimeZone)
+	}
+
+	return PublishedNow(zone)
 }
 
 func NewAuthor(hEntry *microformats.Microformat, hCard *microformats.Microformat) IndiewebAuthor {

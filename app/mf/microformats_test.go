@@ -1,0 +1,100 @@
+package mf
+
+import (
+	"brainbaking.com/go-jamming/common"
+	"github.com/stretchr/testify/assert"
+	"testing"
+	"time"
+	"willnorris.com/go/microformats"
+)
+
+func TestPublished(t *testing.T) {
+	cases := []struct {
+		label        string
+		raw          string
+		expectedTime string
+	}{
+		{
+			"Converts published date in RFC3339 ISO8601 indieweb datetime format with timezone",
+			"2021-04-25T11:24:48+02:00",
+			"2021-04-25T11:24:48+02:00",
+		},
+		{
+			"Converts published date in RFC3339 ISO8601 indieweb datetime format with absolute timezone",
+			"2021-04-25T11:24:48+0200",
+			"2021-04-25T11:24:48+02:00",
+		},
+		{
+			"Converts published date in RFC3339 ISO8601 indieweb datetime format with timezone suffixed with Z",
+			"2021-03-02T16:17:18.000Z",
+			"2021-03-02T16:17:18+00:00",
+		},
+		{
+			"Converts published date in RFC3339 ISO8601 indieweb datetime format without timezone",
+			"2021-04-25T11:24:48",
+			"2021-04-25T11:24:48+00:00",
+		},
+		{
+			"Converts published date in RFC3339 ISO8601 indieweb datetime format without time",
+			"2021-04-25",
+			"2021-04-25T00:00:00+00:00",
+		},
+		{
+			"Returns current date if property with correct timezone not found",
+			"",
+			"2020-01-01T13:30:00+01:00",
+		},
+		{
+			"Reverts to current date if not in correct ISO8601 datetime format",
+			"26 April 2021",
+			"2020-01-01T13:30:00+01:00",
+		},
+		{
+			"https://www.ietf.org/rfc/rfc3339.txt example 1",
+			"1985-04-12T23:20:50.52Z",
+			"1985-04-12T23:20:50+00:00",
+		},
+		{
+			"https://www.ietf.org/rfc/rfc3339.txt example 2",
+			"1996-12-19T16:39:57-08:00",
+			"1996-12-19T16:39:57-08:00",
+		},
+		{
+			"https://www.ietf.org/rfc/rfc3339.txt example 3 explicitly not implemented",
+			"1990-12-31T23:59:60Z",
+			"2020-01-01T13:30:00+01:00",
+		},
+		{
+			"https://www.ietf.org/rfc/rfc3339.txt example 4 explicitly not implemented",
+			"1990-12-31T15:59:60-08:00",
+			"2020-01-01T13:30:00+01:00",
+		},
+		{
+			"https://www.ietf.org/rfc/rfc3339.txt example 5 with seconds ignored",
+			"1937-01-01T12:00:27.87+00:20",
+			"1937-01-01T12:00:27+00:20",
+		},
+	}
+	common.Now = func() time.Time {
+		return time.Date(2020, time.January, 1, 12, 30, 0, 0, time.UTC)
+	}
+	utcPlusOne := time.FixedZone("UTC+1", 60*60)
+	defer func() {
+		common.Now = time.Now
+	}()
+
+	for _, tc := range cases {
+		t.Run(tc.label, func(t *testing.T) {
+			props := map[string][]interface{}{}
+			props["published"] = []interface{}{
+				tc.raw,
+			}
+			theTime := Published(&microformats.Microformat{
+				Properties: props,
+			}, utcPlusOne)
+
+			assert.Equal(t, tc.expectedTime, theTime)
+		})
+
+	}
+}

@@ -6,6 +6,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"strings"
+	"time"
 )
 
 type Config struct {
@@ -16,6 +17,10 @@ type Config struct {
 	ConString                   string   `json:"conString"`
 	AllowedWebmentionSources    []string `json:"allowedWebmentionSources"`
 	DisallowedWebmentionDomains []string `json:"disallowedWebmentionDomains"`
+}
+
+func (c *Config) Zone() *time.Location {
+	return time.FixedZone("local", c.UtcOffset*60)
 }
 
 func (c *Config) missingKeys() []string {
