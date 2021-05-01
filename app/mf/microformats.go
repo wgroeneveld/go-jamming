@@ -19,6 +19,8 @@ const (
 )
 
 var (
+	// This is similar to Hugo's string-to-date casting system
+	// See https://github.com/spf13/cast/blob/master/caste.go
 	supportedFormats = []string{
 		dateFormatWithTimeZone,
 		dateFormatWithAbsoluteTimeZone,
@@ -36,6 +38,10 @@ type IndiewebAuthor struct {
 
 func (ia *IndiewebAuthor) Anonymize() {
 	ia.Picture = fmt.Sprintf("/pictures/%s", Anonymous)
+}
+
+func (ia *IndiewebAuthor) AnonymizeName() {
+	ia.Name = "Anonymous"
 }
 
 type IndiewebDataResult struct {

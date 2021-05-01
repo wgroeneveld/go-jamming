@@ -224,3 +224,8 @@ That's pretty flexible. I have not taken the trouble to put this into the config
 A separate goroutine cleans up ips each 2 minutes, the TTL is 5 minutes. See `limiter.go`. 
 
 Database migrations are run using the `-migrate` flag. 
+
+## TODOs
+
+- Pictures are bound to domain names only. That means `brid.gy` will net a single picture. Perhaps the combination domain + user would be more appropriate?
+

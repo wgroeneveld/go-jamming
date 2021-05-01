@@ -18,12 +18,16 @@ func init() {
 	}
 }
 
+const (
+	bridgy = "brid.gy"
+)
+
 // Handle handles picture GET calls.
 // It does not validate the picture query as it's part of a composite key anyway.
 func Handle(repo db.MentionRepo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		picDomain := mux.Vars(r)["picture"]
-		if picDomain == mf.Anonymous {
+		if picDomain == mf.Anonymous || picDomain == bridgy {
 			servePicture(w, anonymous)
 			return
 		}

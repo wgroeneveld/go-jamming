@@ -38,6 +38,12 @@ func TestSaveAuthorPictureLocally(t *testing.T) {
 			nil,
 		},
 		{
+			"Refuses to download if it's from a silo domain and possibly involves GDPR privacy issues",
+			"https://brid.gy/picture.jpg",
+			"https://brid.gy/picture.jpg",
+			errWontDownloadBecauseOfPrivacy,
+		},
+		{
 			"Absolute URL does not get replaced but error if no valid image",
 			"https://brainbaking.com/index.xml",
 			"https://brainbaking.com/index.xml",
@@ -63,7 +69,7 @@ func TestSaveAuthorPictureLocally(t *testing.T) {
 			}
 
 			indieweb := &mf.IndiewebData{
-				Source: "https://brainbaking.com",
+				Source: tc.pictureUrl,
 				Author: mf.IndiewebAuthor{
 					Picture: tc.pictureUrl,
 				},
@@ -240,6 +246,27 @@ func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {
 
 	receiver.Receive(wm)
 	assert.Empty(t, repo.GetAll("brainbaking.com").Data)
+}
+
+func TestProcessSourceBodyAnonymizesBothAuthorPictureAndNameIfComingFromSilo(t *testing.T) {
+	wm := mf.Mention{
+		Source: "https://brid.gy/post/twitter/ChrisAldrich/1387130900962443264",
+		Target: "https://brainbaking.com/",
+	}
+	repo := db.NewMentionRepo(conf)
+	receiver := &Receiver{
+		Conf: conf,
+		Repo: repo,
+	}
+
+	src, err := ioutil.ReadFile("../../../mocks/valid-bridgy-source.html")
+	assert.NoError(t, err)
+
+	receiver.processSourceBody(string(src), wm)
+	savedMention := repo.Get(wm)
+
+	assert.Equal(t, "Anonymous", savedMention.Author.Name)
+	assert.Equal(t, "/pictures/anonymous", savedMention.Author.Picture)
 }
 
 func TestProcessSourceBodyAbortsIfNoMentionOfTargetFoundInSourceHtml(t *testing.T) {

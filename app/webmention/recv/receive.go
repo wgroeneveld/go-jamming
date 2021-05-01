@@ -23,9 +23,12 @@ type Receiver struct {
 var (
 	titleRegexp = regexp.MustCompile(`<title>(.*?)<\/title>`)
 
-	errPicUnableToDownload = errors.New("Unable to download author picture")
-	errPicNoRealImage      = errors.New("Downloaded author picture is not a real image")
-	errPicUnableToSave     = errors.New("Unable to save downloaded author picture")
+	errPicUnableToDownload          = errors.New("Unable to download author picture")
+	errPicNoRealImage               = errors.New("Downloaded author picture is not a real image")
+	errPicUnableToSave              = errors.New("Unable to save downloaded author picture")
+	errWontDownloadBecauseOfPrivacy = errors.New("Will not save locally because it's form a silo domain")
+
+	siloDomains = []string{"brid.gy", "twitter.com"}
 )
 
 func (recv *Receiver) Receive(wm mf.Mention) {
@@ -59,6 +62,10 @@ func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 		if err != nil {
 			log.Error().Err(err).Str("url", indieweb.Author.Picture).Msg("Failed to save picture. Reverting to anonymous")
 			indieweb.Author.Anonymize()
+
+			if err == errWontDownloadBecauseOfPrivacy {
+				indieweb.Author.AnonymizeName()
+			}
 		}
 	}
 
@@ -111,7 +118,15 @@ func (recv *Receiver) parseBodyAsNonIndiewebSite(body string, wm mf.Mention) *mf
 // saveAuthorPictureLocally tries to download the author picture and checks if it's valid based on img header.
 // If it succeeds, it alters the picture path to a local /pictures/x one.
 // If it fails, it returns an error.
+// This refuses to download from silo sources such as brid.gy because of privacy concerns.
 func (recv *Receiver) saveAuthorPictureLocally(indieweb *mf.IndiewebData) error {
+	srcDomain := rest.Domain(indieweb.Source)
+	for _, siloDomain := range siloDomains {
+		if srcDomain == siloDomain {
+			return errWontDownloadBecauseOfPrivacy
+		}
+	}
+
 	_, picData, err := recv.RestClient.GetBody(indieweb.Author.Picture)
 	if err != nil {
 		return errPicUnableToDownload
@@ -120,7 +135,6 @@ func (recv *Receiver) saveAuthorPictureLocally(indieweb *mf.IndiewebData) error 
 		return errPicNoRealImage
 	}
 
-	srcDomain := rest.Domain(indieweb.Source)
 	_, dberr := recv.Repo.SavePicture(picData, srcDomain)
 	if dberr != nil {
 		return errPicUnableToSave
