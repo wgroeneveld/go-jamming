@@ -174,7 +174,7 @@ func TestReceive(t *testing.T) {
 				Source: "https://brainbaking.com/valid-nonindieweb-source.html",
 				Target: "https://brainbaking.com/valid-indieweb-target.html",
 			},
-			json: `{"author":{"name":"https://brainbaking.com/valid-nonindieweb-source.html", "picture":""}, "content":"Diablo 2 Twenty Years Later: A Retrospective | Jefklaks Codex", "name":"Diablo 2 Twenty Years Later: A Retrospective | Jefklaks Codex", "published":"2020-01-01T12:30:00+00:00", "source":"https://brainbaking.com/valid-nonindieweb-source.html", "target":"https://brainbaking.com/valid-indieweb-target.html", "type":"mention", "url":"https://brainbaking.com/valid-nonindieweb-source.html"}`,
+			json: `{"author":{"name":"https://brainbaking.com/valid-nonindieweb-source.html", "picture":"/pictures/anonymous"}, "content":"Diablo 2 Twenty Years Later: A Retrospective | Jefklaks Codex", "name":"Diablo 2 Twenty Years Later: A Retrospective | Jefklaks Codex", "published":"2020-01-01T12:30:00+00:00", "source":"https://brainbaking.com/valid-nonindieweb-source.html", "target":"https://brainbaking.com/valid-indieweb-target.html", "type":"mention", "url":"https://brainbaking.com/valid-nonindieweb-source.html"}`,
 		},
 	}
 
@@ -254,7 +254,7 @@ func TestProcessSourceBodyAnonymizesBothAuthorPictureAndNameIfComingFromSilo(t *
 		Target: "https://brainbaking.com/",
 	}
 	repo := db.NewMentionRepo(conf)
-	receiver := &Receiver{
+	recv := &Receiver{
 		Conf: conf,
 		Repo: repo,
 	}
@@ -262,7 +262,7 @@ func TestProcessSourceBodyAnonymizesBothAuthorPictureAndNameIfComingFromSilo(t *
 	src, err := ioutil.ReadFile("../../../mocks/valid-bridgy-source.html")
 	assert.NoError(t, err)
 
-	receiver.processSourceBody(string(src), wm)
+	recv.processSourceBody(string(src), wm)
 	savedMention := repo.Get(wm)
 
 	assert.Equal(t, "Anonymous", savedMention.Author.Name)
@@ -275,11 +275,23 @@ func TestProcessSourceBodyAbortsIfNoMentionOfTargetFoundInSourceHtml(t *testing.
 		Target: "https://jefklakscodex.com/articles",
 	}
 	repo := db.NewMentionRepo(conf)
-	receiver := &Receiver{
+	recv := &Receiver{
 		Conf: conf,
 		Repo: repo,
 	}
 
-	receiver.processSourceBody("<html>my nice body</html>", wm)
+	recv.processSourceBody("<html>my nice body</html>", wm)
 	assert.Empty(t, repo.Get(wm))
+}
+
+func TestProcessAuthorPictureAnonymizesIfEmpty(t *testing.T) {
+	recv := &Receiver{}
+	indieweb := &mf.IndiewebData{
+		Author: mf.IndiewebAuthor{
+			Picture: "",
+		},
+	}
+	recv.processAuthorPicture(indieweb)
+
+	assert.Equal(t, "/pictures/anonymous", indieweb.Author.Picture)
 }

@@ -57,23 +57,29 @@ func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 
 	data := microformats.Parse(strings.NewReader(body), wm.SourceUrl())
 	indieweb := recv.convertBodyToIndiewebData(body, wm, data)
-	if indieweb.Author.Picture != "" {
-		err := recv.saveAuthorPictureLocally(indieweb)
-		if err != nil {
-			log.Error().Err(err).Str("url", indieweb.Author.Picture).Msg("Failed to save picture. Reverting to anonymous")
-			indieweb.Author.Anonymize()
-
-			if err == errWontDownloadBecauseOfPrivacy {
-				indieweb.Author.AnonymizeName()
-			}
-		}
-	}
+	recv.processAuthorPicture(indieweb)
 
 	key, err := recv.Repo.Save(wm, indieweb)
 	if err != nil {
 		log.Error().Err(err).Stringer("wm", wm).Msg("Failed to save new mention to db")
 	}
 	log.Info().Str("key", key).Msg("OK: Webmention processed.")
+}
+
+func (recv *Receiver) processAuthorPicture(indieweb *mf.IndiewebData) {
+	if indieweb.Author.Picture != "" {
+		err := recv.saveAuthorPictureLocally(indieweb)
+		if err != nil {
+			log.Error().Err(err).Str("url", indieweb.Author.Picture).Msg("Failed to save picture. Reverting to anonymous")
+			indieweb.Author.AnonymizePicture()
+
+			if err == errWontDownloadBecauseOfPrivacy {
+				indieweb.Author.AnonymizeName()
+			}
+		}
+	} else {
+		indieweb.Author.AnonymizePicture()
+	}
 }
 
 func (recv *Receiver) convertBodyToIndiewebData(body string, wm mf.Mention, mfRoot *microformats.Data) *mf.IndiewebData {
