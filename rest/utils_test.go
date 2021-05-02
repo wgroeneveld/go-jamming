@@ -91,6 +91,16 @@ func TestDomainParseFromTarget(t *testing.T) {
 			"https://mayonaise.frit.be/patatjes/zijn/lekker",
 			"frit.be",
 		},
+		{
+			"parse from localhost domain without extension",
+			"https://localhost:1313/stuff",
+			"localhost:1313",
+		},
+		{
+			"malformed http string with too little slashes simply returns same URL",
+			"https:*groovy.bla/stuff",
+			"https:*groovy.bla/stuff",
+		},
 	}
 
 	for _, tc := range cases {

@@ -19,7 +19,7 @@ func (s *CollectSuite) SetupTest() {
 	s.xml = string(file)
 	s.snder = &Sender{
 		Conf: &common.Config{
-			DisallowedWebmentionDomains: []string{
+			Blacklist: []string{
 				"youtube.com",
 			},
 		},

@@ -22,6 +22,9 @@ var conf = &common.Config{
 		"brainbaking.com",
 	},
 	ConString: ":memory:",
+	Blacklist: []string{
+		"blacklisted.com",
+	},
 }
 
 func TestSaveAuthorPictureLocally(t *testing.T) {
@@ -227,6 +230,22 @@ func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testi
 	receiver.Receive(wm)
 	indb := repo.Get(wm)
 	assert.Empty(t, indb)
+}
+
+func TestReceiveFromBlacklistedDomainDoesNothing(t *testing.T) {
+	wm := mf.Mention{
+		Source: "https://blacklisted.com/whoops",
+		Target: "https://brainbaking.com/valid-indieweb-source.html",
+	}
+
+	repo := db.NewMentionRepo(conf)
+	receiver := &Receiver{
+		Conf: conf,
+		Repo: repo,
+	}
+
+	receiver.Receive(wm)
+	assert.Empty(t, repo.GetAll("brainbaking.com").Data)
 }
 
 func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {

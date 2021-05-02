@@ -82,7 +82,7 @@ Place a `config.json` file in the same directory that looks like this: (below ar
     "brainbaking.com",
     "jefklakscodex.com"
   ],
-  "disallowedWebmentionDomains":  [
+  "blacklist":  [
     "youtube.com"
   ]
 }
@@ -90,7 +90,7 @@ Place a `config.json` file in the same directory that looks like this: (below ar
 
 - port, host: http server params
 - token, allowedWebmentionSources: see below, used for authentication
-- disallowedWebmentionDomains: if an URL from that domain is encountered in your feed, ignore it. Does not send mentions to it. 
+- blacklist: blacklist domains from which we do NOT send to or accept mentions from. 
 - utcOffset: offset in minutes for date processing, starting from UTC time.
 - conString: file path to store all mentions and author avatars in a simple key/value store, based on [buntdb](https://github.com/tidwall/buntdb).
 
@@ -180,6 +180,10 @@ This means if you made changes in-between, and they appear in the RSS feed as re
 **Do I have to provide a ?source= parameter each time**?
 
 No. The server will automatically store the latest push, and if it's called again, it will not send out anything if nothing more recent was found in your RSS feed based on the last published link. Providing the parameter merely lets you override the behavior.
+
+#### 1.4 `DELETE /webmention/:domain/:token?source=x&target=y`
+
+Deletes a webmention or logs a warning if no relevant mention found. 
 
 ### 2. Pingbacks
 

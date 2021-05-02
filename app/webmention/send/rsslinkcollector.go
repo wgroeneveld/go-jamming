@@ -65,7 +65,7 @@ func (snder *Sender) collectUniqueHrefsFromHtml(html string) []string {
 
 	for _, match := range hrefRegexp.FindAllStringSubmatch(html, -1) {
 		url := match[1] // [0] is the match of the entire expression, [1] is the capture group
-		if !extRegexp.MatchString(url) && !snder.Conf.ContainsDisallowedDomain(url) && !strings.HasPrefix(url, "#") {
+		if !extRegexp.MatchString(url) && !snder.Conf.IsBlacklisted(url) && !strings.HasPrefix(url, "#") {
 			urlmap.Add(url)
 		}
 	}

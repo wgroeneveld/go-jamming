@@ -56,13 +56,16 @@ func lastSentKey(domain string) string {
 	return fmt.Sprintf("%s:lastsent", domain)
 }
 
-// Delete removes a possibly present mention by key. Ignores possible errors.
+// Delete removes a possibly present mention by key. Ignores but logs possible errors.
 func (r *MentionRepoBunt) Delete(wm mf.Mention) {
 	key := r.mentionToKey(wm)
-	r.db.Update(func(tx *buntdb.Tx) error {
-		tx.Delete(key)
-		return nil
+	err := r.db.Update(func(tx *buntdb.Tx) error {
+		_, err := tx.Delete(key)
+		return err
 	})
+	if err != nil {
+		log.Warn().Err(err).Str("key", key).Stringer("wm", wm).Msg("Unable to delete")
+	}
 }
 
 func (r *MentionRepoBunt) SavePicture(bytes string, domain string) (string, error) {

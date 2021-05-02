@@ -30,6 +30,11 @@ var (
 )
 
 func (recv *Receiver) Receive(wm mf.Mention) {
+	if recv.Conf.IsBlacklisted(wm.Source) {
+		log.Warn().Stringer("wm", wm).Msg("  ABORT: source url comes from blacklisted domain!")
+		return
+	}
+
 	log.Info().Stringer("wm", wm).Msg("OK: looks valid")
 	_, body, geterr := recv.RestClient.GetBody(wm.Source)
 

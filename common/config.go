@@ -1,6 +1,7 @@
 package common
 
 import (
+	"brainbaking.com/go-jamming/rest"
 	"encoding/json"
 	"errors"
 	"github.com/rs/zerolog/log"
@@ -10,13 +11,21 @@ import (
 )
 
 type Config struct {
-	Port                        int      `json:"port"`
-	Token                       string   `json:"token"`
-	UtcOffset                   int      `json:"utcOffset"`
-	DataPath                    string   `json:"dataPath"`
-	ConString                   string   `json:"conString"`
-	AllowedWebmentionSources    []string `json:"allowedWebmentionSources"`
-	DisallowedWebmentionDomains []string `json:"disallowedWebmentionDomains"`
+	Port                     int      `json:"port"`
+	Token                    string   `json:"token"`
+	UtcOffset                int      `json:"utcOffset"`
+	DataPath                 string   `json:"dataPath"`
+	ConString                string   `json:"conString"`
+	AllowedWebmentionSources []string `json:"allowedWebmentionSources"`
+	Blacklist                []string `json:"blacklist"`
+}
+
+func (c *Config) IsBlacklisted(url string) bool {
+	if !strings.HasPrefix(url, "http") {
+		return false
+	}
+	domain := rest.Domain(url)
+	return Includes(c.Blacklist, domain)
 }
 
 func (c *Config) Zone() *time.Location {
@@ -40,22 +49,8 @@ func (c *Config) missingKeys() []string {
 	return keys
 }
 
-func (c *Config) ContainsDisallowedDomain(url string) bool {
-	for _, domain := range c.DisallowedWebmentionDomains {
-		if strings.Contains(url, domain) {
-			return true
-		}
-	}
-	return false
-}
-
-func (c *Config) IsAnAllowedDomain(url string) bool {
-	for _, domain := range c.AllowedWebmentionSources {
-		if domain == url {
-			return true
-		}
-	}
-	return false
+func (c *Config) IsAnAllowedDomain(domain string) bool {
+	return Includes(c.AllowedWebmentionSources, domain)
 }
 
 func (c *Config) FetchDomain(url string) (string, error) {
@@ -98,11 +93,11 @@ func config() *Config {
 
 func defaultConfig() *Config {
 	return &Config{
-		Port:                        1337,
-		Token:                       "miauwkes",
-		UtcOffset:                   60,
-		ConString:                   "data/mentions.db",
-		AllowedWebmentionSources:    []string{"brainbaking.com", "jefklakscodex.com"},
-		DisallowedWebmentionDomains: []string{"youtube.com"},
+		Port:                     1337,
+		Token:                    "miauwkes",
+		UtcOffset:                60,
+		ConString:                "mentions.db",
+		AllowedWebmentionSources: []string{"brainbaking.com", "jefklakscodex.com"},
+		Blacklist:                []string{"youtube.com"},
 	}
 }

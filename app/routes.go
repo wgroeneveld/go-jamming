@@ -20,4 +20,5 @@ func (s *server) routes() {
 	s.router.HandleFunc("/webmention", webmention.HandlePost(c, db)).Methods("POST")
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandleGet(db))).Methods("GET")
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandlePut(c, db))).Methods("PUT")
+	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandleDelete(db))).Methods("DELETE")
 }

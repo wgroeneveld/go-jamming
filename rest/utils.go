@@ -23,11 +23,16 @@ func Unauthorized(w http.ResponseWriter) {
 
 // Domain parses the target url to extract the domain as part of the allowed webmention targets.
 // This is the same as conf.FetchDomain(wm.Target), only without config, and without error handling.
-// Assumes http(s) protocol, which should have been validated by now.
+// Assumes http(s) protocol, which should have been validated before calling this.
 func Domain(target string) string {
-	withPossibleSubdomain := strings.Split(target, "/")[2]
+	slashes := strings.Split(target, "/")
+	if len(slashes) < 3 {
+		return target
+	}
+
+	withPossibleSubdomain := slashes[2]
 	split := strings.Split(withPossibleSubdomain, ".")
-	if len(split) == 2 {
+	if len(split) <= 2 {
 		return withPossibleSubdomain // that was the extension, not the subdomain.
 	}
 	return fmt.Sprintf("%s.%s", split[1], split[2])

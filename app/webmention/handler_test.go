@@ -1,8 +1,10 @@
 package webmention
 
 import (
+	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/db"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -27,6 +29,32 @@ var (
 func init() {
 	cnf.ConString = ":memory:"
 	repo = db.NewMentionRepo(cnf)
+}
+
+func TestHandleDelete(t *testing.T) {
+	wm := mf.Mention{
+		Source: "https://infos.by/markdown-v-nauke/",
+		Target: "https://brainbaking.com/post/2021/02/writing-academic-papers-in-markdown/",
+	}
+
+	_, err := repo.Save(wm, &mf.IndiewebData{
+		Source: wm.Source,
+		Target: wm.Target,
+		Name:   "mytest",
+	})
+	assert.NoError(t, err)
+	assert.NotEmpty(t, repo.GetAll("brainbaking.com").Data)
+
+	ts := httptest.NewServer(HandleDelete(repo))
+	defer ts.Close()
+
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s?source=%s&target=%s", ts.URL, wm.Source, wm.Target), nil)
+	assert.NoError(t, err)
+	_, err = client.Do(req)
+	assert.NoError(t, err)
+
+	assert.Empty(t, repo.GetAll("brainbaking.com").Data)
 }
 
 func TestHandlePostWithInvalidUrlsShouldReturnBadRequest(t *testing.T) {

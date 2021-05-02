@@ -23,6 +23,20 @@ func HandleGet(repo db.MentionRepo) http.HandlerFunc {
 	}
 }
 
+// HandleDelete deletes a possible webmention but does not verify source/target.
+// If no or wrong parameters are provided, it will log a warning.
+func HandleDelete(repo db.MentionRepo) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		wm := mf.Mention{
+			Source: r.FormValue("source"),
+			Target: r.FormValue("target"),
+		}
+
+		repo.Delete(wm)
+	}
+}
+
 func HandlePut(conf *common.Config, repo db.MentionRepo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		domain := mux.Vars(r)["domain"]
