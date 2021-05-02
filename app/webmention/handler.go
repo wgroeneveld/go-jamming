@@ -25,7 +25,6 @@ func HandleGet(repo db.MentionRepo) http.HandlerFunc {
 
 func HandlePut(conf *common.Config, repo db.MentionRepo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		since := sinceQueryParam(r)
 		domain := mux.Vars(r)["domain"]
 		source := sourceQueryParam(r)
 
@@ -38,7 +37,7 @@ func HandlePut(conf *common.Config, repo db.MentionRepo) http.HandlerFunc {
 		if source != "" {
 			go snder.SendSingle(domain, source)
 		} else {
-			go snder.Send(domain, since)
+			go snder.Send(domain)
 		}
 
 		rest.Accept(w)
@@ -51,15 +50,6 @@ func sourceQueryParam(r *http.Request) string {
 		return sourceParam[0]
 	}
 	return ""
-}
-
-func sinceQueryParam(r *http.Request) string {
-	sinceParam := r.URL.Query()["since"]
-	since := ""
-	if len(sinceParam) > 0 {
-		since = sinceParam[0]
-	}
-	return since
 }
 
 func HandlePost(conf *common.Config, repo db.MentionRepo) http.HandlerFunc {

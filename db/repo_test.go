@@ -5,11 +5,9 @@ import (
 	"brainbaking.com/go-jamming/common"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"github.com/tidwall/buntdb"
 	"io/ioutil"
 	"os"
 	"testing"
-	"time"
 )
 
 var (
@@ -48,23 +46,13 @@ func TestDelete(t *testing.T) {
 	assert.Equal(t, 0, len(results.Data))
 }
 
-func TestUpdateSince(t *testing.T) {
+func TestUpdateLastSentMention(t *testing.T) {
 	db := NewMentionRepo(conf)
-	nowStamp := time.Date(2020, 10, 13, 14, 15, 0, 0, time.UTC)
 
-	db.UpdateSince("pussycat.com", nowStamp)
-	since, err := db.Since("pussycat.com")
+	db.UpdateLastSentMention("pussycat.com", "https://last.sent")
+	last := db.LastSentMention("pussycat.com")
 
-	assert.NoError(t, err)
-	assert.Equal(t, nowStamp, since)
-}
-
-func TestSinceFirstTimeIsEmptytime(t *testing.T) {
-	db := NewMentionRepo(conf)
-	since, err := db.Since("pussycat.com")
-
-	assert.Equal(t, buntdb.ErrNotFound, err)
-	assert.Equal(t, time.Time{}, since)
+	assert.Equal(t, "https://last.sent", last)
 }
 
 func TestGet(t *testing.T) {

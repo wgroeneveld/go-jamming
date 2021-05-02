@@ -10,30 +10,12 @@ import (
 	"github.com/rs/zerolog/log"
 	"strings"
 	"sync"
-	"time"
 )
 
 type Sender struct {
 	RestClient rest.Client
 	Conf       *common.Config
 	Repo       db.MentionRepo
-}
-
-func (snder *Sender) sinceForDomain(domain string, since string) time.Time {
-	if since != "" {
-		return common.IsoToTime(since)
-	}
-
-	sinceConf, err := snder.Repo.Since(domain)
-	if err != nil {
-		log.Warn().Str("domain", domain).Msg("No query param, and no config found. Reverting to beginning of time...")
-		return time.Time{}
-	}
-	return sinceConf
-}
-
-func (snder *Sender) updateSinceForDomain(domain string) {
-	snder.Repo.UpdateSince(domain, common.Now())
 }
 
 // SendSingle sends out webmentions serially for a single source.
@@ -60,29 +42,34 @@ func (snder *Sender) SendSingle(domain string, relSource string) {
 
 // Send sends out multiple webmentions based on since and what's posted in the RSS feed.
 // It first GETs domain/index.xml and goes from there.
-func (snder *Sender) Send(domain string, since string) {
-	timeSince := snder.sinceForDomain(domain, since)
+func (snder *Sender) Send(domain string) {
+	lastSent := snder.Repo.LastSentMention(domain)
 	feedUrl := "https://" + domain + "/index.xml"
 
-	log.Info().Str("domain", domain).Time("since", timeSince).Msg(` OK: someone wants to send mentions`)
+	log.Info().Str("domain", domain).Str("lastsent", lastSent).Msg(` OK: someone wants to send mentions`)
 	_, feed, err := snder.RestClient.GetBody(feedUrl)
 	if err != nil {
 		log.Err(err).Str("url", feedUrl).Msg("Unable to retrieve RSS feed, send aborted")
 		return
 	}
 
-	if err = snder.parseRssFeed(feed, timeSince); err != nil {
+	lastSent, err = snder.parseRssFeed(feed, lastSent)
+	if err != nil {
 		log.Err(err).Str("url", feedUrl).Msg("Unable to parse RSS feed, send aborted")
 		return
 	}
 
-	snder.updateSinceForDomain(domain)
+	snder.Repo.UpdateLastSentMention(domain, lastSent)
+	log.Info().Str("domain", domain).Str("lastsent", lastSent).Msg(` OK: send processed.`)
 }
 
-func (snder *Sender) parseRssFeed(feed string, since time.Time) error {
-	items, err := snder.Collect(feed, since)
+func (snder *Sender) parseRssFeed(feed string, lastSentLink string) (string, error) {
+	items, err := snder.Collect(feed, lastSentLink)
 	if err != nil {
-		return err
+		return lastSentLink, err
+	}
+	if len(items) == 0 {
+		return lastSentLink, nil
 	}
 
 	var wg sync.WaitGroup
@@ -108,7 +95,8 @@ func (snder *Sender) parseRssFeed(feed string, since time.Time) error {
 		}
 	}
 	wg.Wait()
-	return nil
+	// first item is the most recent one!
+	return items[0].link, nil
 }
 
 var mentionFuncs = map[string]func(snder *Sender, mention mf.Mention, endpoint string){

@@ -3,6 +3,7 @@
 
 *.prof
 *.test
+*.db
 
 config.json
 

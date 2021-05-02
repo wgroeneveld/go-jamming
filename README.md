@@ -164,7 +164,7 @@ Sends out **both webmentions and pingbacks**, based on the domain's `index.xml` 
 
 This does a couple of things:
 
-1. Fetch RSS entries (since x, or everything)
+1. Fetch RSS entries (since last sent link x, or everything)
 2. Find outbound `href`s (starting with `http`)
 3. Check if those domains have a `webmention` link endpoint installed, according to the w3.org rules. If not, check for a `pingback` endpoint. If not, bail out.
 4. If webmention/pingback found: `POST` for each found href with `source` the own domain and `target` the outbound link found in the RSS feed, using either XML or form data according to the protocol. 
@@ -173,11 +173,13 @@ As with the `POST` call, will result in a `202 Accepted` and handles things asyn
 
 **Does this thing take updates into account**?
 
-Yes and no. It checks the `<pubDate/>` `<item/>` RSS tag by default. I decided against porting the more complicated `<timestamp/>` HTML check as it would only spam possible receivers. So if you consider your article to be updated, you should also update the publication date! 
+Yes and no. It checks the `<link/>` tag to see if there's a new post since mentions were last sent. If a new link is discovered, it will send out those. 
 
-**Do I have to provide a ?since= parameter each time**?
+This means if you made changes in-between, and they appear in the RSS feed as recent items, it will get resend. 
 
-No. The server will automatically store the latest push, and if it's called again, it will not send out anything if nothing more recent was found in your RSS feed based on the last since timestamp. Providing the parameter merely lets you override the behavior.
+**Do I have to provide a ?source= parameter each time**?
+
+No. The server will automatically store the latest push, and if it's called again, it will not send out anything if nothing more recent was found in your RSS feed based on the last published link. Providing the parameter merely lets you override the behavior.
 
 ### 2. Pingbacks
 

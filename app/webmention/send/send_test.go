@@ -12,7 +12,6 @@ import (
 	"net/url"
 	"sync"
 	"testing"
-	"time"
 )
 
 var conf = &common.Config{
@@ -20,54 +19,6 @@ var conf = &common.Config{
 	AllowedWebmentionSources: []string{
 		"domain",
 	},
-}
-
-func TestSinceForDomain(t *testing.T) {
-	cases := []struct {
-		label        string
-		sinceInParam string
-		sinceInDb    string
-		expected     time.Time
-	}{
-		{
-			"Is since parameter if provided",
-			"2021-03-09T15:51:43.732Z",
-			"",
-			time.Date(2021, time.March, 9, 15, 51, 43, 732, time.UTC),
-		},
-		{
-			"Is file contents if since parameter is empty and file is not",
-			"",
-			"2021-03-09T15:51:43.732Z",
-			time.Date(2021, time.March, 9, 15, 51, 43, 732, time.UTC),
-		},
-		{
-			"Is empty time if both parameter and file are not present",
-			"",
-			"",
-			time.Time{},
-		},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.label, func(t *testing.T) {
-			snder := Sender{
-				Conf: conf,
-				Repo: db.NewMentionRepo(conf),
-			}
-			if tc.sinceInDb != "" {
-				snder.Repo.UpdateSince("domain", common.IsoToTime(tc.sinceInDb))
-			}
-
-			actual := snder.sinceForDomain("domain", tc.sinceInParam)
-			assert.Equal(t, tc.expected.Year(), actual.Year())
-			assert.Equal(t, tc.expected.Month(), actual.Month())
-			assert.Equal(t, tc.expected.Day(), actual.Day())
-			assert.Equal(t, tc.expected.Hour(), actual.Hour())
-			assert.Equal(t, tc.expected.Minute(), actual.Minute())
-			assert.Equal(t, tc.expected.Second(), actual.Second())
-		})
-	}
 }
 
 func TestSendSingleDoesNotSendIfRelPathNotFound(t *testing.T) {
@@ -205,7 +156,7 @@ func TestSendIntegrationTestCanSendBothWebmentionsAndPingbacks(t *testing.T) {
 		},
 	}
 
-	snder.Send("brainbaking.com", "2021-03-16T16:00:00.000Z")
+	snder.Send("brainbaking.com")
 	assert.Equal(t, 3, len(posted))
 
 	wmPost1 := posted["http://aaronpk.example/webmention-endpoint-header"].(url.Values)

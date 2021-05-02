@@ -47,7 +47,7 @@ func TestHandlePostWithTestServer_Parallel(t *testing.T) {
 	defer ts.Close()
 	var wg sync.WaitGroup
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 3; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

@@ -5,7 +5,6 @@ import (
 	"brainbaking.com/go-jamming/common"
 	"regexp"
 	"strings"
-	"time"
 )
 
 type RSSItem struct {
@@ -38,19 +37,20 @@ type RSSItem struct {
       '          '
   }
 **/
-func (snder *Sender) Collect(xml string, since time.Time) ([]RSSItem, error) {
+func (snder *Sender) Collect(xml string, lastSentLink string) ([]RSSItem, error) {
 	feed, err := rss.ParseFeed([]byte(xml))
 	if err != nil {
 		return nil, err
 	}
 	var items []RSSItem
 	for _, rssitem := range feed.ItemList {
-		if since.IsZero() || since.Before(rssitem.PubDateAsTime()) {
-			items = append(items, RSSItem{
-				link:  rssitem.Link,
-				hrefs: snder.collectUniqueHrefsFromHtml(rssitem.Description),
-			})
+		if rssitem.Link == lastSentLink {
+			break
 		}
+		items = append(items, RSSItem{
+			link:  rssitem.Link,
+			hrefs: snder.collectUniqueHrefsFromHtml(rssitem.Description),
+		})
 	}
 	return items, nil
 }

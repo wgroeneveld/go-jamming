@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/suite"
 	"io/ioutil"
 	"testing"
-	"time"
 )
 
 type CollectSuite struct {
@@ -37,7 +36,7 @@ func (s *CollectSuite) TestCollectUniqueHrefsFromHtmlShouldNotContainInlineLinks
 }
 
 func (s *CollectSuite) TestCollectShouldNotContainHrefsFromBlockedDomains() {
-	items, err := s.snder.Collect(s.xml, common.IsoToTime("2021-03-10T00:00:00.000Z"))
+	items, err := s.snder.Collect(s.xml, "https://brainbaking.com/notes/2021/03/09h15m17s30/")
 	assert.NoError(s.T(), err)
 	last := items[len(items)-1]
 	assert.Equal(s.T(), "https://brainbaking.com/notes/2021/03/10h16m24s22/", last.link)
@@ -49,7 +48,7 @@ func (s *CollectSuite) TestCollectShouldNotContainHrefsFromBlockedDomains() {
 }
 
 func (s *CollectSuite) TestCollectShouldNotContainHrefsThatPointToImages() {
-	items, err := s.snder.Collect(s.xml, common.IsoToTime("2021-03-14T00:00:00.000Z"))
+	items, err := s.snder.Collect(s.xml, "https://brainbaking.com/notes/2021/03/13h12m44s29/")
 	assert.NoError(s.T(), err)
 	last := items[len(items)-1]
 	// test case:
@@ -59,14 +58,15 @@ func (s *CollectSuite) TestCollectShouldNotContainHrefsThatPointToImages() {
 	}, last.hrefs)
 }
 
-func (s *CollectSuite) TestCollectNothingIfDateInFutureAndSinceNothingNewInFeed() {
-	items, err := s.snder.Collect(s.xml, time.Now().Add(time.Duration(600)*time.Hour))
+func (s *CollectSuite) TestCollectNothingIfNothingNewInFeed() {
+	latestEntry := "https://brainbaking.com/notes/2021/03/16h17m07s14/"
+	items, err := s.snder.Collect(s.xml, latestEntry)
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), 0, len(items))
 }
 
-func (s *CollectSuite) TestCollectLatestXLinksWhenASinceParameterIsProvided() {
-	items, err := s.snder.Collect(s.xml, common.IsoToTime("2021-03-15T00:00:00.000Z"))
+func (s *CollectSuite) TestCollectLatestXLinksWhenARecentLinkParameterIsProvided() {
+	items, err := s.snder.Collect(s.xml, "https://brainbaking.com/notes/2021/03/14h17m41s53/")
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), 3, len(items))
 
@@ -81,9 +81,8 @@ func (s *CollectSuite) TestCollectLatestXLinksWhenASinceParameterIsProvided() {
 
 }
 
-func (s *CollectSuite) TestCollectEveryExternalLinkWithoutAValidSinceDate() {
-	// no valid since date = zero time passed.
-	items, err := s.snder.Collect(s.xml, time.Time{})
+func (s *CollectSuite) TestCollectEveryExternalLinkWithoutARecentLink() {
+	items, err := s.snder.Collect(s.xml, "")
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), 141, len(items))
 

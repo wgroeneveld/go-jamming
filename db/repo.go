@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"github.com/tidwall/buntdb"
-	"time"
 )
 
 type MentionRepoBunt struct {
@@ -20,41 +19,41 @@ type MentionRepo interface {
 	Save(key mf.Mention, data *mf.IndiewebData) (string, error)
 	SavePicture(bytes string, domain string) (string, error)
 	Delete(key mf.Mention)
-	Since(domain string) (time.Time, error)
-	UpdateSince(domain string, since time.Time)
+	LastSentMention(domain string) string
+	UpdateLastSentMention(domain string, lastSent string)
 	Get(key mf.Mention) *mf.IndiewebData
 	GetPicture(domain string) []byte
 	GetAll(domain string) mf.IndiewebDataResult
 }
 
-// UpdateSince updates the since timestamp to now. Logs but ignores errors.
-func (r *MentionRepoBunt) UpdateSince(domain string, since time.Time) {
+// UpdateLastSentMention updates the last sent mention link. Logs but ignores errors.
+func (r *MentionRepoBunt) UpdateLastSentMention(domain string, lastSentMentionLink string) {
 	err := r.db.Update(func(tx *buntdb.Tx) error {
-		_, _, err := tx.Set(sinceKey(domain), common.TimeToIso(since), nil)
+		_, _, err := tx.Set(lastSentKey(domain), lastSentMentionLink, nil)
 		return err
 	})
 	if err != nil {
-		log.Error().Err(err).Msg("UpdateSince: unable to save")
+		log.Error().Err(err).Msg("UpdateLastSentMention: unable to save")
 	}
 }
 
-// Since fetches the last timestamp of the mf send.
-// Returns converted found instance, or an error if none found.
-func (r *MentionRepoBunt) Since(domain string) (time.Time, error) {
-	var since string
+// LastSentMention fetches the last known RSS link where mentions were sent, or an empty string if an error occured.
+func (r *MentionRepoBunt) LastSentMention(domain string) string {
+	var lastSent string
 	err := r.db.View(func(tx *buntdb.Tx) error {
-		val, err := tx.Get(sinceKey(domain))
-		since = val
+		val, err := tx.Get(lastSentKey(domain))
+		lastSent = val
 		return err
 	})
 	if err != nil {
-		return time.Time{}, err
+		log.Error().Err(err).Msg("LastSentMention: unable to retrieve last sent, reverting to empty")
+		return ""
 	}
-	return common.IsoToTime(since), nil
+	return lastSent
 }
 
-func sinceKey(domain string) string {
-	return fmt.Sprintf("%s:since", domain)
+func lastSentKey(domain string) string {
+	return fmt.Sprintf("%s:lastsent", domain)
 }
 
 // Delete removes a possibly present mention by key. Ignores possible errors.

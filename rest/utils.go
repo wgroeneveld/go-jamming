@@ -44,6 +44,10 @@ var (
 	tiffM               = imageType{0x4D, 0x4D, 0x00, 0x2A}
 	webp                = imageType{0x52, 0x49, 0x46, 0x46} // RIFF 32 bits
 	supportedImageTypes = []imageType{jpg, png, gif, bmp, webp, tiffI, tiffM}
+
+	// SiloDomains are domains where mentions of multiple individuals may come from.
+	// These are privacy issues and will be anonymized as such.
+	SiloDomains = []string{"brid.gy", "twitter.com", "facebook.com"}
 )
 
 // IsRealImage checks the first few bytes of the provided data to see if it's a real image.

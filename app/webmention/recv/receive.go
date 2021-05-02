@@ -27,8 +27,6 @@ var (
 	errPicNoRealImage               = errors.New("Downloaded author picture is not a real image")
 	errPicUnableToSave              = errors.New("Unable to save downloaded author picture")
 	errWontDownloadBecauseOfPrivacy = errors.New("Will not save locally because it's form a silo domain")
-
-	siloDomains = []string{"brid.gy", "twitter.com"}
 )
 
 func (recv *Receiver) Receive(wm mf.Mention) {
@@ -127,10 +125,8 @@ func (recv *Receiver) parseBodyAsNonIndiewebSite(body string, wm mf.Mention) *mf
 // This refuses to download from silo sources such as brid.gy because of privacy concerns.
 func (recv *Receiver) saveAuthorPictureLocally(indieweb *mf.IndiewebData) error {
 	srcDomain := rest.Domain(indieweb.Source)
-	for _, siloDomain := range siloDomains {
-		if srcDomain == siloDomain {
-			return errWontDownloadBecauseOfPrivacy
-		}
+	if common.Includes(rest.SiloDomains, srcDomain) {
+		return errWontDownloadBecauseOfPrivacy
 	}
 
 	_, picData, err := recv.RestClient.GetBody(indieweb.Author.Picture)

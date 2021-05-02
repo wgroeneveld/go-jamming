@@ -2,7 +2,9 @@ package pictures
 
 import (
 	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/db"
+	"brainbaking.com/go-jamming/rest"
 	_ "embed"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
@@ -18,16 +20,12 @@ func init() {
 	}
 }
 
-const (
-	bridgy = "brid.gy"
-)
-
 // Handle handles picture GET calls.
 // It does not validate the picture query as it's part of a composite key anyway.
 func Handle(repo db.MentionRepo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		picDomain := mux.Vars(r)["picture"]
-		if picDomain == mf.Anonymous || picDomain == bridgy {
+		if picDomain == mf.Anonymous || common.Includes(rest.SiloDomains, picDomain) {
 			servePicture(w, anonymous)
 			return
 		}
