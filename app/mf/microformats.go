@@ -50,17 +50,24 @@ type IndiewebDataResult struct {
 }
 
 func ResultFailure(data []*IndiewebData) IndiewebDataResult {
-	return IndiewebDataResult{
+	return emptyNilData(IndiewebDataResult{
 		Status: "failure",
 		Data:   data,
-	}
+	})
 }
 
 func ResultSuccess(data []*IndiewebData) IndiewebDataResult {
-	return IndiewebDataResult{
+	return emptyNilData(IndiewebDataResult{
 		Status: "success",
 		Data:   data,
+	})
+}
+
+func emptyNilData(result IndiewebDataResult) IndiewebDataResult {
+	if result.Data == nil {
+		result.Data = make([]*IndiewebData, 0)
 	}
+	return result
 }
 
 type IndiewebData struct {

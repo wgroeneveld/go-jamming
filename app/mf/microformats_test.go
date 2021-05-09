@@ -2,11 +2,54 @@ package mf
 
 import (
 	"brainbaking.com/go-jamming/common"
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 	"willnorris.com/go/microformats"
 )
+
+func TestResultSuccessNonEmpty(t *testing.T) {
+	arr := make([]*IndiewebData, 1)
+	arr[0] = &IndiewebData{Author: IndiewebAuthor{Name: "Jaak"}}
+
+	data := ResultSuccess(arr)
+	jsonData, err := json.Marshal(data)
+	assert.NoError(t, err)
+
+	expected := `{"status":"success","json":[{"author":{"name":"Jaak","picture":""},"name":"","content":"","published":"","url":"","type":"","source":"","target":""}]}`
+	assert.Equal(t, expected, string(jsonData))
+}
+
+func TestResultSuccessEmptyEncodesAsEmptyJSONArray(t *testing.T) {
+	data := ResultSuccess(nil)
+	jsonData, err := json.Marshal(data)
+	assert.NoError(t, err)
+
+	expected := `{"status":"success","json":[]}`
+	assert.Equal(t, expected, string(jsonData))
+}
+
+func TestResultFailureNonEmpty(t *testing.T) {
+	arr := make([]*IndiewebData, 1)
+	arr[0] = &IndiewebData{Author: IndiewebAuthor{Name: "Jaak"}}
+
+	data := ResultFailure(arr)
+	jsonData, err := json.Marshal(data)
+	assert.NoError(t, err)
+
+	expected := `{"status":"failure","json":[{"author":{"name":"Jaak","picture":""},"name":"","content":"","published":"","url":"","type":"","source":"","target":""}]}`
+	assert.Equal(t, expected, string(jsonData))
+}
+
+func TestResultFailureEmptyEncodesAsEmptyJSONArray(t *testing.T) {
+	data := ResultFailure(nil)
+	jsonData, err := json.Marshal(data)
+	assert.NoError(t, err)
+
+	expected := `{"status":"failure","json":[]}`
+	assert.Equal(t, expected, string(jsonData))
+}
 
 func TestPublished(t *testing.T) {
 	cases := []struct {
