@@ -4,101 +4,36 @@ Go module `brainbaking.com/go-jamming`:
 
 > A minimalistic Go-powered jamstack-augmented microservice for webmentions etc
 
-✅️ **This is a fork of [serve-my-jams](https://github.com/wgroeneveld/serve-my-jams)**, the Node-powered original microservice, which is no longer being maintained. 
+This is a set of minimalistic Go-based microservices that aid you in your [IndieWeb](https://indieweb.org/) Jamstack coolness 😎. Currently, it handles **Webmentions** and **Pingbacks** for your statically generated website.
 
-**Are you looking for a way to DO something with this?** See https://github.com/wgroeneveld/jam-my-stack !
+Go-jamming acts as an easy drop-in replacement for [webmention.io](https://webmention.io).
 
-This is a set of minimalistic Go-based microservices that aid you in your IndieWeb Jamstack coolness 😎 (name-dropping). While [jam-my-stack](https://github.com/wgroeneveld/jam-my-stack) is a set of scripts used to run at checkin-time, this is a dymamic service that handles requests. 
-
-Inspect how it's used on https://brainbaking.com/ - usually, a `<link/>` in your `<head/>` suffices:
+Usage is very simple, a `<link/>` in your `<head/>` suffices:
 
 ```
-<link rel="webmention" href="https://jam.brainbaking.com/webmention" />
-<link rel="pingback" href="https://jam.brainbaking.com/pingback" />
+<link rel="webmention" href="https://jam.yourserver.com/webmention" />
+<link rel="pingback" href="https://jam.yourserver.com/pingback" />
 ```
 
-If you want to support the older pingback protocol, you can leverage webmenton.io's forward capabilities. Although I developed this primarily because webmention.io is _not_ reliable - you've been warned. 
+## How do I run/install this thing?
 
-## Building and running
+See [the installation guide: INSTALL.md](https://github.com/wgroeneveld/go-jamming/blob/master/INSTALL.md)!
 
-Well, that's easy!
+## Can I see it in action?
 
-1. Build: `go build`
-2. Run: `./go-jamming`
-3. ???
-4. Profit!
+Sure. These sites use it:
 
-It's very much a fire-and-forget thing. Put it behind a reverse proxy such as nginx using something like this:
+- https://brainbaking.com/
+- https://jefklakscodex.com/
+- https://redzuurdesem.be/
 
-```
-server {
-        listen 443 ssl http2;
-        listen [::]:443 ssl http2;
+They leverage the client-side [jam-my-stack](https://github.com/wgroeneveld/jam-my-stack) JS scripts which call the appropriate APIs (see below). 
 
-        server_name [your-domain];
-
-        location / {
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $remote_addr;
-                proxy_set_header Host $host;
-                proxy_pass http://127.0.0.1:[your-port];
-        }
-    ssl_certificate /etc/letsencrypt/live/[your-domain]/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/[your-domain]/privkey.pem;
-}
-```
-
-Create a very simple Linux system service that fires up the jam:
-
-```
-[Unit]
-Description=Go-Jamming
-After=network.target
-
-[Service]
-User=[myuser]
-WorkingDirectory=/var/www/gojamming
-ExecStart=/var/www/gojamming/go-jamming
-SuccessExitStatus=0
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Now install using `sudo systemctl enable/install gojamming` and you're done!
-
-## Configuration
-
-Place a `config.json` file in the same directory that looks like this: (below are the default values)
-
-```json
-{
-  "port": 1337,
-  "host": "localhost",
-  "token": "miauwkes",
-  "conString": "data/mentions.db",
-  "utcOffset": 60,
-  "allowedWebmentionSources":  [
-    "brainbaking.com",
-    "jefklakscodex.com"
-  ],
-  "blacklist":  [
-    "youtube.com"
-  ]
-}
-```
-
-- port, host: http server params
-- token, allowedWebmentionSources: see below, used for authentication
-- blacklist: blacklist domains from which we do NOT send to or accept mentions from. 
-- utcOffset: offset in minutes for date processing, starting from UTC time.
-- conString: file path to store all mentions and author avatars in a simple key/value store, based on [buntdb](https://github.com/tidwall/buntdb).
-
-If a config file is missing, or required keys are missing, a warning will be generated and default values will be used instead. See `common/config.go`.
+**How do I integrate it in Hugo/my static site**? See https://brainbaking.com/post/2021/05/beyond-webmention-io/
 
 ---
 
-## What's in it?
+## What does it do?
 
 ### 1. Webmentions
 
@@ -157,6 +92,7 @@ A few remarks:
 - `published`: This is not processed and simply taken over from the microformat.
 - `target` is your domain, `source` is... well... the source. 
 - `content`: Does not contain HTML. Automatically capped at 250 characters if needed.
+- Pictures and authors are anonymized if coming from a silo webmention server such as brid.gy to respect the author's privacy. See https://sebastiangreger.net/2018/05/indieweb-privacy-challenge-webmentions-backfeeds-gdpr/
 
 #### 1.3 `PUT /webmention/:domain/:token`
 
@@ -219,6 +155,8 @@ Will result in a `200 OK` - that returns XML according to [The W3 pingback XML-R
 
 Happens automatically through `PUT /webmention/:domain/:token`! Links that are discovered as `rel="pingback"` that **do not** already have a webmention link will be processed as XML-RPC requests to be send. 
 
+---
+
 ## Troubleshooting
 
 Run in verbose mode: use `-verbose`. This also logs debug info. Structured JSON is outputted through os.Stderr - which is usually `/var/log/syslog`. 
@@ -230,8 +168,3 @@ That's pretty flexible. I have not taken the trouble to put this into the config
 A separate goroutine cleans up ips each 2 minutes, the TTL is 5 minutes. See `limiter.go`. 
 
 Database migrations are run using the `-migrate` flag. 
-
-## TODOs
-
-- Pictures are bound to domain names only. That means `brid.gy` will net a single picture. Perhaps the combination domain + user would be more appropriate?
-
