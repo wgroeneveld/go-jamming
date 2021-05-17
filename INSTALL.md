@@ -1,5 +1,7 @@
 # Go-Jamming installation guide
 
+Back to the main [README.md](https://github.com/wgroeneveld/go-jamming/blob/master/README.md)
+
 ## 1. Installing
 
 Download the latest binary version from the [GitHub releases page](https://github.com/wgroeneveld/go-jamming/releases). This is a **single binary** and installing it is just a matter of copy-pasting it to your sever! Simply execute with `./go-jamming`. 
@@ -79,3 +81,7 @@ WantedBy=multi-user.target
 ```
 
 Now install using `sudo systemctl enable/install gojamming` and you're done!
+
+## 5. Configuring your templates
+
+Read more on how to integrate this in for example Hugo on https://brainbaking.com/post/2021/05/beyond-webmention-io/
