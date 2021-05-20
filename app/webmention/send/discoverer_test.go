@@ -3,24 +3,90 @@ package send
 import (
 	"brainbaking.com/go-jamming/mocks"
 	"brainbaking.com/go-jamming/rest"
+	"fmt"
 	"github.com/stretchr/testify/assert"
+	"net/http"
 	"strings"
 	"testing"
 )
 
-func TestDiscoverE2EWithRedirect(t *testing.T) {
+func TestDiscoverMentionEndpointE2EWithRedirect(t *testing.T) {
 	t.Skip("Skipping TestDiscoverE2EWithRedirect, webmention.rocks is slow.")
 	var sender = &Sender{
 		RestClient: &rest.HttpClient{},
 	}
 
-	link, wmType := sender.discover("https://webmention.rocks/test/23/page")
+	link, wmType := sender.discoverMentionEndpoint("https://webmention.rocks/test/23/page")
 	assert.Equal(t, typeWebmention, wmType)
 	expectedUrl := "https://webmention.rocks/test/23/page/webmention-endpoint/"
 	assert.Truef(t, strings.HasPrefix(link, expectedUrl), "should start with %s, but was %s", expectedUrl, link)
 }
 
-func TestDiscover(t *testing.T) {
+func TestDisccoverRssFeedPrefersFirstEntriesOverLater(t *testing.T) {
+	var snder = &Sender{
+		RestClient: &mocks.RestClientMock{
+			HeadFunc: func(s string) (*http.Response, error) {
+				if strings.HasSuffix(s, "/index.xml") {
+					return &http.Response{
+						Header: map[string][]string{
+							"Content-Type": {"text/xml"},
+						},
+						StatusCode: 200,
+					}, nil
+				}
+				return nil, fmt.Errorf("BOOM")
+			},
+		},
+	}
+
+	feed, err := snder.discoverRssFeed("blah.com")
+	assert.NoError(t, err)
+	assert.Equal(t, "https://blah.com/all/index.xml", feed)
+}
+
+func TestDiscoverRssFeedNoneFoundReturnsError(t *testing.T) {
+	var snder = &Sender{
+		RestClient: &mocks.RestClientMock{
+			HeadFunc: func(s string) (*http.Response, error) {
+				return nil, fmt.Errorf("BOOM")
+			},
+		},
+	}
+
+	_, err := snder.discoverRssFeed("blah.com")
+	assert.Error(t, err)
+}
+func TestDiscoverRssFeedFirstNotXmlReturnsSecondWorkingOne(t *testing.T) {
+	var snder = &Sender{
+		RestClient: &mocks.RestClientMock{
+			HeadFunc: func(s string) (*http.Response, error) {
+				if strings.HasSuffix(s, "/all/index.xml") {
+					return &http.Response{
+						Header: map[string][]string{
+							"Content-Type": {"text/html"},
+						},
+						StatusCode: 200,
+					}, nil
+				}
+				if strings.HasSuffix(s, "/feed") {
+					return &http.Response{
+						Header: map[string][]string{
+							"Content-Type": {"text/xml"},
+						},
+						StatusCode: 200,
+					}, nil
+				}
+				return nil, fmt.Errorf("BOOM")
+			},
+		},
+	}
+
+	feed, err := snder.discoverRssFeed("blah.com")
+	assert.NoError(t, err)
+	assert.Equal(t, "https://blah.com/feed", feed)
+}
+
+func TestDiscoverMentionEndpoint(t *testing.T) {
 	var sender = &Sender{
 		RestClient: &mocks.RestClientMock{
 			GetBodyFunc: mocks.RelPathGetBodyFunc("../../../mocks/"),
@@ -126,7 +192,7 @@ func TestDiscover(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.label, func(t *testing.T) {
-			link, mentionType := sender.discover(tc.url)
+			link, mentionType := sender.discoverMentionEndpoint(tc.url)
 			assert.Equal(t, tc.expectedLink, link)
 			assert.Equal(t, tc.expectedType, mentionType)
 		})

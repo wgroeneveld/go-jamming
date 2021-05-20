@@ -14,6 +14,7 @@ import (
 
 type Client interface {
 	Get(url string) (*http.Response, error)
+	Head(url string) (*http.Response, error)
 	Post(url string, contentType string, body string) error
 	GetBody(url string) (http.Header, string, error)
 	PostForm(url string, formData url.Values) error
@@ -42,12 +43,16 @@ var (
 	ResponseAboveLimit = errors.New("response bigger than limit")
 )
 
+func (client *HttpClient) Head(url string) (*http.Response, error) {
+	return jammingHttp.Head(url)
+}
+
 func (client *HttpClient) PostForm(url string, formData url.Values) error {
 	resp, err := jammingHttp.PostForm(url, formData)
 	if err != nil {
 		return fmt.Errorf("POST Form to %s: %v", url, err)
 	}
-	if !isStatusOk(resp) {
+	if !IsStatusOk(resp) {
 		return fmt.Errorf("POST Form to %s: Status code is not OK (%d)", url, resp.StatusCode)
 	}
 	return nil
@@ -58,7 +63,7 @@ func (client *HttpClient) Post(url string, contenType string, body string) error
 	if err != nil {
 		return fmt.Errorf("POST to %s: %v", url, err)
 	}
-	if !isStatusOk(resp) {
+	if !IsStatusOk(resp) {
 		return fmt.Errorf("POST to %s: Status code is not OK (%d)", url, resp.StatusCode)
 	}
 	return nil
@@ -72,7 +77,7 @@ func (client *HttpClient) GetBody(url string) (http.Header, string, error) {
 		return nil, "", fmt.Errorf("GET from %s: %w", url, geterr)
 	}
 
-	if !isStatusOk(resp) {
+	if !IsStatusOk(resp) {
 		return nil, "", fmt.Errorf("GET from %s: Status code is not OK (%d)", url, resp.StatusCode)
 	}
 
@@ -85,7 +90,7 @@ func (client *HttpClient) GetBody(url string) (http.Header, string, error) {
 	return resp.Header, string(body), nil
 }
 
-func isStatusOk(resp *http.Response) bool {
+func IsStatusOk(resp *http.Response) bool {
 	return resp.StatusCode >= 200 && resp.StatusCode <= 299
 }
 

@@ -2,6 +2,7 @@ package send
 
 import (
 	"brainbaking.com/go-jamming/rest"
+	"fmt"
 	"github.com/rs/zerolog/log"
 	"net/url"
 	"regexp"
@@ -17,9 +18,30 @@ const (
 
 var (
 	relWebmention = regexp.MustCompile(`rel="??'??webmention`)
+
+	possibleFeedEndpoints = []string{
+		"all/index.xml",
+		"index.xml",
+		"feed",
+		"feed/index.xml",
+	}
 )
 
-func (sndr *Sender) discover(target string) (link string, mentionType string) {
+func (sndr *Sender) discoverRssFeed(domain string) (string, error) {
+	for _, endpt := range possibleFeedEndpoints {
+		feedUrl := fmt.Sprintf("https://%s/%s", domain, endpt)
+		resp, err := sndr.RestClient.Head(feedUrl)
+
+		if err != nil || !rest.IsStatusOk(resp) || resp.Header.Get("Content-Type") != "text/xml" {
+			continue
+		}
+
+		return feedUrl, nil
+	}
+	return "", fmt.Errorf("Unable to discover RSS feed for domain %s", domain)
+}
+
+func (sndr *Sender) discoverMentionEndpoint(target string) (link string, mentionType string) {
 	mentionType = typeUnknown
 	header, body, err := sndr.RestClient.GetBody(target)
 	if err != nil {

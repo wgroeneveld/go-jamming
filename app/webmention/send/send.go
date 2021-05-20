@@ -44,10 +44,15 @@ func (snder *Sender) SendSingle(domain string, relSource string) {
 // It first GETs domain/index.xml and goes from there.
 func (snder *Sender) Send(domain string) {
 	lastSent := snder.Repo.LastSentMention(domain)
-	feedUrl := "https://" + domain + "/index.xml"
 
 	log.Info().Str("domain", domain).Str("lastsent", lastSent).Msg(` OK: someone wants to send mentions`)
+	feedUrl, err := snder.discoverRssFeed(domain)
+	if err != nil {
+		log.Err(err).Str("url", feedUrl).Msg("Unable to retrieve RSS feed, send aborted")
+		return
+	}
 	_, feed, err := snder.RestClient.GetBody(feedUrl)
+	// just to be sure. Should not produce an error due to check above, but you never know.
 	if err != nil {
 		log.Err(err).Str("url", feedUrl).Msg("Unable to retrieve RSS feed, send aborted")
 		return
@@ -60,7 +65,7 @@ func (snder *Sender) Send(domain string) {
 	}
 
 	snder.Repo.UpdateLastSentMention(domain, lastSent)
-	log.Info().Str("domain", domain).Str("lastsent", lastSent).Msg(` OK: send processed.`)
+	log.Info().Str("feed", feedUrl).Str("lastsent", lastSent).Msg(` OK: send processed.`)
 }
 
 func (snder *Sender) parseRssFeed(feed string, lastSentLink string) (string, error) {
@@ -106,7 +111,7 @@ var mentionFuncs = map[string]func(snder *Sender, mention mf.Mention, endpoint s
 }
 
 func (snder *Sender) sendMention(mention mf.Mention) {
-	endpoint, mentionType := snder.discover(mention.Target)
+	endpoint, mentionType := snder.discoverMentionEndpoint(mention.Target)
 	mentionFuncs[mentionType](snder, mention, endpoint)
 }
 

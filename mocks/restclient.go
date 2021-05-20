@@ -12,15 +12,19 @@ import (
 
 // neat trick! https://medium.com/@matryer/meet-moq-easily-mock-interfaces-in-go-476444187d10
 type RestClientMock struct {
+	HeadFunc     func(string) (*http.Response, error)
 	GetFunc      func(string) (*http.Response, error)
 	GetBodyFunc  func(string) (http.Header, string, error)
 	PostFunc     func(string, string, string) error
 	PostFormFunc func(string, url.Values) error
 }
 
-// although these are still requied to match the rest.Client interface.
+// although these are still required to match the rest.Client interface.
 func (m *RestClientMock) Get(url string) (*http.Response, error) {
 	return m.GetFunc(url)
+}
+func (m *RestClientMock) Head(url string) (*http.Response, error) {
+	return m.HeadFunc(url)
 }
 func (m *RestClientMock) GetBody(url string) (http.Header, string, error) {
 	return m.GetBodyFunc(url)
@@ -43,6 +47,17 @@ func toHttpHeader(header map[string]interface{}) http.Header {
 		httpHeader.Add(key, value.(string))
 	}
 	return httpHeader
+}
+
+func Head200ContentXml() func(string) (*http.Response, error) {
+	return func(s string) (*http.Response, error) {
+		return &http.Response{
+			Header: map[string][]string{
+				"Content-Type": {"text/xml"},
+			},
+			StatusCode: 200,
+		}, nil
+	}
 }
 
 func RelPathGetBodyFunc(relPath string) func(string) (http.Header, string, error) {

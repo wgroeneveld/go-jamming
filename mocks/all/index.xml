@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Brain Baking</title>
+    <link>https://brainbaking.com/</link>
+    <description>Recent content on Brain Baking</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>Wouter Groeneveld</managingEditor>
+    <webMaster>Wouter Groeneveld</webMaster>
+    <lastBuildDate>Tue, 16 Mar 2021 17:07:14 +0000</lastBuildDate>
+    
+  <atom:link href="https://brainbaking.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>@celia @kev I have read both you and Kev&#39;s post on...</title>
+      <link>https://brainbaking.com/notes/2021/03/16h17m07s14/</link>
+      <comments>https://brainbaking.com/notes/2021/03/16h17m07s14/#commento</comments>
+      <pubDate>Tue, 16 Mar 2021 17:07:14 +0000</pubDate>
+      <author>Wouter Groeneveld</author>
+      <guid isPermaLink="true">https://brainbaking.com/notes/2021/03/16h17m07s14/</guid>
+      
+
+      
+      <description>
+          <![CDATA[ 
+          
+          <p>hi there! test discovering: <a href="https://brainbaking.com/link-discover-test-single.html">single</a>. Nice!</p>
+
+          <p>this one is a pingback-only <a href="https://brainbaking.com/pingback-discover-test-single.html">single</a> one. Not good!</p>
+
+          <p>another cool link: <a href="https://brainbaking.com/link-discover-test-multiple.html">multiple</a></p>
+
+          <p>last but not least: <a href="https://brainbaking.com/link-discover-test-none.html">Nothin!</a> What a shame.</p>
+          
+          ]]>
+      </description>
+    </item>
+  </channel>
+</rss>

@@ -117,6 +117,19 @@ This means if you made changes in-between, and they appear in the RSS feed as re
 
 No. The server will automatically store the latest push, and if it's called again, it will not send out anything if nothing more recent was found in your RSS feed based on the last published link. Providing the parameter merely lets you override the behavior.
 
+**Which RSS feed will it use?**
+
+It will attempt to auto-discover them with a HEAD call, in the following order:
+
+1. `/all/index.xml`
+2. `/index.xml`
+3. `/feed`
+4. `/feed/index.xml`
+
+If none provied a status of 200 with content-type `application/xml`, it will abort and log an error. 
+
+Note that this _requires your site to be on HTTPS_!! 
+
 #### 1.4 `DELETE /webmention/:domain/:token?source=x&target=y`
 
 Deletes a webmention or logs a warning if no relevant mention found. 
