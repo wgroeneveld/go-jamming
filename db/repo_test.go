@@ -32,6 +32,34 @@ func TestSaveAndGetPicture(t *testing.T) {
 	assert.Equal(t, data, picDataAfterSave)
 }
 
+func TestCleanupSpam(t *testing.T) {
+	db := NewMentionRepo(conf)
+	db.Save(mf.Mention{
+		Source: "https://naar.hier/jup",
+		Target: "https://pussycat.com/coolpussy.html",
+	}, &mf.IndiewebData{
+		Name:   "lolz",
+		Target: "https://pussycat.com/coolpussy.html",
+		Source: "https://naar.hier/jup",
+		Url:    "https://naar.hier",
+	})
+	db.Save(mf.Mention{
+		Source: "https://spam.be/malicious",
+		Target: "https://pussycat.com/dinges",
+	}, &mf.IndiewebData{
+		Name:   "kapot",
+		Target: "https://pussycat.com/dinges",
+		Source: "https://spam.be/malicious",
+		Url:    "https://spam.be",
+	})
+
+	db.CleanupSpam("pussycat.com", []string{"spam.be", "jaak.com"})
+
+	results := db.GetAll("pussycat.com")
+	assert.Equal(t, 1, len(results.Data))
+	assert.Equal(t, "lolz", results.Data[0].Name)
+}
+
 func TestDelete(t *testing.T) {
 	db := NewMentionRepo(conf)
 	wm := mf.Mention{

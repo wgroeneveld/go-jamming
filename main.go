@@ -1,6 +1,7 @@
 package main
 
 import (
+	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/db"
 	"flag"
 	"os"
@@ -16,11 +17,13 @@ func main() {
 
 	verboseFlag := flag.Bool("verbose", false, "Verbose mode (pretty print log, debug level)")
 	migrateFlag := flag.Bool("migrate", false, "Run migration scripts for the DB and exit.")
+	blacklist := flag.String("blacklist", "", "Blacklist a domain name (also cleans spam from DB)")
 	flag.Parse()
+	blacklisting := len(*blacklist) > 1
 
 	// logs by default to Stderr (/var/log/syslog). Rolling files possible via lumberjack.
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	if *verboseFlag || *migrateFlag {
+	if *verboseFlag || *migrateFlag || blacklisting {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
@@ -30,8 +33,27 @@ func main() {
 		os.Exit(0)
 	}
 
+	if blacklisting {
+		blacklistDomain(*blacklist)
+		os.Exit(0)
+	}
+
 	log.Debug().Msg("Let's a go!")
 	app.Start()
+}
+
+func blacklistDomain(domain string) {
+	log.Info().Str("domain", domain).Msg("Blacklisting...")
+	config := common.Configure()
+	config.AddToBlacklist(domain)
+	config.Save()
+
+	repo := db.NewMentionRepo(config)
+	for _, domain := range config.AllowedWebmentionSources {
+		repo.CleanupSpam(domain, config.Blacklist)
+	}
+
+	log.Info().Msg("Blacklist done, exiting.")
 }
 
 func migrate() {

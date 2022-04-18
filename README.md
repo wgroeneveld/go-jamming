@@ -181,3 +181,18 @@ That's pretty flexible. I have not taken the trouble to put this into the config
 A separate goroutine cleans up ips each 2 minutes, the TTL is 5 minutes. See `limiter.go`. 
 
 Database migrations are run using the `-migrate` flag. 
+
+---
+
+## Fighting spam
+
+Since Go-jamming still supports Pingbacks, spam could be an issue. However, if the URL doesn't contain a genuine link, the mention will be immediately dropped.
+
+Still, spammers always find a way and sometimes even create fake blog posts with real links to your blog. In that case, simply add the domain to the `blacklist` in `config.json`.
+
+Adding this **manually** will not remove existing spam in your DB! The `-blacklist` flag is there to:
+
+1. Automatically add it to the `blacklist` array in the config file;
+2. Automatically search the DB for all allowed domains for spam from the blacklist and remove it. (Check for string match on the URL)
+
+How to use: `./go-jamming -blacklist annoyingspam.com`. This will exit after the above actions. Then you can simply restart the server with `./go-jamming`.

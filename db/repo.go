@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"github.com/tidwall/buntdb"
+	"strings"
 )
 
 type MentionRepoBunt struct {
@@ -19,11 +20,23 @@ type MentionRepo interface {
 	Save(key mf.Mention, data *mf.IndiewebData) (string, error)
 	SavePicture(bytes string, domain string) (string, error)
 	Delete(key mf.Mention)
+	CleanupSpam(domain string, blacklist []string)
 	LastSentMention(domain string) string
 	UpdateLastSentMention(domain string, lastSent string)
 	Get(key mf.Mention) *mf.IndiewebData
 	GetPicture(domain string) []byte
 	GetAll(domain string) mf.IndiewebDataResult
+}
+
+// CleanupSpam removes potential blacklisted spam from the webmention database by checking the url of each entry.
+func (r *MentionRepoBunt) CleanupSpam(domain string, blacklist []string) {
+	for _, mention := range r.GetAll(domain).Data {
+		for _, blacklisted := range blacklist {
+			if strings.Contains(mention.Url, blacklisted) {
+				r.Delete(mention.AsMention())
+			}
+		}
+	}
 }
 
 // UpdateLastSentMention updates the last sent mention link. Logs but ignores errors.
@@ -65,6 +78,8 @@ func (r *MentionRepoBunt) Delete(wm mf.Mention) {
 	})
 	if err != nil {
 		log.Warn().Err(err).Str("key", key).Stringer("wm", wm).Msg("Unable to delete")
+	} else {
+		log.Debug().Str("key", key).Stringer("wm", wm).Msg("Deleted.")
 	}
 }
 

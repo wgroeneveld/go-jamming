@@ -2,8 +2,81 @@ package common
 
 import (
 	"github.com/stretchr/testify/assert"
+	"io/fs"
+	"io/ioutil"
+	"os"
 	"testing"
 )
+
+func TestReadFromJsonMalformedReversToDefaults(t *testing.T) {
+	err := ioutil.WriteFile("config.json", []byte("dinges"), fs.ModePerm)
+	if err != nil {
+		assert.Failf(t, "Error writing test config.json: %s", err.Error())
+	}
+
+	config := Configure()
+	assert.Contains(t, config.AllowedWebmentionSources, "brainbaking.com")
+	os.Remove("config.json")
+}
+
+func TestReadFromJsonWithCorrectJsonData(t *testing.T) {
+	confString := `{
+		  "port": 1337,
+		  "host": "localhost",
+		  "token": "miauwkes",
+		  "conString": "mentions.db",
+		  "utcOffset": 60,
+		  "allowedWebmentionSources":  [
+			"snoopy.be"
+		  ],
+		  "blacklist":  [
+			"youtube.com"
+		  ]
+		}`
+	err := ioutil.WriteFile("config.json", []byte(confString), fs.ModePerm)
+	if err != nil {
+		assert.Failf(t, "Error writing test config.json: %s", err.Error())
+	}
+
+	config := Configure()
+	assert.Contains(t, config.AllowedWebmentionSources, "snoopy.be")
+	assert.Equal(t, 1, len(config.AllowedWebmentionSources))
+	os.Remove("config.json")
+}
+
+func TestSaveAfterAddingANewBlacklistEntry(t *testing.T) {
+	config := Configure()
+	config.AddToBlacklist("somethingnew.be")
+	config.Save()
+
+	newConfig := Configure()
+	assert.Contains(t, newConfig.Blacklist, "somethingnew.be")
+	os.Remove("config.json")
+}
+
+func TestAddToBlacklistNotYetAddsToList(t *testing.T) {
+	conf := Config{
+		Blacklist: []string{
+			"youtube.com",
+		},
+	}
+
+	conf.AddToBlacklist("dinges.be")
+	assert.Contains(t, conf.Blacklist, "dinges.be")
+	assert.Equal(t, 2, len(conf.Blacklist))
+}
+
+func TestAddToBlacklistAlreadyAddedDoNotAddAgain(t *testing.T) {
+	conf := Config{
+		Blacklist: []string{
+			"youtube.com",
+		},
+	}
+
+	conf.AddToBlacklist("youtube.com")
+	assert.Contains(t, conf.Blacklist, "youtube.com")
+	assert.Equal(t, 1, len(conf.Blacklist))
+}
 
 func TestIsBlacklisted(t *testing.T) {
 	cases := []struct {

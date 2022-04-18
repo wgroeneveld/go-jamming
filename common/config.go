@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/rs/zerolog/log"
+	"io/fs"
 	"io/ioutil"
 	"strings"
 	"time"
@@ -68,6 +69,24 @@ func Configure() *Config {
 		log.Info().Str("allowedDomain", domain).Msg("Configured")
 	}
 	return c
+}
+
+func (c *Config) AddToBlacklist(domain string) {
+	for _, d := range c.Blacklist {
+		if d == domain {
+			return
+		}
+	}
+
+	c.Blacklist = append(c.Blacklist, domain)
+}
+
+func (c *Config) Save() {
+	bytes, _ := json.Marshal(c) // we assume a correct internral state here
+	err := ioutil.WriteFile("config.json", bytes, fs.ModePerm)
+	if err != nil {
+		log.Err(err).Msg("Unable to save config.json to disk!")
+	}
 }
 
 func config() *Config {
