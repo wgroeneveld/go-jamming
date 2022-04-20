@@ -4,6 +4,7 @@ import (
 	"brainbaking.com/go-jamming/rest"
 	"fmt"
 	"github.com/rs/zerolog/log"
+	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
@@ -25,14 +26,32 @@ var (
 		"feed",
 		"feed/index.xml",
 	}
+
+	possibleContentTypes = []string{
+		"application/rss+xml",
+		"application/atom+xml",
+		"application/xml",
+		"text/xml",
+		"application/rdf+xml",
+	}
 )
+
+func isContentTypeFeedCompatible(header http.Header) bool {
+	cType := header.Get("Content-Type")
+	for _, possibleType := range possibleContentTypes {
+		if strings.Contains(cType, possibleType) {
+			return true
+		}
+	}
+	return false
+}
 
 func (sndr *Sender) discoverRssFeed(domain string) (string, error) {
 	for _, endpt := range possibleFeedEndpoints {
 		feedUrl := fmt.Sprintf("https://%s/%s", domain, endpt)
 		resp, err := sndr.RestClient.Head(feedUrl)
 
-		if err != nil || !rest.IsStatusOk(resp) || resp.Header.Get("Content-Type") != "text/xml" {
+		if err != nil || !rest.IsStatusOk(resp) || !isContentTypeFeedCompatible(resp.Header) {
 			continue
 		}
 

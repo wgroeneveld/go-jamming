@@ -10,6 +10,17 @@ import (
 	"testing"
 )
 
+func TestDiscoverRssFeedE2EBrainbaking(t *testing.T) {
+	var sender = &Sender{
+		RestClient: &rest.HttpClient{},
+	}
+
+	link, err := sender.discoverRssFeed("brainbaking.com")
+	expectedUrl := "https://brainbaking.com/index.xml"
+	assert.Nil(t, err)
+	assert.Truef(t, strings.HasPrefix(link, expectedUrl), "should start with %s, but was %s", expectedUrl, link)
+}
+
 func TestDiscoverMentionEndpointE2EWithRedirect(t *testing.T) {
 	t.Skip("Skipping TestDiscoverE2EWithRedirect, webmention.rocks is slow.")
 	var sender = &Sender{

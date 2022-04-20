@@ -16,3 +16,4 @@ go-jamming
 vangen
 
 *.sublime-workspace
+.idea/*
