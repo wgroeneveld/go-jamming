@@ -26,24 +26,10 @@ var (
 		"feed",
 		"feed/index.xml",
 	}
-
-	possibleContentTypes = []string{
-		"application/rss+xml",
-		"application/atom+xml",
-		"application/xml",
-		"text/xml",
-		"application/rdf+xml",
-	}
 )
 
 func isContentTypeFeedCompatible(header http.Header) bool {
-	cType := header.Get("Content-Type")
-	for _, possibleType := range possibleContentTypes {
-		if strings.Contains(cType, possibleType) {
-			return true
-		}
-	}
-	return false
+	return strings.Contains(header.Get("Content-Type"), "xml")
 }
 
 func (sndr *Sender) discoverRssFeed(domain string) (string, error) {
