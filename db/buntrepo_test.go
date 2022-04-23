@@ -2,7 +2,6 @@ package db
 
 import (
 	"brainbaking.com/go-jamming/app/mf"
-	"brainbaking.com/go-jamming/common"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -10,20 +9,13 @@ import (
 	"testing"
 )
 
-var (
-	conf = &common.Config{
-		ConString: ":memory:",
-		AllowedWebmentionSources: []string{
-			"pussycat.com",
-		},
-	}
-)
-
 func TestSaveAndGetPicture(t *testing.T) {
 	data, err := ioutil.ReadFile("../mocks/picture.jpg")
 	assert.NoError(t, err)
 
-	db := NewMentionRepo(conf)
+	db := newMentionRepoBunt(":memory:", []string{
+		"pussycat.com",
+	})
 	key, dberr := db.SavePicture(string(data), "bloeberig.be")
 	assert.NoError(t, dberr)
 	assert.Equal(t, "bloeberig.be:picture", key)
@@ -33,7 +25,9 @@ func TestSaveAndGetPicture(t *testing.T) {
 }
 
 func TestCleanupSpam(t *testing.T) {
-	db := NewMentionRepo(conf)
+	db := newMentionRepoBunt(":memory:", []string{
+		"pussycat.com",
+	})
 	db.Save(mf.Mention{
 		Source: "https://naar.hier/jup",
 		Target: "https://pussycat.com/coolpussy.html",
@@ -61,7 +55,9 @@ func TestCleanupSpam(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	db := NewMentionRepo(conf)
+	db := newMentionRepoBunt(":memory:", []string{
+		"pussycat.com",
+	})
 	wm := mf.Mention{
 		Target: "https://pussycat.com/coolpussy.html",
 	}
@@ -75,7 +71,9 @@ func TestDelete(t *testing.T) {
 }
 
 func TestUpdateLastSentMention(t *testing.T) {
-	db := NewMentionRepo(conf)
+	db := newMentionRepoBunt(":memory:", []string{
+		"pussycat.com",
+	})
 
 	db.UpdateLastSentMention("pussycat.com", "https://last.sent")
 	last := db.LastSentMention("pussycat.com")
@@ -84,7 +82,9 @@ func TestUpdateLastSentMention(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	db := NewMentionRepo(conf)
+	db := newMentionRepoBunt(":memory:", []string{
+		"pussycat.com",
+	})
 	wm := mf.Mention{
 		Target: "https://pussycat.com/coolpussy.html",
 	}
@@ -97,12 +97,11 @@ func TestGet(t *testing.T) {
 }
 
 func BenchmarkMentionRepoBunt_GetAll(b *testing.B) {
-	defer os.Remove("test.db")
-	db := NewMentionRepo(&common.Config{
-		ConString: "test.db",
-		AllowedWebmentionSources: []string{
-			"pussycat.com",
-		},
+	b.Cleanup(func() {
+		os.Remove("test.db")
+	})
+	db := newMentionRepoBunt("test.db", []string{
+		"pussycat.com",
 	})
 
 	items := 10000
@@ -127,7 +126,9 @@ func BenchmarkMentionRepoBunt_GetAll(b *testing.B) {
 }
 
 func TestGetAllAndSaveSomeJson(t *testing.T) {
-	db := NewMentionRepo(conf)
+	db := newMentionRepoBunt(":memory:", []string{
+		"pussycat.com",
+	})
 	db.Save(mf.Mention{
 		Target: "https://pussycat.com/coolpussy.html",
 	}, &mf.IndiewebData{
@@ -140,7 +141,9 @@ func TestGetAllAndSaveSomeJson(t *testing.T) {
 }
 
 func TestGetFiltersBasedOnDomain(t *testing.T) {
-	db := NewMentionRepo(conf)
+	db := newMentionRepoBunt(":memory:", []string{
+		"pussycat.com",
+	})
 	db.Save(mf.Mention{
 		Target: "https://pussycat.com/coolpussy.html",
 	}, &mf.IndiewebData{

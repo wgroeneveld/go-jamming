@@ -27,7 +27,6 @@ var (
 )
 
 func init() {
-	cnf.ConString = ":memory:"
 	repo = db.NewMentionRepo(cnf)
 }
 

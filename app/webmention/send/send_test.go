@@ -15,7 +15,6 @@ import (
 )
 
 var conf = &common.Config{
-	ConString: ":memory:",
 	AllowedWebmentionSources: []string{
 		"domain",
 	},
@@ -135,6 +134,7 @@ func TestSendMentionIntegrationStressTest(t *testing.T) {
 func TestSendIntegrationTestCanSendBothWebmentionsAndPingbacks(t *testing.T) {
 	posted := map[string]interface{}{}
 	var lock = sync.Mutex{}
+	t.Cleanup(db.Purge)
 
 	snder := Sender{
 		Conf: conf,

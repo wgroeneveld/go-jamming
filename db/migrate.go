@@ -10,5 +10,6 @@ func Migrate() {
 	repo := NewMentionRepo(cnf)
 
 	// no migrations needed anymore/yet
-	repo.db.Shrink()
+	repo.approvedRepo.db.Shrink()
+	repo.toApproveRepo.db.Shrink()
 }

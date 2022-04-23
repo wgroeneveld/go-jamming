@@ -8,15 +8,16 @@ import (
 	"testing"
 )
 
+func cleanupConfig() {
+	os.Remove("config.json")
+}
+
 func TestReadFromJsonMalformedReversToDefaults(t *testing.T) {
-	err := ioutil.WriteFile("config.json", []byte("dinges"), fs.ModePerm)
-	if err != nil {
-		assert.Failf(t, "Error writing test config.json: %s", err.Error())
-	}
+	ioutil.WriteFile("config.json", []byte("dinges"), fs.ModePerm)
+	t.Cleanup(cleanupConfig)
 
 	config := Configure()
 	assert.Contains(t, config.AllowedWebmentionSources, "brainbaking.com")
-	os.Remove("config.json")
 }
 
 func TestReadFromJsonWithCorrectJsonData(t *testing.T) {
@@ -24,7 +25,6 @@ func TestReadFromJsonWithCorrectJsonData(t *testing.T) {
 		  "port": 1337,
 		  "host": "localhost",
 		  "token": "miauwkes",
-		  "conString": "mentions.db",
 		  "utcOffset": 60,
 		  "allowedWebmentionSources":  [
 			"snoopy.be"
@@ -33,25 +33,23 @@ func TestReadFromJsonWithCorrectJsonData(t *testing.T) {
 			"youtube.com"
 		  ]
 		}`
-	err := ioutil.WriteFile("config.json", []byte(confString), fs.ModePerm)
-	if err != nil {
-		assert.Failf(t, "Error writing test config.json: %s", err.Error())
-	}
+	ioutil.WriteFile("config.json", []byte(confString), fs.ModePerm)
+	t.Cleanup(cleanupConfig)
 
 	config := Configure()
 	assert.Contains(t, config.AllowedWebmentionSources, "snoopy.be")
 	assert.Equal(t, 1, len(config.AllowedWebmentionSources))
-	os.Remove("config.json")
 }
 
 func TestSaveAfterAddingANewBlacklistEntry(t *testing.T) {
+	t.Cleanup(cleanupConfig)
+
 	config := Configure()
 	config.AddToBlacklist("somethingnew.be")
 	config.Save()
 
 	newConfig := Configure()
 	assert.Contains(t, newConfig.Blacklist, "somethingnew.be")
-	os.Remove("config.json")
 }
 
 func TestAddToBlacklistNotYetAddsToList(t *testing.T) {

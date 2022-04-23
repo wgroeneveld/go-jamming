@@ -19,7 +19,6 @@ Place a `config.json` file in the same directory that looks like this: (below ar
   "port": 1337,
   "host": "localhost",
   "token": "miauwkes",
-  "conString": "mentions.db",
   "utcOffset": 60,
   "allowedWebmentionSources":  [
     "brainbaking.com",
@@ -35,9 +34,16 @@ Place a `config.json` file in the same directory that looks like this: (below ar
 - token, allowedWebmentionSources: see below, used for authentication
 - blacklist: blacklist domains from which we do NOT send to or accept mentions from. 
 - utcOffset: offset in minutes for date processing, starting from UTC time.
-- conString: file path to store all mentions and author avatars in a simple key/value store, based on [buntdb](https://github.com/tidwall/buntdb). If the file does not exist yet, it will simply be created.
 
 If a config file is missing, or required keys are missing, a warning will be generated and default values will be used instead. See `common/config.go`.
+
+To keep things simple, the file path to store all mentions and author avatars in a simple key/value store is hardcoded and set to:
+
+- mentions.db (in working dir) for approved mentions
+- mentions_toapprove.db (in working dir) for mentions in moderation.
+
+The database is based on [buntdb](https://github.com/tidwall/buntdb). If the files do not exist, they will simply be created.
+
 
 ## 3. Reverse proxy
 

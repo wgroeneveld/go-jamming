@@ -21,7 +21,6 @@ var conf = &common.Config{
 		"jefklakscodex.com",
 		"brainbaking.com",
 	},
-	ConString: ":memory:",
 	Blacklist: []string{
 		"blacklisted.com",
 	},
@@ -60,6 +59,7 @@ func TestSaveAuthorPictureLocally(t *testing.T) {
 		},
 	}
 
+	t.Cleanup(db.Purge)
 	for _, tc := range cases {
 		t.Run(tc.label, func(t *testing.T) {
 			repo := db.NewMentionRepo(conf)
@@ -207,6 +207,7 @@ func TestReceive(t *testing.T) {
 
 func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testing.T) {
 	repo := db.NewMentionRepo(conf)
+	t.Cleanup(db.Purge)
 
 	wm := mf.Mention{
 		Source: "https://brainbaking.com",
@@ -239,6 +240,7 @@ func TestReceiveFromBlacklistedDomainDoesNothing(t *testing.T) {
 	}
 
 	repo := db.NewMentionRepo(conf)
+	t.Cleanup(db.Purge)
 	receiver := &Receiver{
 		Conf: conf,
 		Repo: repo,
@@ -255,6 +257,7 @@ func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {
 	}
 
 	repo := db.NewMentionRepo(conf)
+	t.Cleanup(db.Purge)
 	receiver := &Receiver{
 		Conf: conf,
 		Repo: repo,
@@ -273,6 +276,7 @@ func TestProcessSourceBodyAnonymizesBothAuthorPictureAndNameIfComingFromSilo(t *
 		Target: "https://brainbaking.com/",
 	}
 	repo := db.NewMentionRepo(conf)
+	t.Cleanup(db.Purge)
 	recv := &Receiver{
 		Conf: conf,
 		Repo: repo,
@@ -294,6 +298,7 @@ func TestProcessSourceBodyAbortsIfNoMentionOfTargetFoundInSourceHtml(t *testing.
 		Target: "https://jefklakscodex.com/articles",
 	}
 	repo := db.NewMentionRepo(conf)
+	t.Cleanup(db.Purge)
 	recv := &Receiver{
 		Conf: conf,
 		Repo: repo,

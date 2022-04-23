@@ -4,7 +4,6 @@ package db
 
 import (
 	"brainbaking.com/go-jamming/app/mf"
-	"brainbaking.com/go-jamming/common"
 	"encoding/json"
 	"fmt"
 	"github.com/rs/zerolog/log"
@@ -12,24 +11,12 @@ import (
 	"strings"
 )
 
-type MentionRepoBunt struct {
+type mentionRepoBunt struct {
 	db *buntdb.DB
 }
 
-type MentionRepo interface {
-	Save(key mf.Mention, data *mf.IndiewebData) (string, error)
-	SavePicture(bytes string, domain string) (string, error)
-	Delete(key mf.Mention)
-	CleanupSpam(domain string, blacklist []string)
-	LastSentMention(domain string) string
-	UpdateLastSentMention(domain string, lastSent string)
-	Get(key mf.Mention) *mf.IndiewebData
-	GetPicture(domain string) []byte
-	GetAll(domain string) mf.IndiewebDataResult
-}
-
 // CleanupSpam removes potential blacklisted spam from the webmention database by checking the url of each entry.
-func (r *MentionRepoBunt) CleanupSpam(domain string, blacklist []string) {
+func (r *mentionRepoBunt) CleanupSpam(domain string, blacklist []string) {
 	for _, mention := range r.GetAll(domain).Data {
 		for _, blacklisted := range blacklist {
 			if strings.Contains(mention.Url, blacklisted) {
@@ -40,7 +27,7 @@ func (r *MentionRepoBunt) CleanupSpam(domain string, blacklist []string) {
 }
 
 // UpdateLastSentMention updates the last sent mention link. Logs but ignores errors.
-func (r *MentionRepoBunt) UpdateLastSentMention(domain string, lastSentMentionLink string) {
+func (r *mentionRepoBunt) UpdateLastSentMention(domain string, lastSentMentionLink string) {
 	err := r.db.Update(func(tx *buntdb.Tx) error {
 		_, _, err := tx.Set(lastSentKey(domain), lastSentMentionLink, nil)
 		return err
@@ -51,7 +38,7 @@ func (r *MentionRepoBunt) UpdateLastSentMention(domain string, lastSentMentionLi
 }
 
 // LastSentMention fetches the last known RSS link where mentions were sent, or an empty string if an error occured.
-func (r *MentionRepoBunt) LastSentMention(domain string) string {
+func (r *mentionRepoBunt) LastSentMention(domain string) string {
 	var lastSent string
 	err := r.db.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(lastSentKey(domain))
@@ -70,7 +57,7 @@ func lastSentKey(domain string) string {
 }
 
 // Delete removes a possibly present mention by key. Ignores but logs possible errors.
-func (r *MentionRepoBunt) Delete(wm mf.Mention) {
+func (r *mentionRepoBunt) Delete(wm mf.Mention) {
 	key := r.mentionToKey(wm)
 	err := r.db.Update(func(tx *buntdb.Tx) error {
 		_, err := tx.Delete(key)
@@ -83,7 +70,7 @@ func (r *MentionRepoBunt) Delete(wm mf.Mention) {
 	}
 }
 
-func (r *MentionRepoBunt) SavePicture(bytes string, domain string) (string, error) {
+func (r *mentionRepoBunt) SavePicture(bytes string, domain string) (string, error) {
 	key := pictureKey(domain)
 	err := r.db.Update(func(tx *buntdb.Tx) error {
 		_, _, err := tx.Set(key, bytes, nil)
@@ -100,7 +87,7 @@ func pictureKey(domain string) string {
 }
 
 // Save saves the mention by marshalling data. Returns the key or a marshal/persist error.
-func (r *MentionRepoBunt) Save(wm mf.Mention, data *mf.IndiewebData) (string, error) {
+func (r *mentionRepoBunt) Save(wm mf.Mention, data *mf.IndiewebData) (string, error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return "", err
@@ -116,13 +103,13 @@ func (r *MentionRepoBunt) Save(wm mf.Mention, data *mf.IndiewebData) (string, er
 	return key, nil
 }
 
-func (r *MentionRepoBunt) mentionToKey(wm mf.Mention) string {
+func (r *mentionRepoBunt) mentionToKey(wm mf.Mention) string {
 	return fmt.Sprintf("%s:%s", wm.Key(), wm.Domain())
 }
 
 // Get returns a single unmarshalled json value based on the mention key.
 // It returns the unmarshalled result or nil if something went wrong.
-func (r *MentionRepoBunt) Get(wm mf.Mention) *mf.IndiewebData {
+func (r *mentionRepoBunt) Get(wm mf.Mention) *mf.IndiewebData {
 	var data mf.IndiewebData
 	key := r.mentionToKey(wm)
 	err := r.db.View(func(tx *buntdb.Tx) error {
@@ -143,7 +130,7 @@ func (r *MentionRepoBunt) Get(wm mf.Mention) *mf.IndiewebData {
 	return &data
 }
 
-func (r *MentionRepoBunt) GetPicture(domain string) []byte {
+func (r *mentionRepoBunt) GetPicture(domain string) []byte {
 	var data []byte
 	key := pictureKey(domain)
 	err := r.db.View(func(tx *buntdb.Tx) error {
@@ -164,7 +151,7 @@ func (r *MentionRepoBunt) GetPicture(domain string) []byte {
 // GetAll returns a wrapped data result for all mentions for a particular domain.
 // Intentionally ignores marshal errors, db should be consistent!
 // Warning, this will potentially marshall 10k strings! See benchmark test.
-func (r *MentionRepoBunt) GetAll(domain string) mf.IndiewebDataResult {
+func (r *mentionRepoBunt) GetAll(domain string) mf.IndiewebDataResult {
 	var data []*mf.IndiewebData
 	err := r.db.View(func(tx *buntdb.Tx) error {
 		return tx.Ascend(domain, func(key, value string) bool {
@@ -182,20 +169,20 @@ func (r *MentionRepoBunt) GetAll(domain string) mf.IndiewebDataResult {
 	return mf.ResultSuccess(data)
 }
 
-// NewMentionRepo opens a database connection using default buntdb settings.
+// NewMentionRepoBunt opens a database connection using default buntdb settings.
 // It also creates necessary indexes based on the passed domain config.
 // This panics if it cannot open the db.
-func NewMentionRepo(c *common.Config) *MentionRepoBunt {
-	repo := &MentionRepoBunt{}
-	db, err := buntdb.Open(c.ConString)
+func newMentionRepoBunt(conString string, allowedWebmentionSources []string) *mentionRepoBunt {
+	approvedRepo := &mentionRepoBunt{}
+	db, err := buntdb.Open(conString)
 	if err != nil {
-		log.Fatal().Str("constr", c.ConString).Msg("new mention repo: cannot open db")
+		log.Fatal().Str("constr", conString).Msg("new mention repo: cannot open db")
 	}
-	repo.db = db
+	approvedRepo.db = db
 
-	for _, domain := range c.AllowedWebmentionSources {
+	for _, domain := range allowedWebmentionSources {
 		db.CreateIndex(domain, fmt.Sprintf("*:%s", domain), buntdb.IndexString)
 	}
 
-	return repo
+	return approvedRepo
 }
