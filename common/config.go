@@ -12,6 +12,8 @@ import (
 )
 
 type Config struct {
+	// BaseURL should end with a / and is used to build URLs in notifications
+	BaseURL                  string   `json:"baseURL"`
 	Port                     int      `json:"port"`
 	Token                    string   `json:"token"`
 	UtcOffset                int      `json:"utcOffset"`
@@ -48,6 +50,9 @@ func (c *Config) missingKeys() []string {
 	}
 	if c.Token == "" {
 		keys = append(keys, "token")
+	}
+	if c.BaseURL == "" {
+		keys = append(keys, "baseURL")
 	}
 	if len(c.AllowedWebmentionSources) == 0 {
 		keys = append(keys, "allowedWebmentionSources")
@@ -128,7 +133,8 @@ func config() *Config {
 }
 
 func defaultConfig() *Config {
-	return &Config{
+	defaultConfig := &Config{
+		BaseURL:                  "https://jam.brainbaking.com/",
 		Port:                     1337,
 		Token:                    "miauwkes",
 		UtcOffset:                60,
@@ -136,4 +142,6 @@ func defaultConfig() *Config {
 		Blacklist:                []string{"youtube.com"},
 		Whitelist:                []string{"brainbaking.com"},
 	}
+	defaultConfig.Save()
+	return defaultConfig
 }

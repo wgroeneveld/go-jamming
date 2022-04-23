@@ -58,15 +58,18 @@ func lastSentKey(domain string) string {
 
 // Delete removes a possibly present mention by key. Ignores but logs possible errors.
 func (r *mentionRepoBunt) Delete(wm mf.Mention) {
-	key := r.mentionToKey(wm)
+	r.deleteByKey(wm.Key())
+}
+
+func (r *mentionRepoBunt) deleteByKey(key string) {
 	err := r.db.Update(func(tx *buntdb.Tx) error {
 		_, err := tx.Delete(key)
 		return err
 	})
 	if err != nil {
-		log.Warn().Err(err).Str("key", key).Stringer("wm", wm).Msg("Unable to delete")
+		log.Warn().Err(err).Str("key", key).Msg("Unable to delete")
 	} else {
-		log.Debug().Str("key", key).Stringer("wm", wm).Msg("Deleted.")
+		log.Debug().Str("key", key).Msg("Deleted.")
 	}
 }
 
@@ -88,11 +91,14 @@ func pictureKey(domain string) string {
 
 // Save saves the mention by marshalling data. Returns the key or a marshal/persist error.
 func (r *mentionRepoBunt) Save(wm mf.Mention, data *mf.IndiewebData) (string, error) {
+	return r.saveByKey(wm.Key(), data)
+}
+
+func (r *mentionRepoBunt) saveByKey(key string, data *mf.IndiewebData) (string, error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return "", err
 	}
-	key := r.mentionToKey(wm)
 	err = r.db.Update(func(tx *buntdb.Tx) error {
 		_, _, err := tx.Set(key, string(jsonData), nil)
 		return err
@@ -103,14 +109,10 @@ func (r *mentionRepoBunt) Save(wm mf.Mention, data *mf.IndiewebData) (string, er
 	return key, nil
 }
 
-func (r *mentionRepoBunt) mentionToKey(wm mf.Mention) string {
-	return fmt.Sprintf("%s:%s", wm.Key(), wm.TargetDomain())
-}
-
 // Get returns a single unmarshalled json value based on the mention key.
 // It returns the unmarshalled result or nil if something went wrong.
 func (r *mentionRepoBunt) Get(wm mf.Mention) *mf.IndiewebData {
-	return r.getByKey(r.mentionToKey(wm))
+	return r.getByKey(wm.Key())
 }
 
 func (r *mentionRepoBunt) getByKey(key string) *mf.IndiewebData {

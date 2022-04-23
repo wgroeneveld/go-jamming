@@ -2,6 +2,7 @@ package webmention
 
 import (
 	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/app/notifier"
 	"brainbaking.com/go-jamming/app/webmention/recv"
 	"brainbaking.com/go-jamming/app/webmention/send"
 	"brainbaking.com/go-jamming/db"
@@ -88,6 +89,9 @@ func HandlePost(conf *common.Config, repo db.MentionRepo) http.HandlerFunc {
 			RestClient: httpClient,
 			Conf:       conf,
 			Repo:       repo,
+			Notifier: &notifier.MailNotifier{
+				Conf: conf,
+			},
 		}
 
 		go recv.Receive(wm)

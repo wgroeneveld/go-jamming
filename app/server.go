@@ -20,10 +20,25 @@ type server struct {
 	repo   db.MentionRepo
 }
 
+func (s *server) domainAndTokenOnly(h http.HandlerFunc) http.HandlerFunc {
+	return s.domainOnly(s.authorizedOnly(h))
+}
+
+func (s *server) domainOnly(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		if !s.conf.IsAnAllowedDomain(vars["domain"]) {
+			rest.Unauthorized(w)
+			return
+		}
+		h(w, r)
+	}
+}
+
 func (s *server) authorizedOnly(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		if vars["token"] != s.conf.Token || !s.conf.IsAnAllowedDomain(vars["domain"]) {
+		if vars["token"] != s.conf.Token {
 			rest.Unauthorized(w)
 			return
 		}

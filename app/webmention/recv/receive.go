@@ -2,6 +2,7 @@ package recv
 
 import (
 	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/app/notifier"
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/db"
 	"brainbaking.com/go-jamming/rest"
@@ -16,6 +17,7 @@ import (
 
 type Receiver struct {
 	RestClient rest.Client
+	Notifier   notifier.Notifier
 	Conf       *common.Config
 	Repo       db.MentionRepo
 }
@@ -62,23 +64,30 @@ func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 	indieweb := recv.convertBodyToIndiewebData(body, wm, data)
 	recv.processAuthorPicture(indieweb)
 
-	recv.saveMentionToDatabase(wm, indieweb)
+	if recv.Conf.IsWhitelisted(wm.Source) {
+		recv.processWhitelistedMention(wm, indieweb)
+	} else {
+		recv.processMentionInModeration(wm, indieweb)
+	}
 }
 
-func (recv *Receiver) saveMentionToDatabase(wm mf.Mention, indieweb *mf.IndiewebData) {
-	if recv.Conf.IsWhitelisted(wm.Source) {
-		key, err := recv.Repo.Save(wm, indieweb)
-		if err != nil {
-			log.Error().Err(err).Stringer("wm", wm).Msg("Failed to save new mention to db")
-		}
-		log.Info().Str("key", key).Msg("OK: Webmention processed, in whitelist.")
-	} else {
-		key, err := recv.Repo.InModeration(wm, indieweb)
-		if err != nil {
-			log.Error().Err(err).Stringer("wm", wm).Msg("Failed to save new mention to in moderation db")
-		}
-		log.Info().Str("key", key).Msg("OK: Webmention processed, in moderation.")
+func (recv *Receiver) processMentionInModeration(wm mf.Mention, indieweb *mf.IndiewebData) {
+	key, err := recv.Repo.InModeration(wm, indieweb)
+	if err != nil {
+		log.Error().Err(err).Stringer("wm", wm).Msg("Failed to save new mention to in moderation db")
 	}
+	if recv.Notifier != nil {
+		recv.Notifier.NotifyReceived(wm, indieweb)
+	}
+	log.Info().Str("key", key).Msg("OK: Webmention processed, in moderation.")
+}
+
+func (recv *Receiver) processWhitelistedMention(wm mf.Mention, indieweb *mf.IndiewebData) {
+	key, err := recv.Repo.Save(wm, indieweb)
+	if err != nil {
+		log.Error().Err(err).Stringer("wm", wm).Msg("Failed to save new mention to db")
+	}
+	log.Info().Str("key", key).Msg("OK: Webmention processed, in whitelist.")
 }
 
 func (recv *Receiver) processAuthorPicture(indieweb *mf.IndiewebData) {

@@ -39,7 +39,8 @@ func (wm Mention) SourceDomain() string {
 // Key returns a unique string representation of the mention for use in storage.
 // TODO Profiling indicated that md5() consumes a lot of CPU power, so this could be replaced with db migration.
 func (wm Mention) Key() string {
-	return fmt.Sprintf("%x", md5.Sum([]byte("source="+wm.Source+",target="+wm.Target)))
+	key := fmt.Sprintf("%x", md5.Sum([]byte("source="+wm.Source+",target="+wm.Target)))
+	return fmt.Sprintf("%s:%s", key, wm.TargetDomain())
 }
 
 func (wm Mention) SourceUrl() *url.URL {

@@ -237,7 +237,7 @@ func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testi
 	assert.Empty(t, indb)
 }
 
-func TestReceiveFromNotInWhitelistSavesInModeration(t *testing.T) {
+func TestReceiveFromNotInWhitelistSavesInModerationAndNotifies(t *testing.T) {
 	wm := mf.Mention{
 		Source: "https://brainbaking.com/valid-indieweb-source.html",
 		Target: "https://brainbaking.com/valid-indieweb-target.html",
@@ -246,22 +246,30 @@ func TestReceiveFromNotInWhitelistSavesInModeration(t *testing.T) {
 		AllowedWebmentionSources: []string{
 			"brainbaking.com",
 		},
+		BaseURL:   "https://jam.brainbaking.com/",
+		Token:     "mytoken",
 		Blacklist: []string{},
 		Whitelist: []string{},
 	}
 	repo := db.NewMentionRepo(cnf)
 	t.Cleanup(db.Purge)
+	notifierMock := &mocks.StringNotifier{
+		Conf:   cnf,
+		Output: "",
+	}
 	receiver := &Receiver{
 		Conf: cnf,
 		Repo: repo,
 		RestClient: &mocks.RestClientMock{
 			GetBodyFunc: mocks.RelPathGetBodyFunc("../../../mocks/"),
 		},
+		Notifier: notifierMock,
 	}
 
 	receiver.Receive(wm)
 	assert.Empty(t, repo.GetAll("brainbaking.com").Data)
 	assert.Equal(t, 1, len(repo.GetAllToModerate("brainbaking.com").Data))
+	assert.Contains(t, notifierMock.Output, "Accept?")
 }
 
 func TestReceiveFromBlacklistedDomainDoesNothing(t *testing.T) {

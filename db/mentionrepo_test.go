@@ -15,7 +15,23 @@ var (
 	}
 )
 
-func TestApproveCases(t *testing.T) {
+func TestRejectUnknownKeyReturnsNil(t *testing.T) {
+	repo := NewMentionRepo(repoCnf)
+	t.Cleanup(Purge)
+
+	result := repo.Reject("fuckballz")
+	assert.Nil(t, result)
+}
+
+func TestApproveUnknownKeyReturnsNil(t *testing.T) {
+	repo := NewMentionRepo(repoCnf)
+	t.Cleanup(Purge)
+
+	result := repo.Approve("fuckballz")
+	assert.Nil(t, result)
+}
+
+func TestApproveAndRejectCases(t *testing.T) {
 	cases := []struct {
 		label                  string
 		approve                bool
@@ -42,6 +58,7 @@ func TestApproveCases(t *testing.T) {
 			defer Purge()
 
 			wm := mf.Mention{
+				Source: "https://jefklakscodex.com/dinges",
 				Target: "https://brainbaking.com/sjiekedinges.html",
 			}
 			data := &mf.IndiewebData{
@@ -50,9 +67,9 @@ func TestApproveCases(t *testing.T) {
 			repo.InModeration(wm, data)
 
 			if tc.approve {
-				repo.Approve(wm)
+				repo.Approve(wm.Key())
 			} else {
-				repo.Reject(wm)
+				repo.Reject(wm.Key())
 			}
 
 			allWms := repo.GetAll("brainbaking.com")

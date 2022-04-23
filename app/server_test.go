@@ -34,13 +34,13 @@ func TestAuthorizedOnlyUnauthorizedWithWrongToken(t *testing.T) {
 	assert.False(t, passed, "should not have called unauthorized func")
 }
 
-func TestAuthorizedOnlyUnauthorizedWithWrongDomain(t *testing.T) {
+func TestDomainOnlyWithWrongDomain(t *testing.T) {
 	srv := &server{
 		conf: conf,
 	}
 
 	passed := false
-	handler := srv.authorizedOnly(func(writer http.ResponseWriter, request *http.Request) {
+	handler := srv.domainOnly(func(writer http.ResponseWriter, request *http.Request) {
 		passed = true
 	})
 	r, _ := http.NewRequest("PUT", "/whatever", nil)

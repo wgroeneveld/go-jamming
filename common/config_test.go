@@ -24,6 +24,7 @@ func TestReadFromJsonWithCorrectJsonData(t *testing.T) {
 	confString := `{
 		  "port": 1337,
 		  "host": "localhost",
+          "baseURL": "https://jam.brainbaking.com/",
 		  "token": "miauwkes",
 		  "utcOffset": 60,
 		  "allowedWebmentionSources":  [
@@ -57,6 +58,7 @@ func TestWhitelist(t *testing.T) {
 		Whitelist: []string{
 			"youtube.com",
 		},
+		BaseURL:                  "https://jam.brainbaking.com/",
 		Port:                     123,
 		Token:                    "token",
 		AllowedWebmentionSources: []string{"blah.com"},
@@ -79,6 +81,7 @@ func TestAddToBlacklistNotYetAddsToListAndSaves(t *testing.T) {
 		Blacklist: []string{
 			"youtube.com",
 		},
+		BaseURL:                  "https://jam.brainbaking.com/",
 		Port:                     123,
 		Token:                    "token",
 		AllowedWebmentionSources: []string{"blah.com"},
