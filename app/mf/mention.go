@@ -24,11 +24,16 @@ func (wm Mention) String() string {
 	return fmt.Sprintf("source: %s, target: %s", wm.Source, wm.Target)
 }
 
-// Domain parses the target url to extract the domain as part of the allowed webmention targets.
+// TargetDomain parses the target url to extract the domain as part of the allowed webmention targets.
 // This is the same as conf.FetchDomain(wm.Target), only without config, and without error handling.
 // Assumes http(s) protocol, which should have been validated by now.
-func (wm Mention) Domain() string {
+func (wm Mention) TargetDomain() string {
 	return rest.Domain(wm.Target)
+}
+
+// SoureceDomain converts the Source to a domain name to be used in whitelisting/blacklisting (See TargetDomain()).
+func (wm Mention) SourceDomain() string {
+	return rest.Domain(wm.Source)
 }
 
 // Key returns a unique string representation of the mention for use in storage.

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"brainbaking.com/go-jamming/app/admin"
 	"brainbaking.com/go-jamming/app/index"
 	"brainbaking.com/go-jamming/app/pictures"
 	"brainbaking.com/go-jamming/app/pingback"
@@ -18,7 +19,12 @@ func (s *server) routes() {
 	s.router.HandleFunc("/pictures/{picture}", pictures.Handle(db)).Methods("GET")
 	s.router.HandleFunc("/pingback", pingback.HandlePost(c, db)).Methods("POST")
 	s.router.HandleFunc("/webmention", webmention.HandlePost(c, db)).Methods("POST")
+
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandleGet(db))).Methods("GET")
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandlePut(c, db))).Methods("PUT")
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.authorizedOnly(webmention.HandleDelete(db))).Methods("DELETE")
+
+	s.router.HandleFunc("/admin/{domain}/{token}", s.authorizedOnly(admin.HandleGet(db))).Methods("GET")
+	s.router.HandleFunc("/admin/approve/{token}", s.authorizedOnly(admin.HandleApprove(c, db))).Methods("POST")
+	s.router.HandleFunc("/admin/reject/{token}", s.authorizedOnly(admin.HandleReject(c, db))).Methods("POST")
 }

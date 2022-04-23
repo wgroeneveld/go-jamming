@@ -18,14 +18,23 @@ type Config struct {
 	DataPath                 string   `json:"dataPath"`
 	AllowedWebmentionSources []string `json:"allowedWebmentionSources"`
 	Blacklist                []string `json:"blacklist"`
+	Whitelist                []string `json:"whitelist"`
 }
 
 func (c *Config) IsBlacklisted(url string) bool {
+	return isListedIn(url, c.Blacklist)
+}
+
+func (c *Config) IsWhitelisted(url string) bool {
+	return isListedIn(url, c.Whitelist)
+}
+
+func isListedIn(url string, list []string) bool {
 	if !strings.HasPrefix(url, "http") {
 		return false
 	}
 	domain := rest.Domain(url)
-	return Includes(c.Blacklist, domain)
+	return Includes(list, domain)
 }
 
 func (c *Config) Zone() *time.Location {
@@ -67,14 +76,26 @@ func Configure() *Config {
 	return c
 }
 
+// AddToBlacklist adds the given domain to the blacklist slice and persists to disk.
 func (c *Config) AddToBlacklist(domain string) {
-	for _, d := range c.Blacklist {
-		if d == domain {
-			return
+	c.Blacklist = addToList(domain, c.Blacklist)
+	c.Save()
+}
+
+// AddToWhitelist adds the given domain to the whitelist slice and persists to disk.
+func (c *Config) AddToWhitelist(domain string) {
+	c.Whitelist = addToList(domain, c.Whitelist)
+	c.Save()
+}
+
+func addToList(key string, arr []string) []string {
+	for _, d := range arr {
+		if d == key {
+			return arr
 		}
 	}
 
-	c.Blacklist = append(c.Blacklist, domain)
+	return append(arr, key)
 }
 
 func (c *Config) Save() {
@@ -113,5 +134,6 @@ func defaultConfig() *Config {
 		UtcOffset:                60,
 		AllowedWebmentionSources: []string{"brainbaking.com", "jefklakscodex.com"},
 		Blacklist:                []string{"youtube.com"},
+		Whitelist:                []string{"brainbaking.com"},
 	}
 }

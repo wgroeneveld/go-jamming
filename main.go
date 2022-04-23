@@ -46,7 +46,6 @@ func blacklistDomain(domain string) {
 	log.Info().Str("domain", domain).Msg("Blacklisting...")
 	config := common.Configure()
 	config.AddToBlacklist(domain)
-	config.Save()
 
 	repo := db.NewMentionRepo(config)
 	for _, domain := range config.AllowedWebmentionSources {

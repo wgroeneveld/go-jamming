@@ -24,6 +24,10 @@ var conf = &common.Config{
 	Blacklist: []string{
 		"blacklisted.com",
 	},
+	Whitelist: []string{
+		"brainbaking.com",
+		"jefklakscodex.com",
+	},
 }
 
 func TestSaveAuthorPictureLocally(t *testing.T) {
@@ -233,6 +237,33 @@ func TestReceiveTargetDoesNotExistAnymoreDeletesPossiblyOlderWebmention(t *testi
 	assert.Empty(t, indb)
 }
 
+func TestReceiveFromNotInWhitelistSavesInModeration(t *testing.T) {
+	wm := mf.Mention{
+		Source: "https://brainbaking.com/valid-indieweb-source.html",
+		Target: "https://brainbaking.com/valid-indieweb-target.html",
+	}
+	cnf := &common.Config{
+		AllowedWebmentionSources: []string{
+			"brainbaking.com",
+		},
+		Blacklist: []string{},
+		Whitelist: []string{},
+	}
+	repo := db.NewMentionRepo(cnf)
+	t.Cleanup(db.Purge)
+	receiver := &Receiver{
+		Conf: cnf,
+		Repo: repo,
+		RestClient: &mocks.RestClientMock{
+			GetBodyFunc: mocks.RelPathGetBodyFunc("../../../mocks/"),
+		},
+	}
+
+	receiver.Receive(wm)
+	assert.Empty(t, repo.GetAll("brainbaking.com").Data)
+	assert.Equal(t, 1, len(repo.GetAllToModerate("brainbaking.com").Data))
+}
+
 func TestReceiveFromBlacklistedDomainDoesNothing(t *testing.T) {
 	wm := mf.Mention{
 		Source: "https://blacklisted.com/whoops",
@@ -248,6 +279,7 @@ func TestReceiveFromBlacklistedDomainDoesNothing(t *testing.T) {
 
 	receiver.Receive(wm)
 	assert.Empty(t, repo.GetAll("brainbaking.com").Data)
+	assert.Empty(t, repo.GetAllToModerate("brainbaking.com").Data)
 }
 
 func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {
@@ -268,6 +300,7 @@ func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {
 
 	receiver.Receive(wm)
 	assert.Empty(t, repo.GetAll("brainbaking.com").Data)
+	assert.Empty(t, repo.GetAllToModerate("brainbaking.com").Data)
 }
 
 func TestProcessSourceBodyAnonymizesBothAuthorPictureAndNameIfComingFromSilo(t *testing.T) {
@@ -275,10 +308,19 @@ func TestProcessSourceBodyAnonymizesBothAuthorPictureAndNameIfComingFromSilo(t *
 		Source: "https://brid.gy/post/twitter/ChrisAldrich/1387130900962443264",
 		Target: "https://brainbaking.com/",
 	}
-	repo := db.NewMentionRepo(conf)
+	cnf := &common.Config{
+		AllowedWebmentionSources: []string{
+			"brainbaking.com",
+		},
+		Whitelist: []string{
+			"brid.gy",
+		},
+	}
+
+	repo := db.NewMentionRepo(cnf)
 	t.Cleanup(db.Purge)
 	recv := &Receiver{
-		Conf: conf,
+		Conf: cnf,
 		Repo: repo,
 	}
 

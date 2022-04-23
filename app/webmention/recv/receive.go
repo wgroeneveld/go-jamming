@@ -62,11 +62,23 @@ func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 	indieweb := recv.convertBodyToIndiewebData(body, wm, data)
 	recv.processAuthorPicture(indieweb)
 
-	key, err := recv.Repo.Save(wm, indieweb)
-	if err != nil {
-		log.Error().Err(err).Stringer("wm", wm).Msg("Failed to save new mention to db")
+	recv.saveMentionToDatabase(wm, indieweb)
+}
+
+func (recv *Receiver) saveMentionToDatabase(wm mf.Mention, indieweb *mf.IndiewebData) {
+	if recv.Conf.IsWhitelisted(wm.Source) {
+		key, err := recv.Repo.Save(wm, indieweb)
+		if err != nil {
+			log.Error().Err(err).Stringer("wm", wm).Msg("Failed to save new mention to db")
+		}
+		log.Info().Str("key", key).Msg("OK: Webmention processed, in whitelist.")
+	} else {
+		key, err := recv.Repo.InModeration(wm, indieweb)
+		if err != nil {
+			log.Error().Err(err).Stringer("wm", wm).Msg("Failed to save new mention to in moderation db")
+		}
+		log.Info().Str("key", key).Msg("OK: Webmention processed, in moderation.")
 	}
-	log.Info().Str("key", key).Msg("OK: Webmention processed.")
 }
 
 func (recv *Receiver) processAuthorPicture(indieweb *mf.IndiewebData) {

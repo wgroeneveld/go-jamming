@@ -104,14 +104,17 @@ func (r *mentionRepoBunt) Save(wm mf.Mention, data *mf.IndiewebData) (string, er
 }
 
 func (r *mentionRepoBunt) mentionToKey(wm mf.Mention) string {
-	return fmt.Sprintf("%s:%s", wm.Key(), wm.Domain())
+	return fmt.Sprintf("%s:%s", wm.Key(), wm.TargetDomain())
 }
 
 // Get returns a single unmarshalled json value based on the mention key.
 // It returns the unmarshalled result or nil if something went wrong.
 func (r *mentionRepoBunt) Get(wm mf.Mention) *mf.IndiewebData {
+	return r.getByKey(r.mentionToKey(wm))
+}
+
+func (r *mentionRepoBunt) getByKey(key string) *mf.IndiewebData {
 	var data mf.IndiewebData
-	key := r.mentionToKey(wm)
 	err := r.db.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(key)
 		if err != nil {
