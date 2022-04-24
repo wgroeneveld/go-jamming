@@ -22,16 +22,8 @@ func TestBuildNotification(t *testing.T) {
 		Whitelist: []string{},
 	}
 
-	expected := `Hi admin, 
-
-,A webmention was received: 
-Source https://brainbaking.com/valid-indieweb-source.html, Target https://brainbaking.com/valid-indieweb-target.html
-Content: somecontent
-
-Accept? https://jam.brainbaking.com/admin/approve/mytoken/19d462ddff3c3322c662dac3461324bb:brainbaking.com
-Reject? https://jam.brainbaking.com/admin/reject/mytoken/19d462ddff3c3322c662dac3461324bb:brainbaking.com
-Cheerio, your go-jammin' thing.`
-
 	result := BuildNotification(wm, &mf.IndiewebData{Content: "somecontent"}, cnf)
-	assert.Equal(t, result, expected)
+	assert.Contains(t, result, `<em>Source:</em> <a href="https://brainbaking.com/valid-indieweb-source.html">https://brainbaking.com/valid-indieweb-source.html</a><br/>`)
+	assert.Contains(t, result, `<em>Target:</em> <a href="https://brainbaking.com/valid-indieweb-target.html">https://brainbaking.com/valid-indieweb-target.html</a><br/>`)
+	assert.Contains(t, result, `<a href="https://jam.brainbaking.com/admin/approve/mytoken/19d462ddff3c3322c662dac3461324bb:brainbaking.com`)
 }

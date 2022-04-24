@@ -3,22 +3,55 @@ package notifier
 import (
 	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/common"
+	"bytes"
 	"fmt"
+	"github.com/rs/zerolog/log"
+	"text/template"
 )
+
+import _ "embed"
+
+//go:embed notification.html
+var notificationTmplBytes []byte
+var notificationTmpl *template.Template
+
+func init() {
+	var err error
+	notificationTmpl, err = template.New("notification").Parse(string(notificationTmplBytes))
+	if err != nil {
+		log.Fatal().Err(err).Str("name", "notification").Msg("Template invalid")
+	}
+}
+
+type notificationData struct {
+	SourceDomain string
+	Source       string
+	Content      string
+	Target       string
+	AdminURL     string
+	ApproveURL   string
+	RejectURL    string
+}
 
 type Notifier interface {
 	NotifyReceived(wm mf.Mention, data *mf.IndiewebData)
 }
 
-// BuildNotification returns a string representation of the Mention to notify the admin.
+// BuildNotification returns a HTML (string template) representation of the Mention to notify the admin.
 func BuildNotification(wm mf.Mention, data *mf.IndiewebData, cnf *common.Config) string {
-	enter := "\n"
 	acceptUrl := fmt.Sprintf("%sadmin/approve/%s/%s", cnf.BaseURL, cnf.Token, wm.Key())
 	rejectUrl := fmt.Sprintf("%sadmin/reject/%s/%s", cnf.BaseURL, cnf.Token, wm.Key())
+	adminUrl := fmt.Sprintf("%sadmin/%s", cnf.BaseURL, cnf.Token)
 
-	return fmt.Sprintf("Hi admin, %s%s,A webmention was received: %sSource %s, Target %s%sContent: %s%s%sAccept? %s%sReject? %s%sCheerio, your go-jammin' thing.",
-		enter, enter, enter,
-		wm.Source, wm.Target, enter,
-		data.Content, enter, enter,
-		acceptUrl, enter, rejectUrl, enter)
+	var buff bytes.Buffer
+	notificationTmpl.Execute(&buff, notificationData{
+		Source:       wm.Source,
+		Target:       wm.Target,
+		Content:      data.Content,
+		SourceDomain: wm.SourceDomain(),
+		ApproveURL:   acceptUrl,
+		RejectURL:    rejectUrl,
+		AdminURL:     adminUrl,
+	})
+	return buff.String()
 }

@@ -40,8 +40,8 @@
         <tbody>
         {{ range $mentions }}
             <tr>
-                <td>{{ .Source }}</td>
-                <td>{{ .Target }}</td>
+                <td><a href="{{ .Source }}" target="_blank">{{ .Source }}</a></td>
+                <td><a href="{{ .Target }}" target="_blank">{{ .Target }}</a></td>
                 <td>{{ .Content }}</td>
                 <td><a href="{{ .ApproveURL }}">✅ Yes!</a></td>
                 <td><a href="{{ .RejectURL }}">❌ Nop!</a></td>

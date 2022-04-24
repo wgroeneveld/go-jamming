@@ -269,7 +269,7 @@ func TestReceiveFromNotInWhitelistSavesInModerationAndNotifies(t *testing.T) {
 	receiver.Receive(wm)
 	assert.Empty(t, repo.GetAll("brainbaking.com").Data)
 	assert.Equal(t, 1, len(repo.GetAllToModerate("brainbaking.com").Data))
-	assert.Contains(t, notifierMock.Output, "Accept?")
+	assert.Contains(t, notifierMock.Output, "✅ Accept!")
 }
 
 func TestReceiveFromBlacklistedDomainDoesNothing(t *testing.T) {

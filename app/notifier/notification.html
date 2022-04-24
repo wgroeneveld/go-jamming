@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Webmention in moderation from {{ .SourceDomain }}</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 1em;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🥞 Webmention in moderation from {{ .SourceDomain }}</h1>
+
+<p>Hi Admin, a webmention was received:</p>
+
+<p>
+    <em>Source:</em> <a href="{{ .Source }}">{{ .Source }}</a><br/>
+    <em>Target:</em> <a href="{{ .Target }}">{{ .Target }}</a><br/>
+    <em>Content:</em> {{ .Content }}
+</p>
+
+<p>
+    <a href="{{ .ApproveURL }}">✅ Accept!</a><br/>
+    <a href="{{ .RejectURL }}">❌ Reject!</a>
+</p>
+
+<p>
+    Cheerio, your Go-Jammin' Thing! (<a href="{{ .AdminURL }}">Go to Admin Dashboard</a>)
+</p>
+</body>
+</html>
