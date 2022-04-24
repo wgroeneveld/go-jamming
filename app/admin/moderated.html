@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Refresh" content="3; url={{ .RedirectURL }}" />
+  <title>Go-Jamming moderation: {{ .Action }}</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      margin: 1em;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🥞 Go-Jamming Moderation done!</h1>
+
+<h2><em>{{ .Action }}</em>: {{ .Item }}</h2>
+
+<hr/>
+
+<p>Thanks 👍. You'll be redirected to the admin dashboard...</p>
+<p>If you cannot wait, <a href="{{ .RedirectURL }}">please click here</a>.</p>
+
+</body>
+</html>

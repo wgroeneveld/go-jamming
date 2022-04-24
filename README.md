@@ -52,7 +52,7 @@ Accepted form format:
     target=https://aaronpk.example/post-by-aaron
 ```
 
-Will result in a `202 Accepted` - it handles things async. Stores in `.json` files in `[dataPath]/domain`. 
+Will result in a `202 Accepted` - it handles things async. Stores mentions in a **to approve** and **approved** database separately. 
 
 This also saves the author picture/avatar locally - if present in the microformat. It does _not_ resize images, however, if it's bigger than 5 MB, it falls back to a default one. 
 

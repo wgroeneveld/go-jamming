@@ -24,7 +24,8 @@ func (s *server) routes() {
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.domainAndTokenOnly(webmention.HandlePut(c, db))).Methods("PUT")
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.domainAndTokenOnly(webmention.HandleDelete(db))).Methods("DELETE")
 
-	s.router.HandleFunc("/admin/{domain}/{token}", s.domainAndTokenOnly(admin.HandleGet(db))).Methods("GET")
+	s.router.HandleFunc("/admin/{token}", s.authorizedOnly(admin.HandleGet(c, db))).Methods("GET")
+	s.router.HandleFunc("/admin/{domain}/{token}", s.domainAndTokenOnly(admin.HandleGetToApprove(db))).Methods("GET")
 	s.router.HandleFunc("/admin/approve/{token}/{key}", s.authorizedOnly(admin.HandleApprove(c, db))).Methods("GET")
 	s.router.HandleFunc("/admin/reject/{token}/{key}", s.authorizedOnly(admin.HandleReject(c, db))).Methods("GET")
 }

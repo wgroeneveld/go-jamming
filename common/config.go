@@ -17,7 +17,6 @@ type Config struct {
 	Port                     int      `json:"port"`
 	Token                    string   `json:"token"`
 	UtcOffset                int      `json:"utcOffset"`
-	DataPath                 string   `json:"dataPath"`
 	AllowedWebmentionSources []string `json:"allowedWebmentionSources"`
 	Blacklist                []string `json:"blacklist"`
 	Whitelist                []string `json:"whitelist"`
@@ -103,9 +102,13 @@ func addToList(key string, arr []string) []string {
 	return append(arr, key)
 }
 
+func (c *Config) String() string {
+	bytes, _ := json.MarshalIndent(c, "", "  ")
+	return string(bytes)
+}
+
 func (c *Config) Save() {
-	bytes, _ := json.Marshal(c) // we assume a correct internral state here
-	err := ioutil.WriteFile("config.json", bytes, fs.ModePerm)
+	err := ioutil.WriteFile("config.json", []byte(c.String()), fs.ModePerm)
 	if err != nil {
 		log.Err(err).Msg("Unable to save config.json to disk!")
 	}

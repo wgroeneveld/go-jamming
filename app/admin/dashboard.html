@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Go-Jamming admin dashboard</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 1em;
+        }
+        thead {
+            font-weight: bold;
+        }
+        thead tr td {
+            border-bottom: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🥞 Go-Jamming Admin</h1>
+<hr/>
+
+<h2>Mentions To Approve</h2>
+
+{{ range $domain, $mentions := .Mentions }}
+    <h3>&nbsp;&nbsp;&nbsp;🌐 Domain <em>{{ $domain }}</em>&nbsp;&raquo;</h3>
+
+    {{ if $mentions }}
+    <table>
+        <thead>
+            <tr>
+                <td>Source</td>
+                <td>Target</td>
+                <td>Content</td>
+                <td>Approve?</td>
+                <td>Reject?</td>
+            </tr>
+        </thead>
+        <tbody>
+        {{ range $mentions }}
+            <tr>
+                <td>{{ .Source }}</td>
+                <td>{{ .Target }}</td>
+                <td>{{ .Content }}</td>
+                <td><a href="{{ .ApproveURL }}">✅ Yes!</a></td>
+                <td><a href="{{ .RejectURL }}">❌ Nop!</a></td>
+            </tr>
+        {{ end }}
+        </tbody>
+    </table>
+    {{ else }}
+        <p>No mentions to approve, all done.</p>
+    {{ end }}
+{{ end }}
+<hr/>
+
+<h2>Config</h2>
+
+Current <code>config.json</code> contents:
+
+<pre>
+{{ .Config }}
+</pre>
+
+<hr/>
+
+</body>
+</html>
