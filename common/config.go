@@ -14,6 +14,7 @@ import (
 type Config struct {
 	// BaseURL should end with a / and is used to build URLs in notifications
 	BaseURL                  string   `json:"baseURL"`
+	AdminEmail               string   `json:"adminEmail"`
 	Port                     int      `json:"port"`
 	Token                    string   `json:"token"`
 	UtcOffset                int      `json:"utcOffset"`
@@ -137,6 +138,7 @@ func config() *Config {
 
 func defaultConfig() *Config {
 	defaultConfig := &Config{
+		AdminEmail:               "wouter@brainbaking.com",
 		BaseURL:                  "https://jam.brainbaking.com/",
 		Port:                     1337,
 		Token:                    "miauwkes",

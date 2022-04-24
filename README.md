@@ -126,7 +126,7 @@ It will attempt to auto-discover them with a HEAD call, in the following order:
 3. `/feed`
 4. `/feed/index.xml`
 
-If none provied a status of 200 with content-type `application/xml`, it will abort and log an error. 
+If none provied a status of 200 with a Content-Type that contains `xml`, it will abort and log an error. 
 
 Note that this _requires your site to be on HTTPS_!! 
 
@@ -188,7 +188,21 @@ Database migrations are run using the `-migrate` flag.
 
 Since Go-jamming still supports Pingbacks, spam could be an issue. However, if the URL doesn't contain a genuine link, the mention will be immediately dropped.
 
-Still, spammers always find a way and sometimes even create fake blog posts with real links to your blog. In that case, simply add the domain to the `blacklist` in `config.json`.
+Still, spammers always find a way and sometimes even create fake blog posts with real links to your blog. 
+
+### Mentions _in moderation_
+
+Go-Jamming employs a `whitelist` and `blacklist` system. By default, all mentions end up in a moderation queue, another database that will not pollute the mention db.
+
+Each mention has to be manually approved. An e-mail to `localhost:25` (a local Postfix) will be sent out with approve/reject links, if configured. Otherwise, the endpoint `/admin/{token}` is the dashboard where you can approve/reject from time to time:
+
+![](https://raw.githubusercontent.com/wgroeneveld/go-jamming/master/adminpanel.jpg)
+
+Approved mentions will have their domain added to the whitelist. Rejected mentions will have their domain added to the blacklist. 
+
+### Manually blacklisting partial domains
+
+In that case, simply add the domain to the `blacklist` in `config.json`.
 
 Adding this **manually** will not remove existing spam in your DB! The `-blacklist` flag is there to:
 

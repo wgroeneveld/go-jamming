@@ -55,11 +55,11 @@ func sendMail(from, subject, body, toName, toAddress string) error {
 
 func (mn *MailNotifier) NotifyReceived(wm mf.Mention, indieweb *mf.IndiewebData) {
 	err := sendMail(
-		"admin@brainbaking.com",
+		mn.Conf.AdminEmail,
 		"Webmention in moderation from "+wm.SourceDomain(),
 		BuildNotification(wm, indieweb, mn.Conf),
 		"Go-Jamming User",
-		"wouter@brainbaking.com")
+		mn.Conf.AdminEmail)
 
 	if err != nil {
 		log.Err(err).Msg("Unable to send notification mail, check localhost postfix settings?")
