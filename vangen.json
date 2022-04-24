@@ -5,8 +5,10 @@
       "prefix": "go-jamming",
       "subs": [
         "app",
+        "app/admin",
         "app/index",
         "app/mf",
+        "app/notifier",
         "app/pingback",
         "app/pingback/send",
         "app/rss",
@@ -15,6 +17,8 @@
         "app/webmention/recv",
         "app/webmention/send",
         "common",
+        "db",
+        "mocks",
         "rest"
       ],
       "url": "https://github.com/wgroeneveld/go-jamming"
