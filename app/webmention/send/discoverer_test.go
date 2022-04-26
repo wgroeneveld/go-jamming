@@ -16,7 +16,7 @@ func TestDiscoverRssFeedE2EBrainbaking(t *testing.T) {
 	}
 
 	link, err := sender.discoverRssFeed("brainbaking.com")
-	expectedUrl := "https://brainbaking.com/index.xml"
+	expectedUrl := "https://brainbaking.com/all/index.xml"
 	assert.Nil(t, err)
 	assert.Truef(t, strings.HasPrefix(link, expectedUrl), "should start with %s, but was %s", expectedUrl, link)
 }

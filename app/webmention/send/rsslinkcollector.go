@@ -56,8 +56,8 @@ func (snder *Sender) Collect(xml string, lastSentLink string) ([]RSSItem, error)
 }
 
 var (
-	hrefRegexp = regexp.MustCompile(`href="(.+?)"`)
-	extRegexp  = regexp.MustCompile(`\.(gif|zip|rar|bz2|gz|7z|jpe?g|tiff?|png|webp|bmp)$`)
+	hrefRegexp = regexp.MustCompile(`(?i)<a.+?href="(.+?)"`)
+	extRegexp  = regexp.MustCompile(`(?i)\.(gif|zip|rar|bz2|gz|7z|jpe?g|tiff?|png|webp|bmp)$`)
 )
 
 func (snder *Sender) collectUniqueHrefsFromHtml(html string) []string {
