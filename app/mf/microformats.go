@@ -92,8 +92,8 @@ func (id *IndiewebData) IsEmpty() bool {
 	return id.Url == ""
 }
 
-func PublishedNow(zone *time.Location) string {
-	return common.Now().UTC().In(zone).Format(dateFormatWithTimeZone)
+func PublishedNow() string {
+	return common.Now().UTC().Format(dateFormatWithTimeZone)
 }
 
 func shorten(txt string) string {
@@ -174,10 +174,10 @@ func Prop(mf *microformats.Microformat, key string) *microformats.Microformat {
 	return mfEmpty()
 }
 
-func Published(hEntry *microformats.Microformat, zone *time.Location) string {
+func Published(hEntry *microformats.Microformat) string {
 	publishedDate := Str(hEntry, "published")
 	if publishedDate == "" {
-		return PublishedNow(zone)
+		return PublishedNow()
 	}
 
 	for _, format := range supportedFormats {
@@ -188,7 +188,7 @@ func Published(hEntry *microformats.Microformat, zone *time.Location) string {
 		return formatted.Format(dateFormatWithTimeZone)
 	}
 
-	return PublishedNow(zone)
+	return PublishedNow()
 }
 
 func NewAuthor(hEntry *microformats.Microformat, hCard *microformats.Microformat) IndiewebAuthor {

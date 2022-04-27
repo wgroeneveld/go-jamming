@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"strings"
-	"time"
 )
 
 type Config struct {
@@ -17,7 +16,6 @@ type Config struct {
 	AdminEmail               string   `json:"adminEmail"`
 	Port                     int      `json:"port"`
 	Token                    string   `json:"token"`
-	UtcOffset                int      `json:"utcOffset"`
 	AllowedWebmentionSources []string `json:"allowedWebmentionSources"`
 	Blacklist                []string `json:"blacklist"`
 	Whitelist                []string `json:"whitelist"`
@@ -37,10 +35,6 @@ func isListedIn(url string, list []string) bool {
 	}
 	domain := rest.Domain(url)
 	return Includes(list, domain)
-}
-
-func (c *Config) Zone() *time.Location {
-	return time.FixedZone("local", c.UtcOffset*60)
 }
 
 func (c *Config) missingKeys() []string {
@@ -142,7 +136,6 @@ func defaultConfig() *Config {
 		BaseURL:                  "https://jam.brainbaking.com/",
 		Port:                     1337,
 		Token:                    "miauwkes",
-		UtcOffset:                60,
 		AllowedWebmentionSources: []string{"brainbaking.com", "jefklakscodex.com"},
 		Blacklist:                []string{"youtube.com"},
 		Whitelist:                []string{"brainbaking.com"},

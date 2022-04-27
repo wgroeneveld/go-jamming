@@ -28,9 +28,14 @@ type dashboardMention struct {
 	RejectURL  string
 }
 
+type domainMention struct {
+	Name        string
+	MentionsURL string
+}
+
 type dashboardData struct {
 	Config   string
-	Mentions map[string][]dashboardMention
+	Mentions map[domainMention][]dashboardMention
 }
 
 type dashboardModerated struct {
@@ -62,10 +67,14 @@ func indiewebDataToDashboardMention(c *common.Config, dbMentions []*mf.IndiewebD
 func getDashboardData(c *common.Config, repo db.MentionRepo) *dashboardData {
 	data := &dashboardData{
 		Config:   c.String(),
-		Mentions: map[string][]dashboardMention{},
+		Mentions: map[domainMention][]dashboardMention{},
 	}
 	for _, domain := range c.AllowedWebmentionSources {
-		data.Mentions[domain] = indiewebDataToDashboardMention(c, repo.GetAllToModerate(domain).Data)
+		domainKey := domainMention{
+			Name:        domain,
+			MentionsURL: fmt.Sprintf("%swebmention/%s/%s", c.BaseURL, domain, c.Token),
+		}
+		data.Mentions[domainKey] = indiewebDataToDashboardMention(c, repo.GetAllToModerate(domain).Data)
 	}
 
 	return data

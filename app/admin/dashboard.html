@@ -24,7 +24,7 @@
 <h2>Mentions To Approve</h2>
 
 {{ range $domain, $mentions := .Mentions }}
-    <h3>&nbsp;&nbsp;&nbsp;🌐 Domain <em>{{ $domain }}</em>&nbsp;&raquo;</h3>
+<h3>&nbsp;&nbsp;&nbsp;🌐 Domain <em><a href="{{ $domain.MentionsURL }}">{{ $domain.Name }}</a></em>&nbsp;&raquo;</h3>
 
     {{ if $mentions }}
     <table>

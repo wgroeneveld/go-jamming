@@ -200,6 +200,8 @@ Each mention has to be manually approved. An e-mail to `localhost:25` (a local P
 
 Approved mentions will have their domain added to the whitelist. Rejected mentions will have their domain added to the blacklist. 
 
+Read more about how spam moderation works at https://brainbaking.com/post/2022/04/fighting-webmention-and-pingback-spam/
+
 ### Manually blacklisting partial domains
 
 In that case, simply add the domain to the `blacklist` in `config.json`.

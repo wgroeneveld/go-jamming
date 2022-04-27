@@ -21,7 +21,6 @@ Place a `config.json` file in the same directory that looks like this: (below ar
   "port": 1337,
   "host": "localhost",
   "token": "miauwkes",
-  "utcOffset": 60,
   "allowedWebmentionSources":  [
     "brainbaking.com",
     "jefklakscodex.com"
@@ -38,7 +37,6 @@ Place a `config.json` file in the same directory that looks like this: (below ar
 - port, host: http server params
 - token, allowedWebmentionSources: see below, used for authentication
 - blacklist/whitelist: domains from which we do (NOT) send to or accept mentions from. 
-- utcOffset: offset in minutes for date processing, starting from UTC time.
 
 If a config file is missing, or required keys are missing, a warning will be generated and default values will be used instead. See `common/config.go`.
 

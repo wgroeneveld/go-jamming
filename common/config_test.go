@@ -26,7 +26,6 @@ func TestReadFromJsonWithCorrectJsonData(t *testing.T) {
 		  "host": "localhost",
           "baseURL": "https://jam.brainbaking.com/",
 		  "token": "miauwkes",
-		  "utcOffset": 60,
 		  "allowedWebmentionSources":  [
 			"snoopy.be"
 		  ],

@@ -3,7 +3,7 @@ package app
 import (
 	"brainbaking.com/go-jamming/db"
 	"brainbaking.com/go-jamming/rest"
-	"github.com/MagnusFrater/helmet"
+	"github.com/goddtriffin/helmet"
 	"net/http"
 	"strconv"
 	"strings"
