@@ -4,7 +4,7 @@ import (
 	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/common"
 	"encoding/base64"
-	"github.com/rs/zerolog/log"
+	"fmt"
 	"net/mail"
 	"net/smtp"
 )
@@ -53,15 +53,28 @@ func sendMail(from, subject, body, toName, toAddress string) error {
 	return c.Quit()
 }
 
-func (mn *MailNotifier) NotifyReceived(wm mf.Mention, indieweb *mf.IndiewebData) {
-	err := sendMail(
+func (mn *MailNotifier) NotifyReceived(wm mf.Mention, indieweb *mf.IndiewebData) error {
+	if len(mn.Conf.AdminEmail) == 0 {
+		return fmt.Errorf("no adminEmail provided")
+	}
+
+	return sendMail(
 		mn.Conf.AdminEmail,
-		"Webmention in moderation from "+wm.SourceDomain(),
-		BuildNotification(wm, indieweb, mn.Conf),
+		"Webmention received from "+wm.SourceDomain(),
+		buildReceivedMsg(wm, indieweb, mn.Conf),
 		"Go-Jamming User",
 		mn.Conf.AdminEmail)
+}
 
-	if err != nil {
-		log.Err(err).Msg("Unable to send notification mail, check localhost postfix settings?")
+func (mn *MailNotifier) NotifyInModeration(wm mf.Mention, indieweb *mf.IndiewebData) error {
+	if len(mn.Conf.AdminEmail) == 0 {
+		return fmt.Errorf("no adminEmail provided")
 	}
+
+	return sendMail(
+		mn.Conf.AdminEmail,
+		"Webmention in moderation from "+wm.SourceDomain(),
+		buildInModerationMsg(wm, indieweb, mn.Conf),
+		"Go-Jamming User",
+		mn.Conf.AdminEmail)
 }

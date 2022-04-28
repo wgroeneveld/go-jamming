@@ -89,11 +89,9 @@ func HandlePost(conf *common.Config, repo db.MentionRepo) http.HandlerFunc {
 			RestClient: httpClient,
 			Conf:       conf,
 			Repo:       repo,
-		}
-		if len(conf.AdminEmail) > 0 {
-			recv.Notifier = &notifier.MailNotifier{
+			Notifier: &notifier.MailNotifier{
 				Conf: conf,
-			}
+			},
 		}
 
 		go recv.Receive(wm)

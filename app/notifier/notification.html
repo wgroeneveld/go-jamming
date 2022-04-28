@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Webmention in moderation from {{ .SourceDomain }}</title>
+    <title>Webmention {{ .Action }} from {{ .SourceDomain }}</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<h1>🥞 Webmention in moderation from {{ .SourceDomain }}</h1>
+<h1>🥞 Webmention {{ .Action }} from {{ .SourceDomain }}</h1>
 
 <p>Hi Admin, a webmention was received:</p>
 
@@ -23,8 +23,8 @@
 </p>
 
 <p>
-    <a href="{{ .ApproveURL }}">✅ Accept!</a><br/>
-    <a href="{{ .RejectURL }}">❌ Reject!</a>
+    {{ with .ApproveURL}}<a href="{{ . }}">✅ Accept!</a><br/>{{ end }}
+    {{ with .RejectURL }}<a href="{{ . }}">❌ Reject!</a>{{ end }}
 </p>
 
 <p>

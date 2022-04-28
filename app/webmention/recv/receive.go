@@ -76,8 +76,9 @@ func (recv *Receiver) processMentionInModeration(wm mf.Mention, indieweb *mf.Ind
 	if err != nil {
 		log.Error().Err(err).Stringer("wm", wm).Msg("Failed to save new mention to in moderation db")
 	}
-	if recv.Notifier != nil {
-		recv.Notifier.NotifyReceived(wm, indieweb)
+	err = recv.Notifier.NotifyInModeration(wm, indieweb)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to notify")
 	}
 	log.Info().Str("key", key).Msg("OK: Webmention processed, in moderation.")
 }
@@ -86,6 +87,10 @@ func (recv *Receiver) processWhitelistedMention(wm mf.Mention, indieweb *mf.Indi
 	key, err := recv.Repo.Save(wm, indieweb)
 	if err != nil {
 		log.Error().Err(err).Stringer("wm", wm).Msg("Failed to save new mention to db")
+	}
+	err = recv.Notifier.NotifyReceived(wm, indieweb)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to notify")
 	}
 	log.Info().Str("key", key).Msg("OK: Webmention processed, in whitelist.")
 }
