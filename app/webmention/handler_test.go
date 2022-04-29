@@ -22,7 +22,14 @@ func postWm(source string, target string) url.Values {
 }
 
 var (
-	cnf  = common.Configure()
+	cnf = &common.Config{
+		BaseURL:                  "http://localhost:1337/",
+		Port:                     1337,
+		Token:                    "miauwkes",
+		AllowedWebmentionSources: []string{"brainbaking.com"},
+		Blacklist:                []string{"youtube.com"},
+		Whitelist:                []string{"brainbaking.com"},
+	}
 	repo db.MentionRepo
 )
 
@@ -46,7 +53,7 @@ func TestHandleDelete(t *testing.T) {
 
 	ts := httptest.NewServer(HandleDelete(repo))
 	defer ts.Close()
-	defer db.Purge()
+	t.Cleanup(db.Purge)
 
 	client := &http.Client{}
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s?source=%s&target=%s", ts.URL, wm.Source, wm.Target), nil)
@@ -60,7 +67,7 @@ func TestHandleDelete(t *testing.T) {
 func TestHandlePostWithInvalidUrlsShouldReturnBadRequest(t *testing.T) {
 	ts := httptest.NewServer(HandlePost(cnf, repo))
 	defer ts.Close()
-	defer db.Purge()
+	t.Cleanup(db.Purge)
 
 	res, err := http.PostForm(ts.URL, postWm("https://haha.be/woof/said/the/dog.txt", "https://pussies.nl/mycatjustthrewup/gottacleanup.html"))
 	assert.NoError(t, err)
@@ -75,7 +82,7 @@ func TestHandlePostWithInvalidUrlsShouldReturnBadRequest(t *testing.T) {
 func TestHandlePostWithTestServer_Parallel(t *testing.T) {
 	ts := httptest.NewServer(HandlePost(cnf, repo))
 	defer ts.Close()
-	defer db.Purge()
+	t.Cleanup(db.Purge)
 
 	var wg sync.WaitGroup
 

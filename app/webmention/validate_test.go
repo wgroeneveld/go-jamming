@@ -37,7 +37,16 @@ func buildHttpReq(source string, target string) *httpReqMock {
 	}
 }
 
-var config = common.Configure()
+var (
+	config = &common.Config{
+		BaseURL:                  "https://somecool.base.url/",
+		Port:                     1337,
+		Token:                    "miauwkes",
+		AllowedWebmentionSources: []string{"brainbaking.com", "jefklakscodex.com"},
+		Blacklist:                []string{"youtube.com"},
+		Whitelist:                []string{"brainbaking.com"},
+	}
+)
 
 func TestValidate(t *testing.T) {
 	cases := []struct {
