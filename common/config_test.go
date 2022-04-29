@@ -17,7 +17,7 @@ func TestReadFromJsonMalformedReversToDefaults(t *testing.T) {
 	t.Cleanup(cleanupConfig)
 
 	config := Configure()
-	assert.Contains(t, config.AllowedWebmentionSources, "brainbaking.com")
+	assert.Contains(t, config.AllowedWebmentionSources, "mycooldomain.com")
 }
 
 func TestReadFromJsonWithCorrectJsonData(t *testing.T) {

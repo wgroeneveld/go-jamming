@@ -15,7 +15,14 @@ import (
 )
 
 var (
-	cnf  = common.Configure()
+	cnf = &common.Config{
+		BaseURL:                  "http://localhost:1337/",
+		Port:                     1337,
+		Token:                    "miauwkes",
+		AllowedWebmentionSources: []string{"brainbaking.com"},
+		Blacklist:                []string{},
+		Whitelist:                []string{"brainbaking.com"},
+	}
 	repo db.MentionRepo
 )
 

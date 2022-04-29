@@ -132,13 +132,13 @@ func config() *Config {
 
 func defaultConfig() *Config {
 	defaultConfig := &Config{
-		AdminEmail:               "wouter@brainbaking.com",
-		BaseURL:                  "https://jam.brainbaking.com/",
+		AdminEmail:               "admin@mycooldomain.com",
+		BaseURL:                  "http://localhost:1337/",
 		Port:                     1337,
 		Token:                    "miauwkes",
-		AllowedWebmentionSources: []string{"brainbaking.com", "jefklakscodex.com"},
+		AllowedWebmentionSources: []string{"mycooldomain.com", "myotherdomain.com"},
 		Blacklist:                []string{"youtube.com"},
-		Whitelist:                []string{"brainbaking.com"},
+		Whitelist:                []string{"mycooldomain.com"},
 	}
 	defaultConfig.Save()
 	return defaultConfig
