@@ -94,7 +94,17 @@ func TestDomainParseFromTarget(t *testing.T) {
 		{
 			"parse from localhost domain without extension",
 			"https://localhost:1313/stuff",
-			"localhost:1313",
+			"localhost",
+		},
+		{
+			"UK domain with two dots after the name",
+			"https://minutestomidnight.co.uk/blog/article.html",
+			"minutestomidnight.co.uk",
+		},
+		{
+			"UK domain with subdomain",
+			"https://www.minutestomidnight.co.uk/blog/article.html",
+			"minutestomidnight.co.uk",
 		},
 		{
 			"malformed http string with too little slashes simply returns same URL",

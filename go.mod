@@ -10,6 +10,7 @@ require (
 	github.com/rs/zerolog v1.21.0
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/buntdb v1.2.3
+	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
 	golang.org/x/time v0.0.0-20220411224347-583f2d630306
 	willnorris.com/go/microformats v1.1.1
 )

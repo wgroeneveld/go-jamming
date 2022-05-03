@@ -2,7 +2,7 @@ package rest
 
 import (
 	"encoding/json"
-	"fmt"
+	"golang.org/x/net/publicsuffix"
 	"net/http"
 	"net/url"
 	"strings"
@@ -25,17 +25,24 @@ func Unauthorized(w http.ResponseWriter) {
 // This is the same as conf.FetchDomain(wm.Target), only without config, and without error handling.
 // Assumes http(s) protocol, which should have been validated before calling this.
 func Domain(target string) string {
-	slashes := strings.Split(target, "/")
-	if len(slashes) < 3 {
+	url, err := url.Parse(target)
+	if err != nil {
+		return target
+	}
+	host := url.Hostname()
+	if host == "" {
 		return target
 	}
 
-	withPossibleSubdomain := slashes[2]
+	suffix, _ := publicsuffix.PublicSuffix(host)
+	withPossibleSubdomain := strings.ReplaceAll(host, "."+suffix, "")
+
 	split := strings.Split(withPossibleSubdomain, ".")
-	if len(split) <= 2 {
-		return withPossibleSubdomain // that was the extension, not the subdomain.
+	if len(split) <= 1 {
+		return host
 	}
-	return fmt.Sprintf("%s.%s", split[1], split[2])
+
+	return strings.Join(split[1:], ".") + "." + suffix
 }
 
 type imageType []byte
@@ -52,7 +59,13 @@ var (
 
 	// SiloDomains are domains where mentions of multiple individuals may come from.
 	// These are privacy issues and will be anonymized as such.
-	SiloDomains = []string{"brid.gy", "twitter.com", "facebook.com"}
+	SiloDomains = []string{
+		"brid.gy",
+		"twitter.com",
+		"facebook.com",
+		"indieweb.social",
+		"mastodon.social",
+	}
 )
 
 // IsRealImage checks the first few bytes of the provided data to see if it's a real image.
