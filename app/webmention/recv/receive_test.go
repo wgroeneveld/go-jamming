@@ -9,8 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
+	"willnorris.com/go/microformats"
 
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/mocks"
@@ -309,6 +311,30 @@ func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {
 	receiver.Receive(wm)
 	assert.Empty(t, repo.GetAll("brainbaking.com").Data)
 	assert.Empty(t, repo.GetAllToModerate("brainbaking.com").Data)
+}
+
+func TestConvertBodyToIndiewebDataWithComplicatedDataStillFindsName(t *testing.T) {
+	wm := mf.Mention{
+		Source: "https://pauho.net/2022/05/04/662325/",
+		Target: "https://brainbaking.com/post/2022/04/cool-things-people-do-with-their-blogs/",
+	}
+	cnf := &common.Config{
+		AllowedWebmentionSources: []string{
+			"brainbaking.com",
+		},
+	}
+
+	recv := &Receiver{
+		Conf: cnf,
+	}
+	src, err := ioutil.ReadFile("../../../mocks/indieweb-complicated-data.html")
+	assert.NoError(t, err)
+
+	body := string(src)
+	data := microformats.Parse(strings.NewReader(body), wm.SourceUrl())
+	indieweb := recv.convertBodyToIndiewebData(body, wm, data)
+
+	assert.Equal(t, "Paul Houlihan", indieweb.Author.Name)
 }
 
 func TestProcessSourceBodyAnonymizesBothAuthorPictureAndNameIfComingFromSilo(t *testing.T) {

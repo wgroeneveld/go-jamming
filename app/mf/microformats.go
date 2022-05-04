@@ -222,6 +222,9 @@ func DetermineAuthorName(hEntry *microformats.Microformat) string {
 	if authorName == "" {
 		authorName = Str(hEntry, "author")
 	}
+	if authorName == "" {
+		authorName = Str(hEntry, "name")
+	}
 	return authorName
 }
 
