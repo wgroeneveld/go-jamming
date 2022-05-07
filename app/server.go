@@ -55,7 +55,10 @@ func ipFrom(r *http.Request) string {
 	if forwardedFor != "" { // in case of proxy. Could be: clientip, proxy1, proxy2, ...
 		return strings.Split(forwardedFor, ",")[0]
 	}
-	return r.RemoteAddr // also contains port, but don't care
+	if strings.Contains(r.RemoteAddr, ":") { // in case of 127.0.0.1:12345
+		return strings.Split(r.RemoteAddr, ":")[0]
+	}
+	return r.RemoteAddr
 }
 
 func Start() {

@@ -3,6 +3,7 @@ package app
 import (
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/rest"
+	"fmt"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
 	"net/http"
@@ -43,14 +44,15 @@ const (
 	cleanupCron = 2 * time.Minute
 )
 
-func (rl *RateLimiter) getVisitor(ip string) *rate.Limiter {
+func (rl *RateLimiter) limiterFor(ip string, uri string) *rate.Limiter {
 	rl.mu.Lock()
 	defer rl.mu.Unlock()
 
-	v, exists := rl.visitors[ip]
+	key := fmt.Sprintf("%s-%s", ip, uri)
+	v, exists := rl.visitors[key]
 	if !exists {
 		limiter := rate.NewLimiter(rate.Limit(rl.rateLimitPerSec), rl.rateBurst)
-		rl.visitors[ip] = &visitor{limiter, common.Now()}
+		rl.visitors[key] = &visitor{limiter, common.Now()}
 		return limiter
 	}
 
@@ -63,10 +65,10 @@ func (rl *RateLimiter) cleanupVisitors() {
 		time.Sleep(cleanupCron)
 
 		rl.mu.Lock()
-		for ip, v := range rl.visitors {
+		for key, v := range rl.visitors {
 			if time.Since(v.lastSeen) > ttl {
-				log.Debug().Str("ip", ip).Msg("Cleaning up rate limiter visitor")
-				delete(rl.visitors, ip)
+				log.Debug().Str("key", key).Msg("Cleaning up rate limiter visitor")
+				delete(rl.visitors, key)
 			}
 		}
 		rl.mu.Unlock()
@@ -77,10 +79,10 @@ func (rl *RateLimiter) cleanupVisitors() {
 func (rl *RateLimiter) limiterMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := ipFrom(r)
-		limiter := rl.getVisitor(ip)
+		limiter := rl.limiterFor(ip, r.RequestURI)
 
 		if !limiter.Allow() {
-			log.Error().Str("ip", ip).Msg("Someone spamming? Rate limit hit!")
+			log.Error().Str("ip", ip).Str("uri", r.RequestURI).Msg("Someone spamming? Rate limit hit!")
 			rest.TooManyRequests(w)
 			return
 		}
