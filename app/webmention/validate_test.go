@@ -57,6 +57,13 @@ func TestValidate(t *testing.T) {
 		expected    bool
 	}{
 		{
+			"is valid if encoded as form including the charset",
+			"https://brainbaking.com/bla1",
+			"https://jefklakscodex.com/bla",
+			"application/x-www-form-urlencoded; charset=utf-8",
+			true,
+		},
+		{
 			"is valid if source and target https urls",
 			"http://brainbaking.com/bla1",
 			"http://jefklakscodex.com/bla",

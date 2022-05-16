@@ -29,7 +29,7 @@ func isValidTargetUrl(url string, httpClient rest.Client) bool {
 }
 
 func validate(r rest.HttpReq, h rest.HttpHeader, conf *common.Config) bool {
-	return h.Get("Content-Type") == "application/x-www-form-urlencoded" &&
+	return strings.HasPrefix(h.Get("Content-Type"), "application/x-www-form-urlencoded") &&
 		isValidUrl(r.FormValue("source")) &&
 		isValidUrl(r.FormValue("target")) &&
 		r.FormValue("source") != r.FormValue("target") &&

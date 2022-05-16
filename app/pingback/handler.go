@@ -8,7 +8,6 @@ import (
 	"brainbaking.com/go-jamming/rest"
 	"encoding/xml"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 )
@@ -94,7 +93,8 @@ func pingbackError(w http.ResponseWriter, err error) {
         </value>
     </fault>
 </methodResponse>`
-	log.Error().Err(err).Msg("Pingback receive went wrong")
+	// No longer interested in pingback errors, these are 99.9% badly formatted spam that clog up syslog
+	// log.Error().Err(err).Msg("Pingback receive went wrong")
 	w.WriteHeader(200)
 	w.Write([]byte(xml))
 }
