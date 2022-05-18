@@ -313,28 +313,52 @@ func TestReceiveTargetThatDoesNotPointToTheSourceDoesNothing(t *testing.T) {
 	assert.Empty(t, repo.GetAllToModerate("brainbaking.com").Data)
 }
 
-func TestConvertBodyToIndiewebDataWithComplicatedDataStillFindsName(t *testing.T) {
-	wm := mf.Mention{
-		Source: "https://pauho.net/2022/05/04/662325/",
-		Target: "https://brainbaking.com/post/2022/04/cool-things-people-do-with-their-blogs/",
+func TestConvertBodyToIndiewebDataWithComplicatedData(t *testing.T) {
+	cases := []struct {
+		source             string
+		target             string
+		mockFile           string
+		expectedAuthorName string
+	}{
+		{
+			"https://pauho.net/2022/05/04/662325/",
+			"https://brainbaking.com/post/2022/04/cool-things-people-do-with-their-blogs/",
+			"../../../mocks/indieweb-complicated-data.html",
+			"Paul Houlihan",
+		},
+		{
+			"https://ruk.ca/favourite/drought",
+			"https://brainbaking.com/post/2022/05/drought/",
+			"../../../mocks/indieweb-hcard-next-to-name.html",
+			"Peter Rukavina",
+		},
 	}
+
 	cnf := &common.Config{
 		AllowedWebmentionSources: []string{
 			"brainbaking.com",
 		},
 	}
-
 	recv := &Receiver{
 		Conf: cnf,
 	}
-	src, err := ioutil.ReadFile("../../../mocks/indieweb-complicated-data.html")
-	assert.NoError(t, err)
+	for _, tc := range cases {
+		t.Run("indieweb author "+tc.expectedAuthorName, func(t *testing.T) {
+			wm := mf.Mention{
+				Source: tc.source,
+				Target: tc.target,
+			}
 
-	body := string(src)
-	data := microformats.Parse(strings.NewReader(body), wm.SourceUrl())
-	indieweb := recv.convertBodyToIndiewebData(body, wm, data)
+			src, err := ioutil.ReadFile(tc.mockFile)
+			assert.NoError(t, err)
 
-	assert.Equal(t, "Paul Houlihan", indieweb.Author.Name)
+			body := string(src)
+			data := microformats.Parse(strings.NewReader(body), wm.SourceUrl())
+			indieweb := recv.convertBodyToIndiewebData(body, wm, data)
+
+			assert.Equal(t, tc.expectedAuthorName, indieweb.Author.Name)
+		})
+	}
 }
 
 func TestProcessSourceBodyAnonymizesBothAuthorPictureAndNameIfComingFromSilo(t *testing.T) {

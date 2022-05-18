@@ -192,9 +192,12 @@ func Published(hEntry *microformats.Microformat) string {
 }
 
 func NewAuthor(hEntry *microformats.Microformat, hCard *microformats.Microformat) IndiewebAuthor {
-	name := DetermineAuthorName(hEntry)
-	if name == "" {
+	name := ""
+	if hCard != nil {
 		name = DetermineAuthorName(hCard)
+	}
+	if name == "" {
+		name = DetermineAuthorName(hEntry)
 	}
 	picture := DetermineAuthorPhoto(hEntry)
 	if picture == "" {
