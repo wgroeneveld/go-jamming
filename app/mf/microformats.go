@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	dateFormatWithTimeZone               = "2006-01-02T15:04:05-07:00"
+	DateFormatWithTimeZone               = "2006-01-02T15:04:05-07:00"
 	dateFormatWithAbsoluteTimeZone       = "2006-01-02T15:04:05-0700"
 	dateFormatWithTimeZoneSuffixed       = "2006-01-02T15:04:05.000Z"
 	dateFormatWithoutTimeZone            = "2006-01-02T15:04:05"
@@ -22,7 +22,7 @@ var (
 	// This is similar to Hugo's string-to-date casting system
 	// See https://github.com/spf13/cast/blob/master/caste.go
 	supportedFormats = []string{
-		dateFormatWithTimeZone,
+		DateFormatWithTimeZone,
 		dateFormatWithAbsoluteTimeZone,
 		dateFormatWithTimeZoneSuffixed,
 		dateFormatWithSecondsWithoutTimeZone,
@@ -81,6 +81,10 @@ type IndiewebData struct {
 	Target       string         `json:"target"`
 }
 
+func (id *IndiewebData) PublishedDate() time.Time {
+	return common.ToTime(id.Published, DateFormatWithTimeZone)
+}
+
 func (id *IndiewebData) AsMention() Mention {
 	return Mention{
 		Source: id.Source,
@@ -93,7 +97,7 @@ func (id *IndiewebData) IsEmpty() bool {
 }
 
 func PublishedNow() string {
-	return common.Now().UTC().Format(dateFormatWithTimeZone)
+	return common.Now().UTC().Format(DateFormatWithTimeZone)
 }
 
 func shorten(txt string) string {
@@ -185,7 +189,7 @@ func Published(hEntry *microformats.Microformat) string {
 		if err != nil {
 			continue
 		}
-		return formatted.Format(dateFormatWithTimeZone)
+		return formatted.Format(DateFormatWithTimeZone)
 	}
 
 	return PublishedNow()

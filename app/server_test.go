@@ -14,13 +14,13 @@ var conf = &common.Config{
 	AllowedWebmentionSources: []string{"http://ewelja.be"},
 }
 
-func TestAuthorizedOnlyUnauthorizedWithWrongToken(t *testing.T) {
+func TestTokenOnlyUnauthorizedWithWrongToken(t *testing.T) {
 	srv := &server{
 		conf: conf,
 	}
 
 	passed := false
-	handler := srv.authorizedOnly(func(writer http.ResponseWriter, request *http.Request) {
+	handler := srv.tokenOnly(func(writer http.ResponseWriter, request *http.Request) {
 		passed = true
 	})
 	r, _ := http.NewRequest("PUT", "/whatever", nil)
@@ -54,13 +54,13 @@ func TestDomainOnlyWithWrongDomain(t *testing.T) {
 	assert.False(t, passed, "should not have called unauthorized func")
 }
 
-func TestAuthorizedOnlyOkIfTokenAndDomainMatch(t *testing.T) {
+func TestTokenOnlyOkIfTokenAndDomainMatch(t *testing.T) {
 	srv := &server{
 		conf: conf,
 	}
 
 	passed := false
-	handler := srv.authorizedOnly(func(writer http.ResponseWriter, request *http.Request) {
+	handler := srv.tokenOnly(func(writer http.ResponseWriter, request *http.Request) {
 		passed = true
 	})
 	r, _ := http.NewRequest("PUT", "/whatever", nil)

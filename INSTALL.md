@@ -32,11 +32,12 @@ Place a `config.json` file in the same directory that looks like this: (below ar
 }
 ```
 
-- baseURL, with trailing slash: base access point, used in approval/admin panel
-- adminEmail, the e-mail address to send notificaions to. If absent, will not send out mails. **uses 127.0.0.1:25 postfix** at the moment.
-- port, host: http server params
-- token, allowedWebmentionSources: see below, used for authentication
-- blacklist/whitelist: domains from which we do (NOT) send to or accept mentions from. 
+- `baseURL`, with trailing slash: base access point, used in approval/admin panel
+- `adminEmail`, the e-mail address to send notificaions to. If absent, will not send out mails. **uses 127.0.0.1:25 postfix** at the moment.
+- `port`, host: http server params
+- `token`: see below, used for authentication
+- `blacklist`/`whitelist`: domains from which we do (NOT) send to or accept mentions from. This is usually the domain of the `source` in the receiving mention. **Note**: the blacklist is also used to block outgoing mentions. 
+- `allowedWebmentionSources`: your own domains which go-jamming is able to receive mentions from. This is usually domain of the `target` in the receiving mention.
 
 If a config file is missing, or required keys are missing, a warning will be generated and default values will be used instead. See `common/config.go`.
 

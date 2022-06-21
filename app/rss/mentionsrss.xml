@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version='2.0' xmlns:content='http://purl.org/rss/1.0/modules/content/' xmlns:atom='http://www.w3.org/2005/Atom' xmlns:dc='http://purl.org/dc/elements/1.1/'>
+    <channel>
+        <title>Go-Jamming @ {{ .Domain }}</title>
+        <description>Go-Jamming @ {{ .Domain }}</description>
+        <generator>Go-Jamming</generator>
+        <language>en-us</language>
+        <lastBuildDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</lastBuildDate>
+
+        {{ range .Items }}
+        <item>
+            <title>{{ if .ApproveURL }}To Moderate: {{ end }}{{ .Data.Name | html }} ({{ .Data.Url }})</title>
+            <link>{{ .Data.Target }}</link>
+            <pubDate>{{ .Data.PublishedDate.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</pubDate>
+            <dc:creator>{{ .Data.Author.Name | html }}</dc:creator>
+            <description>
+                <![CDATA[
+                    {{ if .ApproveURL }}
+                        <a href="{{ .ApproveURL }}">✅ Approve this mention!</a><br/>
+                        <a href="{{ .RejectURL }}">❌ Reject this mention!</a><br/><br/>
+                    {{ end }}
+
+                    Author: {{ .Data.Author }}<br/>
+                    Name: {{ .Data.Name }}<br/>
+                    Published: {{ .Data.Published }}<br/>
+                    Type: {{ .Data.IndiewebType }}<br/>
+                    Url: <a href="{{ .Data.Url }}">{{ .Data.Url }}</a><br/><br/>
+
+                    Source: <a href="{{ .Data.Source }}">{{ .Data.Source }}</a><br/>
+                    Target: <a href="{{ .Data.Target }}">{{ .Data.Target }}</a><br/><br/>
+
+                    Content: {{ .Data.Content }}
+                ]]>
+            </description>
+        </item>
+        {{ end }}
+    </channel>
+</rss>

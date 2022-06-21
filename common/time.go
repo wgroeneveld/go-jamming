@@ -1,7 +1,6 @@
 package common
 
 import (
-	"github.com/rs/zerolog/log"
 	"time"
 )
 
@@ -20,14 +19,17 @@ func TimeToIso(theTime time.Time) string {
 
 // IsoToTime converts an ISO time string into a time.Time object
 // As produced by clients using day.js - e.g. 2021-04-09T15:51:43.732Z
-func IsoToTime(since string) time.Time {
-	if since == "" {
+func IsoToTime(date string) time.Time {
+	return ToTime(date, IsoFormat)
+}
+
+func ToTime(date string, format string) time.Time {
+	if date == "" {
 		return time.Time{}
 	}
-	t, err := time.Parse(IsoFormat, since)
+	t, err := time.Parse(format, date)
 	if err != nil {
-		log.Warn().Str("time", since).Msg("Invalid ISO date, reverting to now()")
-		return Now()
+		return time.Time{}
 	}
 	return t
 }

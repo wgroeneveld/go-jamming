@@ -168,6 +168,18 @@ Will result in a `200 OK` - that returns XML according to [The W3 pingback XML-R
 
 Happens automatically through `PUT /webmention/:domain/:token`! Links that are discovered as `rel="pingback"` that **do not** already have a webmention link will be processed as XML-RPC requests to be send. 
 
+### 3. Keep track of mentions
+
+#### 3.1 `GET /feed/[domain]/[token]`
+
+To keep track of all incoming mentions, simply subscribe to the above URL for each of your domains using your favorite RSS reader. 
+
+Mentions to approve also appear in the feed, together with links to accept or reject them with a single click! (See below, section "mentions in moderation").
+
+#### 3.2 SMTP `localhost`
+
+Messages of incoming mentions can also be sent via e-mail if you have a localhost SMTP server setup. See the `INSTALL.md` for more instructions and config parameters on how to do so.  
+
 ---
 
 ## Troubleshooting

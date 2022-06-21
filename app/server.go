@@ -21,7 +21,7 @@ type server struct {
 }
 
 func (s *server) domainAndTokenOnly(h http.HandlerFunc) http.HandlerFunc {
-	return s.domainOnly(s.authorizedOnly(h))
+	return s.domainOnly(s.tokenOnly(h))
 }
 
 func (s *server) domainOnly(h http.HandlerFunc) http.HandlerFunc {
@@ -35,7 +35,7 @@ func (s *server) domainOnly(h http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func (s *server) authorizedOnly(h http.HandlerFunc) http.HandlerFunc {
+func (s *server) tokenOnly(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		if vars["token"] != s.conf.Token {

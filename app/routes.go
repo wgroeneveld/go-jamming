@@ -5,6 +5,7 @@ import (
 	"brainbaking.com/go-jamming/app/index"
 	"brainbaking.com/go-jamming/app/pictures"
 	"brainbaking.com/go-jamming/app/pingback"
+	"brainbaking.com/go-jamming/app/rss"
 	"brainbaking.com/go-jamming/app/webmention"
 )
 
@@ -20,12 +21,14 @@ func (s *server) routes() {
 	s.router.HandleFunc("/pingback", pingback.HandlePost(c, db)).Methods("POST")
 	s.router.HandleFunc("/webmention", webmention.HandlePost(c, db)).Methods("POST")
 
+	s.router.HandleFunc("/feed/{domain}/{token}", s.domainAndTokenOnly(rss.HandleGet(c, db))).Methods("GET")
+
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.domainAndTokenOnly(webmention.HandleGet(db))).Methods("GET")
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.domainAndTokenOnly(webmention.HandlePut(c, db))).Methods("PUT")
 	s.router.HandleFunc("/webmention/{domain}/{token}", s.domainAndTokenOnly(webmention.HandleDelete(db))).Methods("DELETE")
 
-	s.router.HandleFunc("/admin/{token}", s.authorizedOnly(admin.HandleGet(c, db))).Methods("GET")
+	s.router.HandleFunc("/admin/{token}", s.tokenOnly(admin.HandleGet(c, db))).Methods("GET")
 	s.router.HandleFunc("/admin/{domain}/{token}", s.domainAndTokenOnly(admin.HandleGetToApprove(db))).Methods("GET")
-	s.router.HandleFunc("/admin/approve/{token}/{key}", s.authorizedOnly(admin.HandleApprove(c, db))).Methods("GET")
-	s.router.HandleFunc("/admin/reject/{token}/{key}", s.authorizedOnly(admin.HandleReject(c, db))).Methods("GET")
+	s.router.HandleFunc("/admin/approve/{token}/{key}", s.tokenOnly(admin.HandleApprove(c, db))).Methods("GET")
+	s.router.HandleFunc("/admin/reject/{token}/{key}", s.tokenOnly(admin.HandleReject(c, db))).Methods("GET")
 }

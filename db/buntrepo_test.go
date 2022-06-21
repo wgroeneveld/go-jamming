@@ -132,7 +132,8 @@ func TestGetAllAndSaveSomeJson(t *testing.T) {
 	db.Save(mf.Mention{
 		Target: "https://pussycat.com/coolpussy.html",
 	}, &mf.IndiewebData{
-		Name: "lolz",
+		Name:      "lolz",
+		Published: "2021-07-24T23:27:25+01:00",
 	})
 
 	results := db.GetAll("pussycat.com")

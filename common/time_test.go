@@ -42,9 +42,9 @@ func (s *TimeSuite) TestIsoToTimeInISOString() {
 	assert.Equal(s.T(), expectedtime.Second(), since.Second())
 }
 
-func (s *TimeSuite) TestIsoToTimeInvalidStringReturnsNowTime() {
+func (s *TimeSuite) TestIsoToTimeInvalidStringReturnsZeroTime() {
 	since := IsoToTime("woef ik ben een hondje")
-	assert.Equal(s.T(), s.nowtime, since)
+	assert.True(s.T(), since.IsZero())
 }
 
 func (s *TimeSuite) TestIsoToTimeEmptyReturnsZeroTime() {
