@@ -61,6 +61,7 @@ var (
 	// These are privacy issues and will be anonymized as such.
 	SiloDomains = []string{
 		"brid.gy",
+		"brid-gy.appspot.com",
 		"twitter.com",
 		"facebook.com",
 		"indieweb.social",

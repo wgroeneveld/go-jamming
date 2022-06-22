@@ -3,6 +3,7 @@ package external
 import (
 	"brainbaking.com/go-jamming/app/mf"
 	"brainbaking.com/go-jamming/common"
+	"brainbaking.com/go-jamming/rest"
 	"encoding/json"
 )
 
@@ -99,10 +100,21 @@ func convert(wmio WebmentionIOMention) *mf.IndiewebData {
 		Content:      contentOf(wmio, iType),
 		Published:    publishedDate(wmio),
 		Url:          wmio.Data.Url,
-		Source:       wmio.Source,
+		Source:       sourceOf(wmio),
 		Target:       wmio.Target,
 		IndiewebType: iType,
 	}
+}
+
+// sourceOf returns wmio.Source unless it detects a silo link such as bridgy.
+// In that case, it returns the data URL. This isn't entirely correct, as it technically never was the sender.
+func sourceOf(wmio WebmentionIOMention) string {
+	srcDomain := rest.Domain(wmio.Source)
+	if common.Includes(rest.SiloDomains, srcDomain) {
+		return wmio.Data.Url
+	}
+
+	return wmio.Source
 }
 
 func nameOf(wmio WebmentionIOMention, iType mf.MfType) string {

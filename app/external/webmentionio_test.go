@@ -7,6 +7,40 @@ import (
 	"time"
 )
 
+func TestTryImportBridgyUrl(t *testing.T) {
+	wmio := &WebmentionIOImporter{}
+	cases := []struct {
+		label          string
+		mention        string
+		expectedSource string
+	}{
+		{
+			"conventional source URL does nothing special",
+			`{ "links": [ { "source": "https://brainbaking.com/lolz"  } ] }`,
+			"https://brainbaking.com/lolz",
+		},
+		{
+			"Source URL from brid.gy takes data URL as source instead",
+			`{ "links": [ { "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/252048752", "data": { "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-252048752" } } ] }`,
+			"https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-252048752",
+		},
+		{
+			"Source URL from brid-gy.appspot.com takes URL as data source instead",
+			`{ "links": [ { "source": "https://brid-gy.appspot.com/post/twitter/iamchrisburnell/1103728693648809984", "data": { "url": "https://twitter.com/adactioLinks/status/1103728693648809984" } } ] }`,
+			"https://twitter.com/adactioLinks/status/1103728693648809984",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.label, func(t *testing.T) {
+			res, err := wmio.TryImport([]byte(tc.mention))
+			assert.NoError(t, err)
+
+			assert.Equal(t, tc.expectedSource, res[0].Source)
+		})
+	}
+}
+
 func TestTryImportPublishedDates(t *testing.T) {
 	wmio := &WebmentionIOImporter{}
 	cases := []struct {
