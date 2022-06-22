@@ -4,7 +4,93 @@ import (
 	"brainbaking.com/go-jamming/app/mf"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
+
+func TestTryImportPublishedDates(t *testing.T) {
+	wmio := &WebmentionIOImporter{}
+	cases := []struct {
+		label        string
+		mention      string
+		expectedDate string
+	}{
+		{
+			"no dates reverts to first",
+			`{ "links": [ {   } ] }`,
+			time.Time{}.Format(mf.DateFormatWithTimeZone),
+		},
+		{
+			"no published date reverts to verified date",
+			`{ "links": [ { "verified_date": "2022-05-25T14:28:10+00:00"  } ] }`,
+			"2022-05-25T14:28:10+00:00",
+		},
+		{
+			"published date present takes preference over rest",
+			`{ "links": [ { "data": { "published": "2020-01-25T14:28:10+00:00" }, "verified_date": "2022-05-25T14:28:10+00:00"  } ] }`,
+			"2020-01-25T14:28:10+00:00",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.label, func(t *testing.T) {
+			res, err := wmio.TryImport([]byte(tc.mention))
+			assert.NoError(t, err)
+
+			assert.Equal(t, tc.expectedDate, res[0].Published)
+		})
+	}
+}
+
+func TestTryImportErrorIfInvalidFormat(t *testing.T) {
+	wmio := &WebmentionIOImporter{}
+	mention := `haha`
+
+	_, err := wmio.TryImport([]byte(mention))
+	assert.Error(t, err)
+}
+
+func TestTryImportForLikeWithMissingAuthor(t *testing.T) {
+	wmio := &WebmentionIOImporter{}
+	mention := `{ "links": [
+{
+            "source": "https://jacky.wtf/2022/5/BRQo",
+            "verified": true,
+            "verified_date": "2022-05-25T14:28:10+00:00",
+            "id": 1404286,
+            "private": false,
+            "data": {
+                "url": "https://jacky.wtf/2022/5/BRQo",
+                "name": null,
+                "content": null,
+                "published": "2022-05-25T14:26:12+00:00",
+                "published_ts": 1653488772
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "https://jacky.wtf/2022/5/BRQo liked a post https://chrisburnell.com/article/changing-with-the-times/",
+                "sentence_html": "<a href=\"https://jacky.wtf/2022/5/BRQo\">someone</a> liked a post <a href=\"https://chrisburnell.com/article/changing-with-the-times/\">https://chrisburnell.com/article/changing-with-the-times/</a>"
+            },
+            "target": "https://chrisburnell.com/article/changing-with-the-times/"
+        }
+] }`
+
+	res, err := wmio.TryImport([]byte(mention))
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(res))
+	result := res[0]
+
+	assert.Equal(t, "https://chrisburnell.com/article/changing-with-the-times/", result.Target)
+	assert.Equal(t, "https://jacky.wtf/2022/5/BRQo", result.Source)
+
+	assert.Equal(t, mf.TypeLike, result.IndiewebType)
+	assert.Equal(t, "https://jacky.wtf/2022/5/BRQo liked a post https://chrisburnell.com/article/changing-with-the-times/", result.Content)
+	assert.Equal(t, "", result.Name)
+	assert.Equal(t, "https://jacky.wtf/2022/5/BRQo", result.Url)
+	assert.Equal(t, "2022-05-25T14:26:12+00:00", result.Published)
+
+	assert.Equal(t, "", result.Author.Name)
+	assert.Equal(t, "", result.Author.Picture)
+}
 
 func TestTryImportForReply(t *testing.T) {
 	wmio := &WebmentionIOImporter{}

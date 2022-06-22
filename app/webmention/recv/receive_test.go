@@ -2,6 +2,7 @@ package recv
 
 import (
 	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/app/notifier"
 	"brainbaking.com/go-jamming/db"
 	"encoding/json"
 	"errors"
@@ -255,7 +256,7 @@ func TestReceiveFromNotInWhitelistSavesInModerationAndNotifies(t *testing.T) {
 	}
 	repo := db.NewMentionRepo(cnf)
 	t.Cleanup(db.Purge)
-	notifierMock := &mocks.StringNotifier{
+	notifierMock := &notifier.StringNotifier{
 		Conf:   cnf,
 		Output: "",
 	}
@@ -415,7 +416,7 @@ func TestProcessAuthorPictureAnonymizesIfEmpty(t *testing.T) {
 			Picture: "",
 		},
 	}
-	recv.processAuthorPicture(indieweb)
+	recv.ProcessAuthorPicture(indieweb)
 
 	assert.Equal(t, "/pictures/anonymous", indieweb.Author.Picture)
 }

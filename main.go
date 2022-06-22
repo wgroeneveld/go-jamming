@@ -4,6 +4,7 @@ import (
 	"brainbaking.com/go-jamming/app/external"
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/db"
+	"brainbaking.com/go-jamming/rest"
 	"flag"
 	"os"
 
@@ -42,12 +43,24 @@ func main() {
 	}
 
 	if importing {
-		external.Import(*importFile)
+		importWebmentionFile(*importFile)
 		os.Exit(0)
 	}
 
 	log.Debug().Msg("Let's a go!")
 	app.Start()
+}
+
+func importWebmentionFile(file string) {
+	log.Info().Str("file", file).Msg("Starting import...")
+
+	config := common.Configure()
+	bootstrapper := external.ImportBootstrapper{
+		RestClient: &rest.HttpClient{},
+		Conf:       config,
+		Repo:       db.NewMentionRepo(config),
+	}
+	bootstrapper.Import(file)
 }
 
 func blacklistDomain(domain string) {

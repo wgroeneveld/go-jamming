@@ -2,6 +2,11 @@ package external
 
 import (
 	"brainbaking.com/go-jamming/app/mf"
+	"brainbaking.com/go-jamming/app/notifier"
+	"brainbaking.com/go-jamming/app/webmention/recv"
+	"brainbaking.com/go-jamming/common"
+	"brainbaking.com/go-jamming/db"
+	"brainbaking.com/go-jamming/rest"
 	"github.com/rs/zerolog/log"
 	"os"
 	"reflect"
@@ -11,9 +16,13 @@ type Importer interface {
 	TryImport(data []byte) ([]*mf.IndiewebData, error)
 }
 
-func Import(file string) {
-	log.Info().Str("file", file).Msg("Starting import...")
+type ImportBootstrapper struct {
+	RestClient rest.Client
+	Conf       *common.Config
+	Repo       db.MentionRepo
+}
 
+func (ib *ImportBootstrapper) Import(file string) {
 	bytes, err := os.ReadFile(file)
 	if err != nil {
 		log.Err(err).Msg("Unable to read file")
@@ -28,9 +37,10 @@ func Import(file string) {
 
 	for _, i := range importers {
 		convertedData, err = i.TryImport(bytes)
-		if err != nil {
-			log.Warn().Str("importType", reflect.TypeOf(i).String()).Msg("Importer failed: ")
+		if err != nil || len(convertedData) == 0 {
+			log.Warn().Str("importType", reflect.TypeOf(i).String()).Msg("Importer failed or returned zero entries")
 		} else {
+			log.Info().Str("importType", reflect.TypeOf(i).String()).Msg("Suitable converter found!")
 			break
 		}
 	}
@@ -40,8 +50,24 @@ func Import(file string) {
 		return
 	}
 
-	// TODO store author pictures locally (and mutate wm for local URL)
-	// TODO strip content + trim?
-	// TODO save converted data in db
-	// TODO whitelist domains?
+	log.Info().Msg("Conversion succeeded, persisting to data storage...")
+	recv := &recv.Receiver{
+		RestClient: ib.RestClient,
+		Conf:       ib.Conf,
+		Repo:       ib.Repo,
+		Notifier:   &notifier.StringNotifier{},
+	}
+
+	for _, wm := range convertedData {
+		mention := mf.Mention{
+			Source: wm.Source,
+			Target: wm.Target,
+		}
+		ib.Conf.AddToWhitelist(mention.SourceDomain())
+
+		recv.ProcessAuthorPicture(wm)
+		recv.ProcessWhitelistedMention(mention, wm)
+	}
+
+	log.Info().Msg("All done, enjoy your go-jammed mentions!")
 }

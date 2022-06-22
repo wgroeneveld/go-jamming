@@ -1,4 +1,4 @@
-package mocks
+package notifier
 
 import (
 	"brainbaking.com/go-jamming/app/mf"

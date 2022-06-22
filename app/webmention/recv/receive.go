@@ -28,7 +28,7 @@ var (
 	errPicUnableToDownload          = errors.New("Unable to download author picture")
 	errPicNoRealImage               = errors.New("Downloaded author picture is not a real image")
 	errPicUnableToSave              = errors.New("Unable to save downloaded author picture")
-	errWontDownloadBecauseOfPrivacy = errors.New("Will not save locally because it's form a silo domain")
+	errWontDownloadBecauseOfPrivacy = errors.New("Will not save locally because it's from a silo domain")
 )
 
 func (recv *Receiver) Receive(wm mf.Mention) {
@@ -62,16 +62,16 @@ func (recv *Receiver) processSourceBody(body string, wm mf.Mention) {
 
 	data := microformats.Parse(strings.NewReader(body), wm.SourceUrl())
 	indieweb := recv.convertBodyToIndiewebData(body, wm, data)
-	recv.processAuthorPicture(indieweb)
+	recv.ProcessAuthorPicture(indieweb)
 
 	if recv.Conf.IsWhitelisted(wm.Source) {
-		recv.processWhitelistedMention(wm, indieweb)
+		recv.ProcessWhitelistedMention(wm, indieweb)
 	} else {
-		recv.processMentionInModeration(wm, indieweb)
+		recv.ProcessMentionInModeration(wm, indieweb)
 	}
 }
 
-func (recv *Receiver) processMentionInModeration(wm mf.Mention, indieweb *mf.IndiewebData) {
+func (recv *Receiver) ProcessMentionInModeration(wm mf.Mention, indieweb *mf.IndiewebData) {
 	key, err := recv.Repo.InModeration(wm, indieweb)
 	if err != nil {
 		log.Error().Err(err).Stringer("wm", wm).Msg("Failed to save new mention to in moderation db")
@@ -83,7 +83,7 @@ func (recv *Receiver) processMentionInModeration(wm mf.Mention, indieweb *mf.Ind
 	log.Info().Str("key", key).Msg("OK: Webmention processed, in moderation.")
 }
 
-func (recv *Receiver) processWhitelistedMention(wm mf.Mention, indieweb *mf.IndiewebData) {
+func (recv *Receiver) ProcessWhitelistedMention(wm mf.Mention, indieweb *mf.IndiewebData) {
 	key, err := recv.Repo.Save(wm, indieweb)
 	if err != nil {
 		log.Error().Err(err).Stringer("wm", wm).Msg("Failed to save new mention to db")
@@ -95,7 +95,7 @@ func (recv *Receiver) processWhitelistedMention(wm mf.Mention, indieweb *mf.Indi
 	log.Info().Str("key", key).Msg("OK: Webmention processed, in whitelist.")
 }
 
-func (recv *Receiver) processAuthorPicture(indieweb *mf.IndiewebData) {
+func (recv *Receiver) ProcessAuthorPicture(indieweb *mf.IndiewebData) {
 	if indieweb.Author.Picture != "" {
 		err := recv.saveAuthorPictureLocally(indieweb)
 		if err != nil {
@@ -153,7 +153,7 @@ func (recv *Receiver) parseBodyAsNonIndiewebSite(body string, wm mf.Mention) *mf
 // saveAuthorPictureLocally tries to download the author picture and checks if it's valid based on img header.
 // If it succeeds, it alters the picture path to a local /pictures/x one.
 // If it fails, it returns an error.
-// This refuses to download from silo sources such as brid.gy because of privacy concerns.
+// If strict is true, this refuses to download from silo sources such as brid.gy because of privacy concerns.
 func (recv *Receiver) saveAuthorPictureLocally(indieweb *mf.IndiewebData) error {
 	srcDomain := rest.Domain(indieweb.Source)
 	if common.Includes(rest.SiloDomains, srcDomain) {

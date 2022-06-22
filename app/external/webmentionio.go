@@ -106,17 +106,18 @@ func convert(wmio WebmentionIOMention) *mf.IndiewebData {
 }
 
 func nameOf(wmio WebmentionIOMention, iType mf.MfType) string {
-	if iType == mf.TypeReply {
+	if (iType == mf.TypeReply || iType == mf.TypeLike) && wmio.Data.Name == "" {
 		return wmio.Data.Content
 	}
 	return wmio.Data.Name
 }
 
 func contentOf(wmio WebmentionIOMention, iType mf.MfType) string {
-	if iType == mf.TypeReply {
-		return wmio.Activity.Sentence
+	content := wmio.Data.Content
+	if iType == mf.TypeReply || (iType == mf.TypeLike && content == "") {
+		content = wmio.Activity.Sentence
 	}
-	return wmio.Data.Content
+	return common.Shorten(content)
 }
 
 // typeOf returns the mf.MfType from a wmio mention.

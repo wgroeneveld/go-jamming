@@ -100,13 +100,6 @@ func PublishedNow() string {
 	return common.Now().UTC().Format(DateFormatWithTimeZone)
 }
 
-func shorten(txt string) string {
-	if len(txt) <= 250 {
-		return txt
-	}
-	return txt[:250] + "..."
-}
-
 // Go stuff: entry.Properties["name"][0].(string),
 // JS stuff: hEntry.properties?.name?.[0]
 // The problem: convoluted syntax and no optional chaining!
@@ -273,12 +266,12 @@ func Url(hEntry *microformats.Microformat, source string) string {
 func Content(hEntry *microformats.Microformat) string {
 	bridgyTwitterContent := Str(hEntry, "bridgy-twitter-content")
 	if bridgyTwitterContent != "" {
-		return shorten(bridgyTwitterContent)
+		return common.Shorten(bridgyTwitterContent)
 	}
 	summary := Str(hEntry, "summary")
 	if summary != "" {
-		return shorten(summary)
+		return common.Shorten(summary)
 	}
 	contentEntry := Map(hEntry, "content")["value"]
-	return shorten(contentEntry)
+	return common.Shorten(contentEntry)
 }
