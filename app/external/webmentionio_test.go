@@ -7,6 +7,54 @@ import (
 	"time"
 )
 
+func TestTryImportName(t *testing.T) {
+	wmio := &WebmentionIOImporter{}
+	cases := []struct {
+		label        string
+		mention      string
+		expectedDate string
+	}{
+		{
+			"Just use name",
+			`{ "links": [ { "data": { "name": "jefke"  }  } ] }`,
+			"jefke",
+		},
+		{
+			"Trim name if longer than 250 chars",
+			`{ "links": [ { "data": { "name": "a;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfj"  }  } ] }`,
+			"a;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;askdfj;alskdfja;dslfkja;dlfkja;ldkfja;ldkfjla;dkfja;ldkjfa;ldkjfl;...",
+		},
+		{
+			"Use content if name is empty in case of reply",
+			`{ "links": [ { "activity": { "type": "reply" }, "data": { "name": "", "content": "wouter"  }  } ] }`,
+			"wouter",
+		},
+		{
+			"Use content if name is empty in case of like",
+			`{ "links": [ { "activity": { "type": "like" }, "data": { "name": "", "content": "wouter"  }  } ] }`,
+			"wouter",
+		},
+		{
+			"Use name if name is not empty in case of reply",
+			`{ "links": [ { "activity": { "type": "reply" }, "data": { "name": "jef", "content": "wouter"  }  } ] }`,
+			"jef",
+		}, {
+			"Use name if name is not empty in case of like",
+			`{ "links": [ { "activity": { "type": "like" }, "data": { "name": "jef", "content": "wouter"  }  } ] }`,
+			"jef",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.label, func(t *testing.T) {
+			res, err := wmio.TryImport([]byte(tc.mention))
+			assert.NoError(t, err)
+
+			assert.Equal(t, tc.expectedDate, res[0].Name)
+		})
+	}
+}
+
 func TestTryImportBridgyUrl(t *testing.T) {
 	wmio := &WebmentionIOImporter{}
 	cases := []struct {

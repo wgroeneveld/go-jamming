@@ -118,10 +118,11 @@ func sourceOf(wmio WebmentionIOMention) string {
 }
 
 func nameOf(wmio WebmentionIOMention, iType mf.MfType) string {
+	name := wmio.Data.Name
 	if (iType == mf.TypeReply || iType == mf.TypeLike) && wmio.Data.Name == "" {
-		return wmio.Data.Content
+		name = wmio.Data.Content
 	}
-	return wmio.Data.Name
+	return common.Shorten(name)
 }
 
 func contentOf(wmio WebmentionIOMention, iType mf.MfType) string {
