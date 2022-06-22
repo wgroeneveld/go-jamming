@@ -238,6 +238,8 @@ func DetermineAuthorName(hEntry *microformats.Microformat) string {
 type MfType string
 
 const (
+	TypeLink     MfType = "link"
+	TypeReply    MfType = "reply"
 	TypeLike     MfType = "like"
 	TypeBookmark MfType = "bookmark"
 	TypeMention  MfType = "mention"

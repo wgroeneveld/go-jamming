@@ -1,6 +1,7 @@
 package main
 
 import (
+	"brainbaking.com/go-jamming/app/external"
 	"brainbaking.com/go-jamming/common"
 	"brainbaking.com/go-jamming/db"
 	"flag"
@@ -18,12 +19,14 @@ func main() {
 	verboseFlag := flag.Bool("verbose", false, "Verbose mode (pretty print log, debug level)")
 	migrateFlag := flag.Bool("migrate", false, "Run migration scripts for the DB and exit.")
 	blacklist := flag.String("blacklist", "", "Blacklist a domain name (also cleans spam from DB)")
+	importFile := flag.String("import", "", "Import mentions from an external source (i.e. webmention.io)")
 	flag.Parse()
 	blacklisting := len(*blacklist) > 1
+	importing := len(*importFile) > 1
 
 	// logs by default to Stderr (/var/log/syslog). Rolling files possible via lumberjack.
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	if *verboseFlag || *migrateFlag || blacklisting {
+	if *verboseFlag || *migrateFlag || blacklisting || importing {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
@@ -35,6 +38,11 @@ func main() {
 
 	if blacklisting {
 		blacklistDomain(*blacklist)
+		os.Exit(0)
+	}
+
+	if importing {
+		external.Import(*importFile)
 		os.Exit(0)
 	}
 

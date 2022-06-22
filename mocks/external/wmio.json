@@ -1,0 +1,636 @@
+{
+    "links": [
+        {
+            "source": "https://chrisburnell.com/note/1655219889/",
+            "verified": true,
+            "verified_date": "2022-06-14T18:28:55+00:00",
+            "id": 1416849,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Chris Burnell",
+                    "url": "https://chrisburnell.com/",
+                    "photo": "https://webmention.io/avatar/chrisburnell.com/ace41559b8d4e8d8189b285d88b1ea2dc6c53056fc512be7d199c0c8cadc53fe.jpg"
+                },
+                "url": "https://chrisburnell.com/note/1655219889/",
+                "name": null,
+                "content": "<p>Given a couple of assumptions about how the data is returned from the server, this change allows you to use different Webmention servers, hopefully lessening the <q>inherent</q></p>\n<p>This change does mean that there are now two more <strong>required</strong> fields that need to be passed to the plugin when invoking it in your <code>.eleventy.js</code> file with <code>addPlugin()</code>:</p>\n<pre><code><span>const</span> pluginWebmentions <span>=</span> <span>require</span><span>(</span><span>\"@chrisburnell/eleventy-cache-webmentions\"</span><span>)</span><br /><br />module<span>.</span><span>exports</span> <span>=</span> <span>function</span><span>(</span><span>eleventyConfig</span><span>)</span> <span>{</span><br />    eleventyConfig<span>.</span><span>addPlugin</span><span>(</span>pluginWebmentions<span>,</span> <span>{</span><br /><span>// these 3 fields are all required!</span><br /><span>domain</span><span>:</span> <span>\"https://example.com\"</span><span>,</span><br /><span>feed</span><span>:</span> <span>\"https://webmention.io/api/mentions.jf2?domain=example.com&amp;token=${process.env.WEBMENTION_IO_TOKEN}&amp;per-page=9001\"</span><span>,</span><br /><span>key</span><span>:</span> <span>\"children\"</span><br /><span>}</span><span>)</span><br /><span>}</span></code></pre>\n<p>The above example, which I’m hoping is simple to update in existing configs, outlines how to use the plugin with <a href=\"https://webmention.io\">Webmention.io</a>.</p>",
+                "published": "2022-06-14T16:18:09+01:00",
+                "published_ts": 1655219889
+            },
+            "activity": {
+                "type": "reply",
+                "sentence": "Chris Burnell commented 'Given a couple of assumptions about how the data is returned from the server, th...' on a post https://chrisburnell.com/eleventy-cache-webmentions/",
+                "sentence_html": "<a href=\"https://chrisburnell.com/\">Chris Burnell</a> commented 'Given a couple of assumptions about how the data is returned from the server, th...' on a post <a href=\"https://chrisburnell.com/eleventy-cache-webmentions/\">https://chrisburnell.com/eleventy-cache-webmentions/</a>"
+            },
+            "rels": {
+                "canonical": "https://chrisburnell.com/note/1655219889/"
+            },
+            "target": "https://chrisburnell.com/eleventy-cache-webmentions/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/252048752",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:16+00:00",
+            "id": 1412862,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Felipe Sere",
+                    "url": "https://twitter.com/felipesere",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/ca88219f9ffb14d73bfb2bf88450cadb355bdaf56773947f39c752af3883fecf.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-252048752",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Felipe Sere favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/felipesere\">Felipe Sere</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/36324447",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:15+00:00",
+            "id": 1412860,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Brian Milne",
+                    "url": "https://twitter.com/BrianDMilne",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/838e9248b675037b510b5ba6e0020933fd47cf5350ae6793a291767f77ccef6a.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-36324447",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Brian Milne favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/BrianDMilne\">Brian Milne</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/685233",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:16+00:00",
+            "id": 1412861,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Jeff Byrnes 🚰",
+                    "url": "https://twitter.com/thejeffbyrnes",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/001c536d4ffe238ac976935b137b07e4df50a12abe6e99b1233207a9beb52c23.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-685233",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Jeff Byrnes 🚰 favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/thejeffbyrnes\">Jeff Byrnes 🚰</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/17018537",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:14+00:00",
+            "id": 1412858,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "tanangular",
+                    "url": "https://twitter.com/cooldezign",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/99eaf005a189df113a75c71a394d9709ec60f0fa2964112a886c52a3cbf7953b.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-17018537",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "tanangular favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/cooldezign\">tanangular</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/85053418",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:15+00:00",
+            "id": 1412859,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "JamCow",
+                    "url": "https://twitter.com/jamcow",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/dace09fd6486df0064057e6ee4d8b06a23728f8e50e5c68b2edff3f0a1c1ba9b.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-85053418",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "JamCow favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/jamcow\">JamCow</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/889737980",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:13+00:00",
+            "id": 1412856,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Mike Riethmuller",
+                    "url": "https://twitter.com/MikeRiethmuller",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/e26c69ef63c66748a1153598f78141b5648a4dc186888369f368f00ab780708b.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-889737980",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Mike Riethmuller favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/MikeRiethmuller\">Mike Riethmuller</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/347785341",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:14+00:00",
+            "id": 1412857,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "image enthusiast | #GenocideOfUkrainians 🌻",
+                    "url": "https://twitter.com/sasvstheworld",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/720151d67e3b75b74fbc9f646c0bb8c5fcb64582bbbfd9aba853c1c1bd049445.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-347785341",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "image enthusiast | #GenocideOfUkrainians 🌻 favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/sasvstheworld\">image enthusiast | #GenocideOfUkrainians 🌻</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/8252062",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:13+00:00",
+            "id": 1412855,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Jennifer Ecker",
+                    "url": "https://twitter.com/drjecker",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/38bb76840d26f4e5b4b091363fdc62c0bb5dbf48c3dbba526b33a5a513545eae.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-8252062",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Jennifer Ecker favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/drjecker\">Jennifer Ecker</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/28527216",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:11+00:00",
+            "id": 1412853,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Bill Rafferty",
+                    "url": "https://twitter.com/bulltwitting",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/cf46db3d996381b6a2f977d7106507f9f7375e1964243f4192b16ddf856a3806.png"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-28527216",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Bill Rafferty favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/bulltwitting\">Bill Rafferty</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/432888518",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:12+00:00",
+            "id": 1412854,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Ryan Mulligan",
+                    "url": "https://twitter.com/hexagoncircle",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/83ecdd1f7b2d6a7a90e86802aa1ae6c2e0d2819b83db984892f9c0be96584092.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-432888518",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Ryan Mulligan favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/hexagoncircle\">Ryan Mulligan</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/205775928",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:10+00:00",
+            "id": 1412852,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Michelle Barker",
+                    "url": "https://twitter.com/MicheBarks",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/46365cd70695ca723991011a6c5a8058ec0108b4b9b31244511b9dff925663c2.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-205775928",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Michelle Barker favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/MicheBarks\">Michelle Barker</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/1319278286",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:07+00:00",
+            "id": 1412851,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Stephen Margheim",
+                    "url": "https://twitter.com/fractaledmind",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/39c01731bd41a8acfdf8755cee4a23396783673c37a39499079479d1891b507e.png"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-1319278286",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Stephen Margheim favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/fractaledmind\">Stephen Margheim</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/1007024772209758213",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:06+00:00",
+            "id": 1412849,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Jack Howells",
+                    "url": "https://twitter.com/jhwlls",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/4874f2eea87d1ee675c7a5589f039fbca97561b3dbed1892dfaaac8b25bcea15.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-1007024772209758213",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Jack Howells favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/jhwlls\">Jack Howells</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/17061996",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:06+00:00",
+            "id": 1412850,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "maarten brouwers 🇺🇳 / murb@todon.nl",
+                    "url": "https://twitter.com/murb",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/d9a3ef93825ec75804176ca9b05522d87e66618f994515cf9122565c05fef1b1.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-17061996",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "maarten brouwers 🇺🇳 / murb@todon.nl favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/murb\">maarten brouwers 🇺🇳 / murb@todon.nl</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/2260815740",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:05+00:00",
+            "id": 1412847,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Jake",
+                    "url": "https://twitter.com/JakeDChampion",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/55452fdbb1b010495f28472fab8127f5c5d5ed7aa4f83162020af3774bb163a8.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-2260815740",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Jake favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/JakeDChampion\">Jake</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/98734097",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:05+00:00",
+            "id": 1412848,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Andy Bell",
+                    "url": "https://twitter.com/hankchizljaw",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/ad7c495b44c43890f231501fcbe4be1c6497c47db16ed3f60a26c9ff440c38af.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-98734097",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Andy Bell favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/hankchizljaw\">Andy Bell</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/15608209",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:04+00:00",
+            "id": 1412846,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Christopher Adams",
+                    "url": "https://twitter.com/koitaki",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/b9ad3e0e7eb4163ba9fb3e79e8a41d3766556e89b2dbb88a392884995718cebf.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-15608209",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Christopher Adams favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/koitaki\">Christopher Adams</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/44765646",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:04+00:00",
+            "id": 1412845,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Jason Lee Cooksey",
+                    "url": "https://twitter.com/jasonleecooksey",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/dbe7a6f4c8e71103c6e541c2c2e779ff92ca040b890e45e127d851e70cee0cf0.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-44765646",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Jason Lee Cooksey favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/jasonleecooksey\">Jason Lee Cooksey</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://brid.gy/like/twitter/iamchrisburnell/1298550501307486208/1241894042557972480",
+            "verified": true,
+            "verified_date": "2022-06-10T08:20:02+00:00",
+            "id": 1412844,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Matt DeCamp",
+                    "url": "https://twitter.com/mpdecamp",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/019a87e85b2d4b3f228b07b12cf1b0c1d278b36af31cc8edf9fee9e1dccf1b8f.jpg"
+                },
+                "url": "https://twitter.com/iamchrisburnell/status/1298550501307486208#favorited-by-1241894042557972480",
+                "name": null,
+                "content": null,
+                "published": null,
+                "published_ts": null
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Matt DeCamp favorited a tweet https://chrisburnell.com/bowhead/",
+                "sentence_html": "<a href=\"https://twitter.com/mpdecamp\">Matt DeCamp</a> favorited a tweet <a href=\"https://chrisburnell.com/bowhead/\">https://chrisburnell.com/bowhead/</a>"
+            },
+            "target": "https://chrisburnell.com/bowhead/"
+        },
+        {
+            "source": "https://jacky.wtf/2022/5/BRQo",
+            "verified": true,
+            "verified_date": "2022-05-25T14:28:10+00:00",
+            "id": 1404286,
+            "private": false,
+            "data": {
+                "url": "https://jacky.wtf/2022/5/BRQo",
+                "name": null,
+                "content": null,
+                "published": "2022-05-25T14:26:12+00:00",
+                "published_ts": 1653488772
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "https://jacky.wtf/2022/5/BRQo liked a post https://chrisburnell.com/article/changing-with-the-times/",
+                "sentence_html": "<a href=\"https://jacky.wtf/2022/5/BRQo\">someone</a> liked a post <a href=\"https://chrisburnell.com/article/changing-with-the-times/\">https://chrisburnell.com/article/changing-with-the-times/</a>"
+            },
+            "target": "https://chrisburnell.com/article/changing-with-the-times/"
+        },
+        {
+            "source": "https://chrisburnell.com/note/1652693080/",
+            "verified": true,
+            "verified_date": "2022-05-16T19:36:52+00:00",
+            "id": 1399408,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Chris Burnell",
+                    "url": "https://chrisburnell.com/",
+                    "photo": "https://webmention.io/avatar/chrisburnell.com/ace41559b8d4e8d8189b285d88b1ea2dc6c53056fc512be7d199c0c8cadc53fe.jpg"
+                },
+                "url": "https://chrisburnell.com/note/1652693080/",
+                "name": null,
+                "content": "<p>first!!1!</p>",
+                "published": "2022-05-16T09:24:40+01:00",
+                "published_ts": 1652689480
+            },
+            "activity": {
+                "type": "reply",
+                "sentence": "Chris Burnell commented 'first!!1!' on a post https://chrisburnell.com/guestbook/",
+                "sentence_html": "<a href=\"https://chrisburnell.com/\">Chris Burnell</a> commented 'first!!1!' on a post <a href=\"https://chrisburnell.com/guestbook/\">https://chrisburnell.com/guestbook/</a>"
+            },
+            "rels": {
+                "canonical": "https://chrisburnell.com/note/1652693080/"
+            },
+            "target": "https://chrisburnell.com/guestbook/"
+        },
+        {
+            "source": "https://chrisburnell.com/note/1652634000/",
+            "verified": true,
+            "verified_date": "2022-05-15T18:32:00+00:00",
+            "id": 1398942,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Chris Burnell",
+                    "url": "https://chrisburnell.com/",
+                    "photo": "https://webmention.io/avatar/chrisburnell.com/ace41559b8d4e8d8189b285d88b1ea2dc6c53056fc512be7d199c0c8cadc53fe.jpg"
+                },
+                "url": "https://chrisburnell.com/note/1652634000/",
+                "name": null,
+                "content": "<p>Happy to say the sparklines are going well—pushed an update yesterday, in fact, to allow them to inherit the color of wherever they are in the DOM for the colour of the line itself.</p>\n<p>Still working on posting a bit more! 😅</p>",
+                "published": "2022-05-15T18:00:00+01:00",
+                "published_ts": 1652634000
+            },
+            "activity": {
+                "type": "reply",
+                "sentence": "Chris Burnell commented 'Happy to say the sparklines are going well—pushed an update yesterday, in fact, ...' on a post https://chrisburnell.com/note/1526371395/",
+                "sentence_html": "<a href=\"https://chrisburnell.com/\">Chris Burnell</a> commented 'Happy to say the sparklines are going well—pushed an update yesterday, in fact, ...' on a post <a href=\"https://chrisburnell.com/note/1526371395/\">https://chrisburnell.com/note/1526371395/</a>"
+            },
+            "rels": {
+                "canonical": "https://chrisburnell.com/note/1652634000/"
+            },
+            "target": "https://chrisburnell.com/note/1526371395/"
+        },
+        {
+            "source": "https://martymcgui.re/2022/05/15/004058/",
+            "verified": true,
+            "verified_date": "2022-05-15T04:42:32+00:00",
+            "id": 1398724,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Marty McGuire",
+                    "url": "https://martymcgui.re/",
+                    "photo": "https://webmention.io/avatar/martymcgui.re/f750b9918a92f3dc86d15d8fefad4a06c20a829ae950e18dfc2c8b9a4b26b422.jpg"
+                },
+                "url": "https://martymcgui.re/2022/05/15/004058/",
+                "name": null,
+                "content": null,
+                "published": "2022-05-15T00:40:58-04:00",
+                "published_ts": 1652589658
+            },
+            "activity": {
+                "type": "like",
+                "sentence": "Marty McGuire liked a post https://chrisburnell.com/article/changing-with-the-times/",
+                "sentence_html": "<a href=\"https://martymcgui.re/\">Marty McGuire</a> liked a post <a href=\"https://chrisburnell.com/article/changing-with-the-times/\">https://chrisburnell.com/article/changing-with-the-times/</a>"
+            },
+            "rels": {
+                "canonical": "https://martymcgui.re/2022/05/15/004058/"
+            },
+            "target": "https://chrisburnell.com/article/changing-with-the-times/"
+        },
+        {
+            "source": "https://brid.gy/post/twitter/iamchrisburnell/1524869209804660750",
+            "verified": true,
+            "verified_date": "2022-05-13T00:36:53+00:00",
+            "id": 1397468,
+            "private": false,
+            "data": {
+                "author": {
+                    "name": "Adactio Links",
+                    "url": "https://twitter.com/adactioLinks",
+                    "photo": "https://webmention.io/avatar/pbs.twimg.com/8e0a805eae6791b05c23541931a123a5446393bb9929fcdd274f7e5c33d7792f.jpeg"
+                },
+                "url": "https://twitter.com/adactioLinks/status/1524869209804660750",
+                "name": null,
+                "content": "Changing with the times · Chris Burnell <a href=\"https://chrisburnell.com/article/changing-with-the-times/\">chrisburnell.com/article/changi…</a>",
+                "published": "2022-05-12T21:48:44+00:00",
+                "published_ts": 1652392124
+            },
+            "activity": {
+                "type": "link",
+                "sentence": "Adactio Links posted 'Changing with the times · Chris Burnell chrisburnell.com/article/changi…' linking to https://chrisburnell.com/article/changing-with-the-times/",
+                "sentence_html": "<a href=\"https://twitter.com/adactioLinks\">Adactio Links</a> posted 'Changing with the times · Chris Burnell chrisburnell.com/article/changi…' linking to <a href=\"https://chrisburnell.com/article/changing-with-the-times/\">https://chrisburnell.com/article/changing-with-the-times/</a>"
+            },
+            "target": "https://chrisburnell.com/article/changing-with-the-times/"
+        }
+    ]
+}
