@@ -145,7 +145,7 @@ func TestReceive(t *testing.T) {
 			json: `{"author":{"name":"Jamie Tanna","picture":"/pictures/brainbaking.com"},"name":"","content":"Recommended read:\nThe IndieWeb Mixed Bag - Thoughts about the (d)evolution of blog interactions\nhttps://brainbaking.com/post/2021/03/the-indieweb-mixed-bag/","published":"2021-03-15T12:42:00+00:00","url":"https://brainbaking.com/mf2/2021/03/1bkre/","type":"bookmark","source":"https://brainbaking.com/valid-bridgy-twitter-source.html","target":"https://brainbaking.com/post/2021/03/the-indieweb-mixed-bag"}`,
 		},
 		{
-			label: "receive a brid.gy Webmention like",
+			label: "receive a brid.gy (Mastodon) Webmention like",
 			wm: mf.Mention{
 				Source: "https://brainbaking.com/valid-bridgy-like.html",
 				// wrapped in a a class="u-like-of" tag
@@ -155,7 +155,17 @@ func TestReceive(t *testing.T) {
 			json: `{"author":{"name":"Stampeding Longhorn","picture":"/pictures/brainbaking.com"},"name":"","content":"","published":"2020-01-01T12:30:00+00:00","url":"https://chat.brainbaking.com/notice/A4nx1rFwKUJYSe4TqK#favorited-by-A4nwg4LYyh4WgrJOXg","type":"like","source":"https://brainbaking.com/valid-bridgy-like.html","target":"https://brainbaking.com/valid-indieweb-target.html"}`,
 		},
 		{
-			label: "receive a brid.gy Webmention that has a url and photo without value",
+			label: "receive a brid.gy (Twitter) Webmention repost",
+			wm: mf.Mention{
+				Source: "https://brainbaking.com/valid-bridgy-twitter-repost.html",
+				// wrapped in a a class="u-like-of" tag
+				Target: "https://brainbaking.com/valid-indieweb-target.html",
+			},
+			// no dates in bridgy-to-mastodon likes...
+			json: `{"author":{"name":"cartocalypse.tif","picture":"/pictures/brainbaking.com"},"name":"My quest in creating a Google Maps clone\n\n            chringel.dev/2022/06/creati…","content":"My quest in creating a Google Maps clone\n\n            chringel.dev/2022/06/creati…","published":"2022-06-21T06:23:53+00:00","url":"https://twitter.com/cartocalypse/status/1539131976879308800","type":"repost","source":"https://brainbaking.com/valid-bridgy-twitter-repost.html","target":"https://brainbaking.com/valid-indieweb-target.html"}`,
+		},
+		{
+			label: "receive a brid.gy (Mastodon) Webmention that has a url and photo without value",
 			wm: mf.Mention{
 				Source: "https://brainbaking.com/valid-bridgy-source.html",
 				Target: "https://brainbaking.com/valid-indieweb-target.html",
@@ -201,6 +211,7 @@ func TestReceive(t *testing.T) {
 				RestClient: &mocks.RestClientMock{
 					GetBodyFunc: mocks.RelPathGetBodyFunc("../../../mocks/"),
 				},
+				Notifier: &notifier.StringNotifier{},
 			}
 
 			receiver.Receive(tc.wm)

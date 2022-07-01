@@ -233,19 +233,24 @@ type MfType string
 const (
 	TypeLink     MfType = "link"
 	TypeReply    MfType = "reply"
+	TypeRepost   MfType = "repost"
 	TypeLike     MfType = "like"
 	TypeBookmark MfType = "bookmark"
 	TypeMention  MfType = "mention"
 )
 
 func Type(hEntry *microformats.Microformat) MfType {
-	likeOf := Str(hEntry, "like-of")
-	if likeOf != "" {
+	hType := Str(hEntry, "like-of")
+	if hType != "" {
 		return TypeLike
 	}
-	bookmarkOf := Str(hEntry, "bookmark-of")
-	if bookmarkOf != "" {
+	hType = Str(hEntry, "bookmark-of")
+	if hType != "" {
 		return TypeBookmark
+	}
+	hType = Str(hEntry, "repost-of")
+	if hType != "" {
+		return TypeRepost
 	}
 	return TypeMention
 }
