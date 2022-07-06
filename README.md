@@ -1,3 +1,8 @@
+⚠️⚠️ **PLEASE READ** ⚠️⚠️: this is an ARCHIVED version. Please go to https://git.brainbaking.com/wgroeneveld/go-jamming for the most recent source code version and releases. Leave GitHub: https://giveupgithub.org/
+
+---
+
+
 # go-jammin' 🥞
 
 Go module `brainbaking.com/go-jamming`:
